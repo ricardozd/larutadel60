@@ -59,6 +59,8 @@ A route matches when all of these hold:
 
 Among the matches, a route that lists `races` beats one that doesn't. Ties are broken by the lowest `minLevel`, then by the `id` sorted alphabetically. Saved progress wins over selection as long as its route still exists and still matches faction and race. Level is not checked here, so a player who outlevels a route keeps it until they switch.
 
+The selected route is saved as progress as soon as it is chosen.
+
 ### 3.2 Step completion
 
 | Type | Completes when | Auto-skipped on catch-up when |
@@ -72,6 +74,14 @@ Among the matches, a route that lists `races` beats one that doesn't. Ties are b
 On every step change, and at login, the engine keeps advancing while the current step is auto-skippable. That way a quest done out of order is skipped, and the player never stays stuck on a step that is already satisfied. **Skip** advances one step. **Back** goes back one step and is never auto-skipped right after. When the last step of a route is completed, the engine switches to `next` (step 1). With no `next`, the window shows the "route complete" text.
 
 `QUEST_ACCEPTED` carries the quest ID in its last argument in every client version, so the engine reads the last argument.
+
+Edge cases:
+- Back on step 1 does nothing.
+- Skip on the last step behaves like completing it: it chains to `next`, or shows route complete.
+- On the route-complete screen only Back is shown, and it returns to the last step.
+- Skip, like every step change, is followed by catch-up.
+
+Timing: engine reactions are synchronous. By the end of the `PLAYER_LOGIN` handler the window shows the selected route and step. `QUEST_ACCEPTED`, `QUEST_TURNED_IN` and `QUEST_LOG_UPDATE` update the window within the same event handler. Time-based checks (goto distance, arrow) run at least every 0.2 s.
 
 ### 3.3 Step window
 
@@ -98,6 +108,15 @@ Step texts. `<title>` = `C_QuestLog.GetTitleForQuestID(questId)`. If the title i
 
 Buttons: `Back` / `Atrás`, `Done` / `Hecho`, `Skip` / `Saltar`. The x and y in `goto` use one decimal place.
 
+Line contract:
+- Each step line shows exactly the table text, with no prefix or numbering. Highlighting may only use color or texture escapes.
+- Lines are font strings created top to bottom (current first), or a single multi-line font string.
+- The current step is followed by the next 2 steps, or fewer near the end of the route.
+- The title shows exactly the route name.
+- Coordinates use `.` as the decimal separator in every locale.
+- The fallback title is `Quest #<id>` (enUS) and `Misión #<id>` (esES).
+- Timing: see §3.2 (synchronous reactions; time-based checks at least every 0.2 s).
+
 ### 3.4 Arrow
 
 - **When shown:** the current step has `coords`, and the player's world position and facing are known. They are unknown (nil) in instances.
@@ -105,6 +124,7 @@ Buttons: `Back` / `Atrás`, `Done` / `Hecho`, `Skip` / `Saltar`. The x and y in 
 - **Rotation:** `SetRotation(bearing - facing)` (radians, counterclockwise, 0 = north), so it points straight up when the target is in front of the player.
 - **Label:** `<n> yd`, rounded to an integer.
 - **Updates:** every 0.1 s while shown.
+- **Visibility:** re-evaluated at least every 0.2 s, also while hidden, independent of zone events. The label is `<n> yd` in every locale.
 
 ### 3.5 Commands (chat prefix `La Ruta del 60: `)
 
@@ -117,6 +137,11 @@ Buttons: `Back` / `Atrás`, `Done` / `Hecho`, `Skip` / `Saltar`. The x and y in 
 | `/ruta reset` / `/ruta reiniciar` | back to step 1 of the current route, then catch-up | `Route restarted.` | `Ruta reiniciada.` |
 | `/ruta show` / `/ruta mostrar` | shows the window | none | none |
 | `/ruta hide` / `/ruta ocultar` | hides the window | none | none |
+
+- Every chat line starts with `La Ruta del 60: `. `/ruta list` prints one such line per route, in any order.
+- `/ruta list` shows routes matching faction, race and class; level is ignored.
+- `/ruta <id>` accepts only ids that `/ruta list` would show. It switches to step 1 and then runs catch-up. Any other id prints `Unknown route: <id>` and changes nothing.
+- Both aliases of each subcommand work in every locale.
 
 ## 4. Client emulation extension (`tests/support/`, additive)
 
@@ -169,9 +194,11 @@ Workflow for this extension:
 - An Undead level 13 character with no saved progress gets the Silverpine route.
 - An Orc character sees the "no route" text.
 - An Alliance character sees the "no route" text.
+- Saved progress on a route that exists but no longer matches the race or faction is replaced by a new selection.
 
 **Steps:**
 - The first step text matches the table, including the fallback title and its refresh after `QUEST_DATA_LOAD_RESULT`.
+- The fallback title is `Misión #<id>` on esES.
 
 **Advance:**
 - accept, complete, turnin and goto each advance through the client actions.
@@ -179,10 +206,13 @@ Workflow for this extension:
 - The manual types advance on **Done**.
 - **Done** is not shown for automatic types.
 - **Skip** and **Back** work.
+- `QUEST_ACCEPTED` with two arguments (quest ID last) advances the accept step.
+- **Back** on step 1 does nothing.
 
 **Catch-up:**
 - With quests already in the log or completed, login lands on the first step that is not satisfied.
 - **Back** onto a satisfied step stays there.
+- **Skip** onto a satisfied step auto-skips it.
 
 **Persistence:**
 - After `client.reload()` the same step is shown.
@@ -191,6 +221,8 @@ Workflow for this extension:
 **Chaining:**
 - Finishing Tirisfal shows the Silverpine route at step 1, after catch-up.
 - Finishing the last route shows "route complete".
+- **Skip** on the last step chains to `next`, or shows "route complete" when there is no `next`.
+- On "route complete" only **Back** is shown among the buttons, and it returns to the last step.
 
 **Arrow:**
 - Shown, with the distance label, when the target is on the same continent.
@@ -200,6 +232,9 @@ Workflow for this extension:
 **Commands:**
 - Each row of §3.5 in both locales, and plain `/ruta` unchanged.
 - `/ruta hide` / `/ruta show` toggle the window's visibility.
+- `/ruta list` ignores level: at level 1 it lists both Undead routes.
+- `/ruta <id>` runs catch-up after switching.
+- `/ruta <id>` with an existing id that does not match the character prints `Unknown route: <id>` and changes nothing.
 
 **Hygiene:**
 - No new globals after login, routes, actions and reload.

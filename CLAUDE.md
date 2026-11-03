@@ -1,61 +1,61 @@
 # La Ruta del 60
 
-Addon gratuito para **WoW Forever** (Classic+ oficial, cliente 1.60.1, `## Interface: 16001`) que guía a cualquier personaje de 1 a 60 por la ruta más rápida. Se desarrolla 100% con IA en macOS y se juega en Windows.
+Free addon for **WoW Forever** (official Classic+, client 1.60.1, `## Interface: 16001`) that guides any character from level 1 to 60 along the fastest route. It is developed 100% with AI on macOS and played on Windows.
 
-## Reglas
-- **Idioma:** el código va SIEMPRE en inglés (identificadores, comentarios, strings, mensajes de CLI, nombres de tests y commits). Las explicaciones van SIEMPRE en castellano (chat, specs, planes, este archivo, agentes y skills). Los textos al jugador se localizan en enUS y esES.
-- **Tests de aceptación primero:** antes de escribir código de una funcionalidad hay tests de caja negra derivados de su spec, commiteados en rojo. `tests/acceptance/`, `tests/support/` y `tools/tests/acceptance/` están **congelados**: se ponen en verde sin modificarlos. Si un test parece mal, PARA y pregunta al usuario.
-  - El congelado se hace cumplir con el tag `acceptance-frozen`: `tools/check.sh` (y el CI) falla si algo modificado, borrado o renombrado respecto al tag cambia bajo esas rutas, tanto en el working tree como en commits. Añadir tests nuevos está permitido.
-  - Una funcionalidad nueva añade tests de aceptación NUEVOS; tras commitearlos en rojo se mueve el tag (`git tag -f acceptance-frozen`), solo con aprobación del usuario.
-  - El push debe incluir los tags (`git push --follow-tags` o `git push origin acceptance-frozen`; si se movió, `--force` sobre ese tag con aprobación del usuario).
-- **API:** Forever usa la API moderna de retail 12.x sobre Lua 5.1, no la de Classic Era. Antes de usar cualquier API de WoW: skill `wow-forever-api` / agente `wow-api-expert`. Lo verificado está en `docs/api/forever-api.md`.
-- **Lua 5.1:** sin `goto`, `//`, operadores de bits nativos, `<const>`.
-- **Sin globals:** todo en `ns` (`local ADDON_NAME, ns = ...`). Solo se permiten `LaRutaDel60DB`, `SLASH_LARUTADEL601` y `SlashCmdList.LARUTADEL60`.
-- **Rutas = datos:** `data/routes/**/*.json` (skill `guide-format`). `addon/LaRutaDel60/Guides/` es GENERADO: nunca se edita a mano.
-- **TOC:** `LaRutaDel60.toc` y `LaRutaDel60_Forever.toc` siempre idénticos.
-- **Textos al jugador:** siempre vía `ns.L`, con clave en `Locales/enUS.lua` y `Locales/esES.lua`.
-- **Original:** no se copia código ni guías de RestedXP u otros addons.
-- Commits pequeños con Conventional Commits. No se hace push sin que el usuario lo pida.
+## Rules
+- **Language:** Everything committed to the repo is in English: code, comments, strings, CLI messages, tests, commits, README, CLAUDE.md, agents, skills, specs, plans and docs. Player-facing texts are localized (enUS + esES). The assistant explains and talks to the user in Spanish in chat.
+- **Acceptance tests first:** before writing code for a feature, there are black-box tests derived from its spec, committed in red. `tests/acceptance/`, `tests/support/` and `tools/tests/acceptance/` are **frozen**: they are turned green without modifying them. If a test looks wrong, STOP and ask the user.
+  - The freeze is enforced with the `acceptance-frozen` tag: `tools/check.sh` (and CI) fails if anything modified, deleted or renamed relative to the tag changes under those paths, both in the working tree and in commits. Adding new tests is allowed.
+  - A new feature adds NEW acceptance tests; after committing them in red, the tag is moved (`git tag -f acceptance-frozen`), only with user approval.
+  - The push must include the tags (`git push --follow-tags` or `git push origin acceptance-frozen`; if it was moved, `--force` on that tag with user approval).
+- **API:** Forever uses the modern retail 12.x API on Lua 5.1, not the Classic Era one. Before using any WoW API: skill `wow-forever-api` / agent `wow-api-expert`. What has been verified is in `docs/api/forever-api.md`.
+- **Lua 5.1:** no `goto`, `//`, native bitwise operators, `<const>`.
+- **No globals:** everything in `ns` (`local ADDON_NAME, ns = ...`). Only `LaRutaDel60DB`, `SLASH_LARUTADEL601` and `SlashCmdList.LARUTADEL60` are allowed.
+- **Routes = data:** `data/routes/**/*.json` (skill `guide-format`). `addon/LaRutaDel60/Guides/` is GENERATED: never edit it by hand.
+- **TOC:** `LaRutaDel60.toc` and `LaRutaDel60_Forever.toc` always identical.
+- **Player-facing texts:** always via `ns.L`, with a key in `Locales/enUS.lua` and `Locales/esES.lua`.
+- **Original:** no code or guides are copied from RestedXP or other addons.
+- Small commits using Conventional Commits. No push unless the user asks.
 
-## Puesta en marcha (clon nuevo, macOS)
-1. `tools/setup.sh`: instala el toolchain y las anotaciones de la API. Si `~/.luarocks/bin` no está en el PATH, avisa: añádelo tú en tu perfil de shell (`check.sh` funciona igual).
-2. Plugin LSP para Claude Code (necesita `lua-language-server` en el PATH): `claude plugin marketplace add ./` y luego `claude plugin install wow-lua-lsp@larutadel60 --scope project`. Después, reinicia Claude Code.
-3. `tools/check.sh` tiene que terminar en `OK: all green`.
+## Setup (fresh clone, macOS)
+1. `tools/setup.sh`: installs the toolchain and the API annotations. If `~/.luarocks/bin` is not in the PATH, it warns: add it yourself in your shell profile (`check.sh` works anyway).
+2. LSP plugin for Claude Code (needs `lua-language-server` in the PATH): `claude plugin marketplace add ./` and then `claude plugin install wow-lua-lsp@larutadel60 --scope project`. Then restart Claude Code.
+3. `tools/check.sh` must end with `OK: all green`.
 
-## Comandos
-| Qué | Comando |
+## Commands
+| What | Command |
 |---|---|
-| Verificación completa (obligatoria antes de commit) | `tools/check.sh` |
-| Tests Lua | `~/.luarocks/bin/busted` (o `busted`) |
-| Tests Python | `python3 -m unittest discover -s tools/tests -t . -q` |
-| Validar / compilar rutas | `python3 tools/validate_routes.py` / `python3 tools/compile_guides.py` |
+| Full verification (mandatory before commit) | `tools/check.sh` |
+| Lua tests | `~/.luarocks/bin/busted` (or `busted`) |
+| Python tests | `python3 -m unittest discover -s tools/tests -t . -q` |
+| Validate / compile routes | `python3 tools/validate_routes.py` / `python3 tools/compile_guides.py` |
 | LuaLS | `tools/luals_check.sh` |
-| Instalar el toolchain (macOS) | `tools/setup.sh` |
-| Instalar en Windows | `scripts\deploy.ps1` (PowerShell) |
+| Install the toolchain (macOS) | `tools/setup.sh` |
+| Install on Windows | `scripts\deploy.ps1` (PowerShell) |
 
-Los hooks de `.claude/settings.json` formatean y lintan cada `.lua` editado y validan cada JSON de rutas. Si devuelven error, corrígelo antes de seguir.
+The hooks in `.claude/settings.json` format and lint every edited `.lua` and validate every route JSON. If they return an error, fix it before continuing.
 
-## Agentes (`.claude/agents/`)
-- `wow-api-expert`: verifica APIs de Forever (solo lectura).
-- `addon-engineer`: implementa código del addon contra tests de aceptación.
-- `route-researcher`: datos crudos de quests desde la web → `data/raw/`.
-- `route-optimizer`: construye rutas óptimas → `data/routes/`.
-- `route-validator`: revisa la coherencia de las rutas (solo lectura).
-- `lua-reviewer`: revisión de código antes de commit (solo lectura).
+## Agents (`.claude/agents/`)
+- `wow-api-expert`: verifies Forever APIs (read-only).
+- `addon-engineer`: implements addon code against acceptance tests.
+- `route-researcher`: raw quest data from the web → `data/raw/`.
+- `route-optimizer`: builds optimal routes → `data/routes/`.
+- `route-validator`: reviews route consistency (read-only).
+- `lua-reviewer`: code review before commit (read-only).
 
 ## Skills (`.claude/skills/`)
 `wow-forever-api`, `guide-format`, `add-route-segment`, `new-module`, `release`, `debug-in-game`.
 
-## Estructura
+## Structure
 ```
-addon/LaRutaDel60/   addon (lo que se copia a Interface\AddOns)
-  Core/ UI/ Modules/ Locales/ Libs/ Guides/(generado)
-data/raw/            datos crudos de la web (con source)
-data/routes/         rutas fuente (JSON)
-tools/               scripts Python/bash (validador, compilador, check)
-tools/tests/         tests de aceptación de las herramientas (congelados)
-tests/support/       emulación del cliente WoW (congelada)
-tests/acceptance/    tests de aceptación del addon (congelados)
-scripts/deploy.ps1   despliegue en Windows
-docs/                specs, planes, API
+addon/LaRutaDel60/   addon (what gets copied to Interface\AddOns)
+  Core/ UI/ Modules/ Locales/ Libs/ Guides/(generated)
+data/raw/            raw data from the web (with source)
+data/routes/         source routes (JSON)
+tools/               Python/bash scripts (validator, compiler, check)
+tools/tests/         acceptance tests for the tools (frozen)
+tests/support/       WoW client emulation (frozen)
+tests/acceptance/    addon acceptance tests (frozen)
+scripts/deploy.ps1   deployment on Windows
+docs/                specs, plans, API
 ```

@@ -1,39 +1,39 @@
-# API de WoW Forever — conocimiento verificado
+# WoW Forever API — verified knowledge
 
-Fuente de verdad del proyecto sobre la API. Cada entrada lleva fecha y fuente. Los mocks de `tests/support/wow_mock.lua` solo pueden imitar APIs de este documento.
+The project's source of truth about the API. Every entry carries a date and a source. The mocks in `tests/support/wow_mock.lua` may only imitate APIs from this document.
 
-## Cliente
-- Versión 1.60.1, `## Interface: 16001`. Lanzamiento 2026-11-04. (2026-11-03, github.com/everbuff/everbuff-wow-addon/issues/1)
-- Los TOC con sufijo `_Forever` o `_Camelot` tienen prioridad; `[AllowLoadGameType camelot]` marca archivos solo-Forever. (2026-11-03, forevermeta.me)
-- `WOW_PROJECT_CAMELOT = 18`; en Forever `WOW_PROJECT_ID == WOW_PROJECT_CAMELOT` (desde la build 70170). (2026-11-03, forevermeta.me)
+## Client
+- Version 1.60.1, `## Interface: 16001`. Release 2026-11-04. (2026-11-03, github.com/everbuff/everbuff-wow-addon/issues/1)
+- TOCs with a `_Forever` or `_Camelot` suffix take priority; `[AllowLoadGameType camelot]` marks Forever-only files. (2026-11-03, forevermeta.me)
+- `WOW_PROJECT_CAMELOT = 18`; in Forever `WOW_PROJECT_ID == WOW_PROJECT_CAMELOT` (since build 70170). (2026-11-03, forevermeta.me)
 
-## Arquitectura de la API
-- Comparte la arquitectura de UI y la mayoría de APIs de retail 12.1.5 (C_QuestLog, C_Map, C_Item, C_Spell, C_Traits). Un addon de Classic Era no carga tal cual. (2026-11-03, Blizzard en el Discord de UI dev, vía forevermeta.me)
-- Restricciones de "secrets" de Midnight activas. (ídem)
-- Unos 1.041 globales de FrameXML de retail eliminados en la 1.60.1. Lista: warcraft.wiki.gg, página "Patch 1.60.1/API changes".
-- Títulos de quest: `C_QuestLog.GetTitleForQuestID`. (2026-11-03, changelogs de addons)
+## API architecture
+- Shares the UI architecture and most APIs of retail 12.1.5 (C_QuestLog, C_Map, C_Item, C_Spell, C_Traits). A Classic Era addon does not load as is. (2026-11-03, Blizzard in the UI dev Discord, via forevermeta.me)
+- Midnight "secrets" restrictions active. (idem)
+- About 1,041 retail FrameXML globals removed in 1.60.1. List: warcraft.wiki.gg, page "Patch 1.60.1/API changes".
+- Quest titles: `C_QuestLog.GetTitleForQuestID`. (2026-11-03, addon changelogs)
 
-## Comportamiento del cliente que emulan los tests
-| Comportamiento | Emulación en `tests/support/` | Fuente |
+## Client behavior emulated by the tests
+| Behavior | Emulation in `tests/support/` | Source |
 |---|---|---|
-| Carga los archivos en el orden del TOC; los `.xml` cargan sus `<Script file>`; cada archivo recibe `(addonName, ns)` | `client.lua` | warcraft.wiki.gg/wiki/TOC_format |
-| SavedVariables: se restauran tras ejecutar los archivos del addon y antes de `ADDON_LOADED` | `client.lua` | warcraft.wiki.gg/wiki/Saving_variables_between_game_sessions |
-| Orden de eventos al entrar: `ADDON_LOADED` → `PLAYER_LOGIN` | `client.lua` | warcraft.wiki.gg/wiki/AddOn_loading_process |
-| `CreateFrame(tipo, nombre)` con `nombre` registra el frame como global `_G[nombre]` | `wow_mock.lua` | warcraft.wiki.gg/wiki/API_CreateFrame |
-| Slash: para cada `KEY` de `SlashCmdList`, los alias son `SLASH_<KEY>1`, `SLASH_<KEY>2`... | `client.lua` | warcraft.wiki.gg/wiki/Creating_a_slash_command |
+| Loads files in TOC order; `.xml` files load their `<Script file>`; each file receives `(addonName, ns)` | `client.lua` | warcraft.wiki.gg/wiki/TOC_format |
+| SavedVariables: restored after running the addon files and before `ADDON_LOADED` | `client.lua` | warcraft.wiki.gg/wiki/Saving_variables_between_game_sessions |
+| Event order on login: `ADDON_LOADED` → `PLAYER_LOGIN` | `client.lua` | warcraft.wiki.gg/wiki/AddOn_loading_process |
+| `CreateFrame(type, name)` with `name` registers the frame as global `_G[name]` | `wow_mock.lua` | warcraft.wiki.gg/wiki/API_CreateFrame |
+| Slash: for each `KEY` in `SlashCmdList`, the aliases are `SLASH_<KEY>1`, `SLASH_<KEY>2`... | `client.lua` | warcraft.wiki.gg/wiki/Creating_a_slash_command |
 
-## APIs emuladas / usadas por el addon
-| API | Uso | Verificado |
+## Emulated / used APIs
+| API | Use | Verified |
 |---|---|---|
-| `C_AddOns.GetAddOnMetadata(addon, field)` | campos `## Field:` del TOC | anotaciones Ketho |
-| `CreateFrame("Frame")`, `:RegisterEvent`, `:UnregisterEvent`, `:SetScript("OnEvent")` | eventos | anotaciones Ketho |
-| `DEFAULT_CHAT_FRAME:AddMessage(msg)`, `print(...)` | chat | anotaciones Ketho |
-| `GetLocale()` | locale del cliente | anotaciones Ketho |
-| `WOW_PROJECT_ID`, `WOW_PROJECT_CAMELOT`, `WOW_PROJECT_MAINLINE` | detección | forevermeta.me |
+| `C_AddOns.GetAddOnMetadata(addon, field)` | `## Field:` fields of the TOC | Ketho annotations |
+| `CreateFrame("Frame")`, `:RegisterEvent`, `:UnregisterEvent`, `:SetScript("OnEvent")` | events | Ketho annotations |
+| `DEFAULT_CHAT_FRAME:AddMessage(msg)`, `print(...)` | chat | Ketho annotations |
+| `GetLocale()` | client locale | Ketho annotations |
+| `WOW_PROJECT_ID`, `WOW_PROJECT_CAMELOT`, `WOW_PROJECT_MAINLINE` | detection | forevermeta.me |
 
-## Pendiente de verificar en el juego
-- Carpeta de instalación de Forever en Windows (`_forever_`, `_camelot_`...). `scripts/deploy.ps1` prueba varias.
+## To be verified in game
+- Forever install folder on Windows (`_forever_`, `_camelot_`...). `scripts/deploy.ps1` tries several.
 
 ## Tooling
-- LSP: plugin `wow-lua-lsp` (lua-language-server 3.19 + anotaciones Ketho mainline en `.vendor/`).
-- `.luarc.json` declara como globals `SlashCmdList`, `DEFAULT_CHAT_FRAME` y `WOW_PROJECT_CAMELOT` porque `Annotations/FrameXML` de Ketho es un submódulo git que `tools/fetch_annotations.sh` no descarga, así que LuaLS no las conoce. `WOW_PROJECT_CAMELOT` además es exclusiva de Forever (no existe en las anotaciones de Classic).
+- LSP: `wow-lua-lsp` plugin (lua-language-server 3.19 + Ketho mainline annotations in `.vendor/`).
+- `.luarc.json` declares `SlashCmdList`, `DEFAULT_CHAT_FRAME` and `WOW_PROJECT_CAMELOT` as globals because Ketho's `Annotations/FrameXML` is a git submodule that `tools/fetch_annotations.sh` does not download, so LuaLS does not know them. `WOW_PROJECT_CAMELOT` is also Forever-exclusive (it does not exist in the Classic annotations).

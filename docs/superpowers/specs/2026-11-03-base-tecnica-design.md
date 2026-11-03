@@ -1,29 +1,29 @@
-# La Ruta del 60 — Base técnica (diseño)
+# La Ruta del 60 — Technical base (design)
 
-Fecha: 2026-11-03
-Estado: aprobado e implementado (rama feat/base-tecnica)
+Date: 2026-11-03
+Status: approved and implemented (branch feat/base-tecnica)
 
-## 1. Contexto
+## 1. Context
 
-**Objetivo del producto:** addon gratuito para *World of Warcraft: Forever* (Classic+ oficial de Blizzard) que guía a cualquier personaje (cualquier raza/clase/facción) de 1 a 60 por la ruta más rápida. Funcionalmente similar a RestedXP (pasos, flecha, auto-aceptar/entregar), pero con **código y rutas 100% propios**: no se copia código ni contenido de guías de RestedXP ni de otros addons.
+**Product goal:** free addon for *World of Warcraft: Forever* (Blizzard's official Classic+) that guides any character (any race/class/faction) from level 1 to 60 along the fastest route. Functionally similar to RestedXP (steps, arrow, auto-accept/turn-in), but with **100% original code and routes**: no code or content is copied from RestedXP guides or other addons.
 
-**Objetivo de esta fase:** crear la base técnica para que el addon se desarrolle íntegramente con IA (Claude Code): agentes, skills, LSP, lint, tests, pipeline de datos, CI y despliegue. El motor del addon es una spec posterior.
+**Goal of this phase:** create the technical base so the addon is developed entirely with AI (Claude Code): agents, skills, LSP, lint, tests, data pipeline, CI and deployment. The addon engine is a later spec.
 
-**Plataforma objetivo:**
-- Cliente WoW Forever 1.60.1, `## Interface: 16001`, lanzamiento 2026-11-04.
-- Lua 5.1 (entorno WoW). API moderna (retail 12.x): `C_QuestLog`, `C_Map`, `C_Item`, `C_Spell`, etc. Restricciones de "secrets" de Midnight activas. ~1.041 globales FrameXML eliminados respecto a retail.
-- Detección: `WOW_PROJECT_ID == WOW_PROJECT_CAMELOT` (18). TOC con sufijo `_Forever` / `_Camelot` soportado.
-- Juego en PC Windows; desarrollo en macOS.
+**Target platform:**
+- WoW Forever client 1.60.1, `## Interface: 16001`, release 2026-11-04.
+- Lua 5.1 (WoW environment). Modern API (retail 12.x): `C_QuestLog`, `C_Map`, `C_Item`, `C_Spell`, etc. Midnight "secrets" restrictions active. ~1,041 FrameXML globals removed compared to retail.
+- Detection: `WOW_PROJECT_ID == WOW_PROJECT_CAMELOT` (18). TOC with `_Forever` / `_Camelot` suffix supported.
+- Played on a Windows PC; developed on macOS.
 
-**Decisiones tomadas con el usuario:**
-- Enfoque A: Claude Code nativo + toolchain Lua estándar (sin MCP propio).
-- Datos de rutas: bases de datos web (Wowhead y similares con datos de Forever), con fuente citada por registro.
-- Despliegue: GitHub + script PowerShell en el PC.
-- Idiomas del addon (textos al jugador): enUS y esES desde el inicio.
-- **Idioma del proyecto:** el código va siempre en inglés: identificadores, comentarios, strings, mensajes de herramientas/CLI, nombres de tests y commits. Las explicaciones van siempre en castellano: specs, planes, CLAUDE.md, agentes, skills y chat.
-- **Tests de aceptación primero:** antes de cualquier código se escriben tests de caja negra derivados solo de esta spec (§11). Se commitean en rojo y quedan congelados: la implementación los pone en verde sin modificarlos.
+**Decisions made with the user:**
+- Approach A: native Claude Code + standard Lua toolchain (no custom MCP).
+- Route data: web databases (Wowhead and similar with Forever data), with the source cited per record.
+- Deployment: GitHub + PowerShell script on the PC.
+- Addon languages (player-facing texts): enUS and esES from the start.
+- **Project language:** everything committed to the repo is in English: code, comments, strings, tool/CLI messages, test names, commits, specs, plans, CLAUDE.md, agents, skills and docs. Player-facing texts are localized (enUS + esES). The assistant explains and talks to the user in Spanish in chat. (Originally the explanations were in Spanish; translated to English when the rule changed.)
+- **Acceptance tests first:** before any code, black-box tests derived only from this spec (§11) are written. They are committed in red and frozen: the implementation turns them green without modifying them.
 
-## 2. Estructura del repositorio
+## 2. Repository structure
 
 ```
 larutadel60/
@@ -57,114 +57,114 @@ larutadel60/
     └── superpowers/specs/
 ```
 
-Principios:
-- **Rutas = datos, no código.** `data/routes/*.json` → validado → compilado a `addon/LaRutaDel60/Guides/*.lua`. Los agentes de rutas nunca tocan `Core/`.
-- **Sin globals.** Todo bajo la tabla privada del addon (`local ADDON, ns = ...`); única global permitida: `LaRutaDel60DB` (SavedVariables) y el comando `/ruta`.
-- **Archivos pequeños y con una responsabilidad.** Un módulo por archivo.
+Principles:
+- **Routes = data, not code.** `data/routes/*.json` → validated → compiled to `addon/LaRutaDel60/Guides/*.lua`. The route agents never touch `Core/`.
+- **No globals.** Everything under the addon's private table (`local ADDON, ns = ...`); the only allowed globals are `LaRutaDel60DB` (SavedVariables) and the `/ruta` command.
+- **Small files with a single responsibility.** One module per file.
 
 ## 3. Toolchain
 
-| Herramienta | Uso | Config |
+| Tool | Use | Config |
 |---|---|---|
-| lua-language-server | LSP: diagnósticos, tipos API WoW | `.luarc.json` (runtime Lua 5.1, library = anotaciones Ketho `vscode-wow-api` mainline, globals del addon) |
-| luacheck | Lint (globals, variables sin usar) | `.luacheckrc` con `std = "lua51"` + globals WoW leídos |
-| stylua | Formato | `.stylua.toml` (tabs, 120 col) |
-| busted | Tests unitarios fuera del juego | `tests/`, mocks en `tests/support/` |
-| python3 | Herramientas de datos | `tools/` (scraper, validador, compilador) |
+| lua-language-server | LSP: diagnostics, WoW API types | `.luarc.json` (Lua 5.1 runtime, library = Ketho `vscode-wow-api` mainline annotations, addon globals) |
+| luacheck | Lint (globals, unused variables) | `.luacheckrc` with `std = "lua51"` + WoW globals read |
+| stylua | Formatting | `.stylua.toml` (tabs, 120 cols) |
+| busted | Unit tests outside the game | `tests/`, mocks in `tests/support/` |
+| python3 | Data tools | `tools/` (scraper, validator, compiler) |
 
-Instalación en macOS vía `brew` (lua-language-server, luacheck, stylua, luarocks) y `luarocks install busted`. Las anotaciones de Ketho se descargan a `.vendor/` (en `.gitignore`) mediante `tools/setup.sh`.
+Installation on macOS via `brew` (lua-language-server, luacheck, stylua, luarocks) and `luarocks install busted`. The Ketho annotations are downloaded to `.vendor/` (in `.gitignore`) by `tools/setup.sh`.
 
-**LSP en Claude Code:** plugin local del proyecto que registra `lua-language-server` para `.lua`, de modo que la herramienta LSP dé diagnósticos y navegación. Si la integración por plugin no está disponible, fallback: hook que ejecuta `lua-language-server --check` sobre el archivo editado.
+**LSP in Claude Code:** project-local plugin that registers `lua-language-server` for `.lua`, so the LSP tool provides diagnostics and navigation. If the plugin integration is not available, fallback: a hook that runs `lua-language-server --check` on the edited file.
 
-**Hooks (`.claude/settings.json`):** tras cada `Edit`/`Write` de un `.lua`: `stylua <archivo>` y `luacheck <archivo>`; la salida vuelve a Claude. Permisos preaprobados para lint, test y `tools/`.
+**Hooks (`.claude/settings.json`):** after each `Edit`/`Write` of a `.lua`: `stylua <file>` and `luacheck <file>`; the output goes back to Claude. Pre-approved permissions for lint, test and `tools/`.
 
-## 4. Agentes (`.claude/agents/`)
+## 4. Agents (`.claude/agents/`)
 
-| Agente | Responsabilidad | Escribe en |
+| Agent | Responsibility | Writes to |
 |---|---|---|
-| `wow-api-expert` | Verifica si una API/evento existe en Forever 1.60.1 (docs/api, anotaciones, wiki) y propone alternativa. | — (solo lectura) |
-| `addon-engineer` | Implementa motor/UI con TDD sobre mocks. | `addon/`, `tests/` |
-| `route-researcher` | Extrae quests/NPCs/coords/niveles de bases web, con URL fuente por registro. | `data/raw/` |
-| `route-optimizer` | Construye y optimiza rutas por facción/raza/clase (orden, viajes, hearthstone, vuelos). | `data/routes/` |
-| `route-validator` | Valida coherencia: prerrequisitos, niveles, coords, IDs, XP acumulada hasta 60. | — (solo lectura) |
-| `lua-reviewer` | Revisión antes de commit: taint, rendimiento, globals, compatibilidad 16001. | — (solo lectura) |
+| `wow-api-expert` | Verifies whether an API/event exists in Forever 1.60.1 (docs/api, annotations, wiki) and proposes an alternative. | — (read-only) |
+| `addon-engineer` | Implements engine/UI with TDD over mocks. | `addon/`, `tests/` |
+| `route-researcher` | Extracts quests/NPCs/coords/levels from web databases, with a source URL per record. | `data/raw/` |
+| `route-optimizer` | Builds and optimizes routes by faction/race/class (order, travel, hearthstone, flights). | `data/routes/` |
+| `route-validator` | Validates consistency: prerequisites, levels, coords, IDs, accumulated XP up to 60. | — (read-only) |
+| `lua-reviewer` | Pre-commit review: taint, performance, globals, 16001 compatibility. | — (read-only) |
 
 ## 5. Skills (`.claude/skills/`)
 
-- `wow-forever-api` — chuleta de API moderna, eliminados, secrets, eventos clave de quests/gossip/mapa.
-- `guide-format` — esquema JSON de rutas y su compilación a Lua.
-- `add-route-segment` — pipeline investigar → JSON → optimizar → validar → compilar para un tramo.
-- `new-module` — plantilla de módulo (archivo, TOC, test, locale).
-- `release` — versión, changelog, tag; CI empaqueta zip.
-- `debug-in-game` — leer errores de BugSack / SavedVariables pegados por el usuario y reproducirlos como test.
+- `wow-forever-api` — cheat sheet of the modern API, removed items, secrets, key quest/gossip/map events.
+- `guide-format` — route JSON schema and its compilation to Lua.
+- `add-route-segment` — research → JSON → optimize → validate → compile pipeline for a segment.
+- `new-module` — module template (file, TOC, test, locale).
+- `release` — version, changelog, tag; CI packages the zip.
+- `debug-in-game` — read BugSack errors / SavedVariables pasted by the user and reproduce them as a test.
 
-## 6. Pipeline de datos de rutas
+## 6. Route data pipeline
 
-1. `route-researcher` guarda registros en `data/raw/<zona>.json` (quest id, nombre, nivel, prerrequisitos, NPC inicio/fin con coords, objetivos, facción, URL fuente).
-2. `route-optimizer` genera `data/routes/<faccion>/<tramo>.json` (lista ordenada de pasos).
-3. `tools/validate_routes.py` comprueba esquema y reglas; falla en CI si hay errores.
-4. `tools/compile_guides.py` genera `addon/LaRutaDel60/Guides/*.lua` (archivos generados, cabecera "no editar").
+1. `route-researcher` saves records in `data/raw/<zone>.json` (quest id, name, level, prerequisites, start/end NPC with coords, objectives, faction, source URL).
+2. `route-optimizer` generates `data/routes/<faction>/<segment>.json` (ordered list of steps).
+3. `tools/validate_routes.py` checks schema and rules; fails in CI if there are errors.
+4. `tools/compile_guides.py` generates `addon/LaRutaDel60/Guides/*.lua` (generated files, "do not edit" header).
 
-En esta fase solo se crean el esquema, el validador, el compilador y una ruta de ejemplo mínima (2–3 pasos) para probar el pipeline extremo a extremo.
+In this phase only the schema, the validator, the compiler and a minimal example route (2–3 steps) are created, to test the pipeline end to end.
 
-## 7. Addon "hola mundo"
+## 7. "Hello world" addon
 
-- TOC con `Interface: 16001`, `SavedVariables: LaRutaDel60DB`, carga de Locales/Core/Guides.
-- `Core/Init.lua`: namespace, evento `PLAYER_LOGIN`, detección de Forever, mensaje en chat, comando `/ruta` que muestra versión y guía cargada.
-- Locales enUS/esES.
-- Test busted que carga el addon con mocks y verifica init + comando.
+- TOC with `Interface: 16001`, `SavedVariables: LaRutaDel60DB`, loading of Locales/Core/Guides.
+- `Core/Init.lua`: namespace, `PLAYER_LOGIN` event, Forever detection, chat message, `/ruta` command showing the version and loaded guide.
+- enUS/esES locales.
+- busted test that loads the addon with mocks and verifies init + command.
 
-## 8. CI y despliegue
+## 8. CI and deployment
 
-- **CI (GitHub Actions):** luacheck, stylua `--check`, busted, validate_routes, compile_guides con diff limpio; en tag `v*`, zip de `addon/LaRutaDel60` adjunto al release.
-- **`scripts/deploy.ps1` (Windows):** parámetros `-WowPath` (por defecto `C:\Program Files (x86)\World of Warcraft\_classic_`, configurable porque la carpeta de Forever puede diferir) y `-Source` (`git` = pull del repo local; `release` = descarga último zip de GitHub). Copia `LaRutaDel60` a `Interface\AddOns`. Indica luego `/reload`.
+- **CI (GitHub Actions):** luacheck, stylua `--check`, busted, validate_routes, compile_guides with a clean diff; on a `v*` tag, zip of `addon/LaRutaDel60` attached to the release.
+- **`scripts/deploy.ps1` (Windows):** parameters `-WowPath` (default `C:\Program Files (x86)\World of Warcraft\_classic_`, configurable because Forever's folder may differ) and `-Source` (`git` = pull of the local repo; `release` = downloads the latest zip from GitHub). Copies `LaRutaDel60` to `Interface\AddOns`. Then tells the user to `/reload`.
 
-## 9. Criterios de éxito de esta fase
+## 9. Success criteria for this phase
 
-- `tools/check.sh` pasa: lint, formato, tests, validación y compilación.
-- Claude Code muestra diagnósticos LSP en archivos `.lua` con tipos de API WoW.
-- Los 6 agentes y 6 skills existen y están referenciados en `CLAUDE.md`.
-- El addon "hola mundo" se instala en Windows con `deploy.ps1` y muestra su mensaje en Forever (verificación manual del usuario).
-- CI verde en GitHub.
+- `tools/check.sh` passes: lint, formatting, tests, validation and compilation.
+- Claude Code shows LSP diagnostics on `.lua` files with WoW API types.
+- The 6 agents and 6 skills exist and are referenced in `CLAUDE.md`.
+- The "hello world" addon installs on Windows with `deploy.ps1` and shows its message in Forever (manual verification by the user).
+- CI green on GitHub.
 
-## 10. Fuera de alcance
+## 10. Out of scope
 
-Motor de guía (flecha, lista de pasos, auto-quest), UI final, rutas reales, publicación en CurseForge.
+Guide engine (arrow, step list, auto-quest), final UI, real routes, CurseForge publishing.
 
-## 11. Contratos verificables y tests de aceptación
+## 11. Verifiable contracts and acceptance tests
 
-Los tests de aceptación solo usan estas interfaces externas. Cualquier otra cosa (funciones internas, formato exacto del Lua generado, texto de los mensajes de error) es detalle de implementación y no se testea a este nivel.
+The acceptance tests only use these external interfaces. Anything else (internal functions, exact format of the generated Lua, text of error messages) is an implementation detail and is not tested at this level.
 
-### 11.1 CLI del pipeline de rutas
-- `python3 tools/validate_routes.py [ROUTES_DIR]` (por defecto `data/routes`): exit 0 si todas las rutas son válidas; exit 1 si no, con un error por línea en stderr, y cada línea contiene la ruta relativa del archivo culpable.
+### 11.1 Route pipeline CLI
+- `python3 tools/validate_routes.py [ROUTES_DIR]` (default `data/routes`): exit 0 if all routes are valid; exit 1 otherwise, with one error per line on stderr, and each line contains the relative path of the offending file.
 - `python3 tools/compile_guides.py [--routes DIR] [--out DIR] [--check]`:
-  - Sin `--check`: valida; si hay errores, exit 1 y **no escribe nada**. Si todo es válido, escribe `<id>.lua` por ruta y `Guides.xml` (que lista todas con `<Script file="<id>.lua"/>`), borra los `.lua` de rutas que ya no existen y termina con exit 0.
-  - Con `--check`: no escribe; exit 1 si la salida difiere de lo que hay en `--out`, exit 0 si está al día.
-- Ida y vuelta: cargar `<id>.lua` en Lua 5.1 con `(addonName, ns)` deja en `ns.Guides[id]` una tabla con **exactamente los mismos datos** que el JSON de origen.
-- Reglas de validación: las de la tabla de formato (§6 y la skill `guide-format`). Cada regla tiene al menos un caso de aceptación.
+  - Without `--check`: validates; if there are errors, exit 1 and **writes nothing**. If everything is valid, writes one `<id>.lua` per route and `Guides.xml` (which lists them all with `<Script file="<id>.lua"/>`), deletes the `.lua` files of routes that no longer exist and ends with exit 0.
+  - With `--check`: writes nothing; exit 1 if the output differs from what is in `--out`, exit 0 if up to date.
+- Round trip: loading `<id>.lua` in Lua 5.1 with `(addonName, ns)` leaves in `ns.Guides[id]` a table with **exactly the same data** as the source JSON.
+- Validation rules: those in the format table (§6 and the `guide-format` skill). Each rule has at least one acceptance case.
 
-### 11.2 Addon (lo que ve el jugador)
-Mensajes en el chat (sin códigos de color), con el prefijo `La Ruta del 60: `:
+### 11.2 Addon (what the player sees)
+Chat messages (no color codes), with the prefix `La Ruta del 60: `:
 
-| Situación | enUS | esES / esMX |
+| Situation | enUS | esES / esMX |
 |---|---|---|
 | Login | `Loaded. Type /ruta for info.` | `Cargado. Escribe /ruta para más info.` |
-| Login en un cliente que no es Forever (antes del anterior) | `Warning: this client is not WoW Forever; guides may be wrong.` | `Aviso: este cliente no es WoW Forever; las guías pueden fallar.` |
+| Login on a non-Forever client (before the previous one) | `Warning: this client is not WoW Forever; guides may be wrong.` | `Aviso: este cliente no es WoW Forever; las guías pueden fallar.` |
 | `/ruta` | `Version <TOC Version> - <N> guide(s) loaded.` | `Versión <TOC Version> - <N> guía(s) cargada(s).` |
 
-- `<N>` = número de rutas en `data/routes`.
-- `LaRutaDel60DB` existe tras el login y conserva los datos previos.
-- Globals nuevas tras cargar el addon y hacer login: solo `LaRutaDel60DB`, `SLASH_LARUTADEL601` y la clave `LARUTADEL60` en `SlashCmdList`.
-- TOC: `LaRutaDel60.toc` y `LaRutaDel60_Forever.toc` idénticos, `## Interface: 16001`, `## SavedVariables: LaRutaDel60DB`, y cada archivo listado (y cada script incluido en un `.xml`) existe.
+- `<N>` = number of routes in `data/routes`.
+- `LaRutaDel60DB` exists after login and keeps the previous data.
+- New globals after loading the addon and logging in: only `LaRutaDel60DB`, `SLASH_LARUTADEL601` and the `LARUTADEL60` key in `SlashCmdList`.
+- TOC: `LaRutaDel60.toc` and `LaRutaDel60_Forever.toc` identical, `## Interface: 16001`, `## SavedVariables: LaRutaDel60DB`, and every listed file (and every script included in an `.xml`) exists.
 
-### 11.3 Herramientas
-- `tools/check.sh`: exit 0 en el repo limpio; exit distinto de 0 si hay un `.lua` del addon con error de lint, una ruta inválida o guías desactualizadas.
-- Hook `.claude/hooks/post-edit.sh` (recibe por stdin el JSON de PostToolUse): exit 2 con mensaje en stderr si el `.lua` editado tiene errores de lint o si la edición deja rutas inválidas; exit 0 en el resto de casos.
-- Los tests de herramientas que ejecutan `tools/check.sh` lo hacen sobre una copia temporal del repo y con `LR60_SKIP_TOOLING_TESTS=1`, para no ejecutarse a sí mismos en bucle.
+### 11.3 Tools
+- `tools/check.sh`: exit 0 on the clean repo; non-zero exit if there is an addon `.lua` with a lint error, an invalid route or outdated guides.
+- Hook `.claude/hooks/post-edit.sh` (receives the PostToolUse JSON on stdin): exit 2 with a message on stderr if the edited `.lua` has lint errors or if the edit leaves invalid routes; exit 0 in all other cases.
+- The tool tests that run `tools/check.sh` do so on a temporary copy of the repo and with `LR60_SKIP_TOOLING_TESTS=1`, so they do not run themselves in a loop.
 
-### 11.4 Emulación del cliente en tests
-- `tests/support/` emula el cliente: carga los archivos en el orden del TOC (expandiendo los `.xml`), pasa `(addonName, ns)`, resuelve los slash commands como el cliente (`SLASH_<KEY><n>` → `SlashCmdList[KEY]`) y captura el chat (`DEFAULT_CHAT_FRAME:AddMessage` y `print`).
-- Los mocks solo imitan APIs que están en `docs/api/forever-api.md`, con la fuente citada.
+### 11.4 Client emulation in tests
+- `tests/support/` emulates the client: loads files in TOC order (expanding `.xml`), passes `(addonName, ns)`, resolves slash commands like the client (`SLASH_<KEY><n>` → `SlashCmdList[KEY]`) and captures the chat (`DEFAULT_CHAT_FRAME:AddMessage` and `print`).
+- The mocks only imitate APIs that are in `docs/api/forever-api.md`, with the source cited.
 
-### 11.5 Verificación manual (no automatizable en macOS)
-`deploy.ps1` en Windows, el LSP dentro de Claude Code y el addon en el cliente real: checklist para el usuario en la última tarea del plan.
+### 11.5 Manual verification (not automatable on macOS)
+`deploy.ps1` on Windows, the LSP inside Claude Code and the addon in the real client: checklist for the user in the last task of the plan.

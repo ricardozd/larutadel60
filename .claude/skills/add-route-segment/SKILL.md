@@ -1,18 +1,18 @@
 ---
 name: add-route-segment
-description: Usar cuando el usuario pida añadir o rehacer un tramo de ruta de leveo (p. ej. "ruta humano 1-10", "Horda 30-40 en Stranglethorn"). Orquesta investigar → JSON crudo → optimizar → validar → compilar → commit.
+description: Use when the user asks to add or redo a leveling route segment (e.g. "human route 1-10", "Horde 30-40 in Stranglethorn"). Orchestrates research → raw JSON → optimize → validate → compile → commit.
 ---
 
-# Añadir un tramo de ruta
+# Add a route segment
 
-Entrada: facción, raza o clase (si aplica), rango de niveles y zonas.
+Input: faction, race or class (if applicable), level range and zones.
 
-1. **Plan:** decide el id (`<faccion>-<zona>-<min>-<max>`), la ruta anterior (para su `next`) y las quests arrastradas.
-2. **Investigar:** agente `route-researcher` por zona → `data/raw/<zona>.json`. Comprueba que cada quest tenga `source`.
-3. **Optimizar:** agente `route-optimizer` → `data/routes/<faccion>/<id>.json`. Actualiza el `next` de la ruta anterior.
-4. **Validar:** agente `route-validator`. Si hay problemas, vuelve al paso 3 con el informe (máx. 3 vueltas; si siguen, informa al usuario).
-5. **Compilar:** `python3 tools/compile_guides.py` y `tools/check.sh` en verde.
-6. **Commit:** `git add data/ addon/LaRutaDel60/Guides && git commit -m "feat(routes): <id>"` (con el trailer `Co-Authored-By`).
-7. Informa al usuario en castellano: niveles cubiertos, nº de pasos, quests con `"forever": false`, y pide que lo pruebe en el juego.
+1. **Plan:** decide the id (`<faction>-<zone>-<min>-<max>`), the previous route (for its `next`) and the carried quests.
+2. **Research:** `route-researcher` agent per zone → `data/raw/<zone>.json`. Check that every quest has `source`.
+3. **Optimize:** `route-optimizer` agent → `data/routes/<faction>/<id>.json`. Update the `next` of the previous route.
+4. **Validate:** `route-validator` agent. If there are problems, go back to step 3 with the report (max. 3 rounds; if they persist, inform the user).
+5. **Compile:** `python3 tools/compile_guides.py` and `tools/check.sh` green.
+6. **Commit:** `git add data/ addon/LaRutaDel60/Guides && git commit -m "feat(routes): <id>"` (with the `Co-Authored-By` trailer).
+7. Reply to the user in Spanish; everything written to the repo is in English. Report: levels covered, number of steps, quests with `"forever": false`, and ask them to test it in the game.
 
-No inventes datos: lo que falte se marca en el informe, nunca se rellena.
+Do not invent data: whatever is missing is flagged in the report, never filled in.

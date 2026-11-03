@@ -1,28 +1,28 @@
-# Base técnica de La Ruta del 60 — Plan de implementación
+# La Ruta del 60 Technical Base — Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Objetivo:** dejar el repositorio listo para desarrollar 100% con IA un addon de leveo 1-60 para WoW Forever: toolchain Lua (LSP, lint, formato, tests), pipeline de rutas JSON→Lua, addon "hola mundo", agentes, skills, hooks, CI y despliegue a Windows.
+**Goal:** leave the repository ready to develop a 1-60 leveling addon for WoW Forever 100% with AI: Lua toolchain (LSP, lint, formatting, tests), JSON→Lua route pipeline, "hello world" addon, agents, skills, hooks, CI and deployment to Windows.
 
-**Arquitectura:** primero se escriben los **tests de aceptación de caja negra** derivados de la spec (§11), que quedan congelados. Después cada tarea implementa lo justo para ponerlos en verde. El addon vive en `addon/LaRutaDel60/`. Las rutas son datos (`data/routes/**/*.json`) que se validan y se compilan a `addon/LaRutaDel60/Guides/`. Los tests Lua corren con busted sobre LuaJIT (compatible con Lua 5.1), con un emulador del cliente en `tests/support/`. Los de Python y herramientas usan unittest y ejecutan las CLIs como subprocesos.
+**Architecture:** first the **black-box acceptance tests** derived from the spec (§11) are written, and they are frozen. Then each task implements just enough to turn them green. The addon lives in `addon/LaRutaDel60/`. Routes are data (`data/routes/**/*.json`) that are validated and compiled to `addon/LaRutaDel60/Guides/`. Lua tests run with busted on LuaJIT (Lua 5.1 compatible), with a client emulator in `tests/support/`. The Python and tool tests use unittest and run the CLIs as subprocesses.
 
 **Tech Stack:** Lua 5.1 / LuaJIT 2.1, busted 2.3, luacheck 1.2, stylua 2.6, lua-language-server 3.19, anotaciones Ketho `vscode-wow-api`, Python 3 (solo stdlib), GitHub Actions, PowerShell 5+.
 
 ## Restricciones globales
 
-- **Idioma:** código en inglés (identificadores, comentarios, strings, mensajes de CLI, nombres de tests, commits). Explicaciones en castellano (docs, CLAUDE.md, agentes, skills).
-- **Tests de aceptación congelados:** `tests/acceptance/`, `tests/support/` y `tools/tests/acceptance/` no se modifican desde la Tarea 3 en adelante. Si una tarea no puede ponerlos en verde sin cambiarlos: PARAR y preguntar al usuario.
+- **Language:** everything committed to the repo is in English (code, comments, strings, CLI messages, test names, commits, docs, CLAUDE.md, agents, skills). Player-facing texts are localized (enUS + esES). The assistant talks to the user in Spanish in chat.
+- **Frozen acceptance tests:** `tests/acceptance/`, `tests/support/` and `tools/tests/acceptance/` are not modified from Task 3 onwards. If a task cannot turn them green without changing them: STOP and ask the user.
 - Cliente objetivo: WoW Forever 1.60.1, `## Interface: 16001`.
 - Lua 5.1: sin `goto`, `//`, operadores bit nativos, `<const>`/`<close>`.
-- API moderna (retail 12.x). Detección de Forever: `WOW_PROJECT_ID == WOW_PROJECT_CAMELOT` (18).
-- Globals permitidas: `LaRutaDel60DB`, `SLASH_LARUTADEL601`, `SlashCmdList.LARUTADEL60`. Todo lo demás en `ns` (`local ADDON_NAME, ns = ...`).
-- Comando de chat: `/ruta`. Textos al jugador en enUS + esES (esMX usa esES), exactamente los de la spec §11.2.
-- `addon/LaRutaDel60/Guides/` es generado: nunca se edita a mano.
-- No copiar código ni guías de RestedXP u otros addons.
+- Modern API (retail 12.x). Forever detection: `WOW_PROJECT_ID == WOW_PROJECT_CAMELOT` (18).
+- Allowed globals: `LaRutaDel60DB`, `SLASH_LARUTADEL601`, `SlashCmdList.LARUTADEL60`. Everything else in `ns` (`local ADDON_NAME, ns = ...`).
+- Chat command: `/ruta`. Player-facing texts in enUS + esES (esMX uses esES), exactly those in spec §11.2.
+- `addon/LaRutaDel60/Guides/` is generated: never edited by hand.
+- Do not copy code or guides from RestedXP or other addons.
 - Python solo stdlib.
-- Commits con trailer `Co-Authored-By: Claude <modelo que hizo el commit> <noreply@anthropic.com>` (p. ej. Opus 5.5, Sonnet 5.5 o Haiku 5.5).
+- Commits with trailer `Co-Authored-By: Claude <model that made the commit> <noreply@anthropic.com>` (e.g. Opus 5.5, Sonnet 5.5 or Haiku 5.5).
 
-## Estructura de archivos
+## File structure
 
 ```
 .gitignore .editorconfig .luarc.json .luacheckrc .stylua.toml .styluaignore .busted
@@ -60,15 +60,15 @@ docs/api/forever-api.md
 
 ---
 
-### Tarea 1: Configuración del toolchain (sin código de producto)
+### Task 1: Toolchain setup (no product code)
 
 **Archivos:**
 - Crear: `.gitignore`, `.editorconfig`, `.luarc.json`, `.luacheckrc`, `.stylua.toml`, `.styluaignore`, `.busted`, `tools/setup.sh`, `tools/fetch_annotations.sh`, `data/raw/.gitkeep`
 
 **Interfaces:**
-- Produce: `.vendor/vscode-wow-api/Annotations/Core`, `~/.luarocks/bin/busted` (LuaJIT), y la config que respetan todas las tareas.
+- Produce: `.vendor/vscode-wow-api/Annotations/Core`, `~/.luarocks/bin/busted` (LuaJIT), and the config that all tasks respect.
 
-- [ ] **Paso 1: `.gitignore`**
+- [ ] **Step 1: `.gitignore`**
 
 ```gitignore
 .vendor/
@@ -80,7 +80,7 @@ __pycache__/
 luacov.*
 ```
 
-- [ ] **Paso 2: `.editorconfig`**
+- [ ] **Step 2: `.editorconfig`**
 
 ```ini
 root = true
@@ -109,7 +109,7 @@ indent_style = space
 indent_size = 4
 ```
 
-- [ ] **Paso 3: `.stylua.toml` y `.styluaignore`**
+- [ ] **Step 3: `.stylua.toml` y `.styluaignore`**
 
 `.stylua.toml`:
 ```toml
@@ -128,7 +128,7 @@ addon/LaRutaDel60/Libs/
 addon/LaRutaDel60/Guides/
 ```
 
-- [ ] **Paso 4: `.luacheckrc`**
+- [ ] **Step 4: `.luacheckrc`**
 
 ```lua
 std = "lua51"
@@ -163,7 +163,7 @@ files["tests/**"] = {
 files["tools/tests/**/*.lua"] = { std = "max" }
 ```
 
-- [ ] **Paso 5: `.luarc.json`**
+- [ ] **Step 5: `.luarc.json`**
 
 ```json
 {
@@ -177,7 +177,7 @@ files["tools/tests/**/*.lua"] = { std = "max" }
 }
 ```
 
-- [ ] **Paso 6: `.busted`**
+- [ ] **Step 6: `.busted`**
 
 ```lua
 return {
@@ -189,7 +189,7 @@ return {
 }
 ```
 
-- [ ] **Paso 7: `tools/fetch_annotations.sh`**
+- [ ] **Step 7: `tools/fetch_annotations.sh`**
 
 ```bash
 #!/usr/bin/env bash
@@ -208,7 +208,7 @@ test -d "$DEST/Annotations/Core" || { echo "ERROR: $DEST/Annotations/Core not fo
 echo "OK: annotations in $DEST/Annotations/Core"
 ```
 
-- [ ] **Paso 8: `tools/setup.sh`**
+- [ ] **Step 8: `tools/setup.sh`**
 
 ```bash
 #!/usr/bin/env bash
@@ -225,7 +225,7 @@ esac
 echo "OK: toolchain installed"
 ```
 
-- [ ] **Paso 9: ejecutar setup**
+- [ ] **Step 9: ejecutar setup**
 
 ```bash
 mkdir -p data/raw && touch data/raw/.gitkeep
@@ -233,9 +233,9 @@ chmod +x tools/setup.sh tools/fetch_annotations.sh
 tools/setup.sh
 luajit -v && ~/.luarocks/bin/busted --version && luacheck --version && stylua --version && lua-language-server --version
 ```
-Esperado: `OK: toolchain installed` y cinco versiones (LuaJIT 2.1, busted 2.3.x, Luacheck 1.2.x, stylua 2.6.x, 3.19.x).
+Expected: `OK: toolchain installed` y cinco versiones (LuaJIT 2.1, busted 2.3.x, Luacheck 1.2.x, stylua 2.6.x, 3.19.x).
 
-- [ ] **Paso 10: commit**
+- [ ] **Step 10: commit**
 
 ```bash
 git add .gitignore .editorconfig .luarc.json .luacheckrc .stylua.toml .styluaignore .busted tools/setup.sh tools/fetch_annotations.sh data/raw/.gitkeep
@@ -244,64 +244,66 @@ git commit -m "chore: Lua toolchain configuration"
 
 ---
 
-### Tarea 2: Tests de aceptación (en rojo, y se congelan)
+### Task 2: Acceptance tests (red, then frozen)
 
-Se escriben **solo a partir de la spec §11**, sin ningún código de producto. Al terminar esta tarea todos deben FALLAR o dar error, porque todavía no existe nada que probar.
+They are written **only from spec §11**, with no product code. When this task finishes they must all FAIL or error, because there is nothing to test yet.
 
 **Archivos:**
 - Crear: `docs/api/forever-api.md`, `tests/support/wow_mock.lua`, `tests/support/client.lua`, `tests/acceptance/toc_spec.lua`, `tests/acceptance/addon_spec.lua`, `tools/__init__.py`, `tools/tests/__init__.py`, `tools/tests/acceptance/__init__.py`, `tools/tests/acceptance/support.py`, `tools/tests/acceptance/dump_guide.lua`, `tools/tests/acceptance/test_route_pipeline.py`, `tools/tests/acceptance/test_tooling.py`
 
 **Interfaces:**
-- Produce (contratos que las tareas siguientes deben cumplir, copiados de la spec §11):
-  - CLI `python3 tools/validate_routes.py [DIR]`: exit 0/1; errores en stderr con el path relativo del archivo.
+- Produce (contracts that the following tasks must fulfill, copied from spec §11):
+  - CLI `python3 tools/validate_routes.py [DIR]`: exit 0/1; errors on stderr with the file's relative path.
   - CLI `python3 tools/compile_guides.py [--routes DIR] [--out DIR] [--check]`.
-  - Archivo generado `<id>.lua` que, cargado con `(addonName, ns)`, deja `ns.Guides[id]` igual al JSON; y `Guides.xml` con `<Script file="<id>.lua"/>`.
-  - Mensajes de chat de la §11.2. Globals permitidas.
+  - Generated file `<id>.lua` that, loaded with `(addonName, ns)`, leaves `ns.Guides[id]` equal to the JSON; and `Guides.xml` with `<Script file="<id>.lua"/>`.
+  - Chat messages from §11.2. Allowed globals.
   - `tools/check.sh` y `.claude/hooks/post-edit.sh` (§11.3); variable `LR60_SKIP_TOOLING_TESTS=1`.
 
-- [ ] **Paso 1: `docs/api/forever-api.md`** (base que deben citar los mocks)
+- [ ] **Step 1: `docs/api/forever-api.md`** (base that the mocks must cite)
 
 ```markdown
-# API de WoW Forever — conocimiento verificado
+# WoW Forever API — verified knowledge
 
-Fuente de verdad del proyecto sobre la API. Cada entrada lleva fecha y fuente. Los mocks de `tests/support/wow_mock.lua` solo pueden imitar APIs de este documento.
+The project's source of truth about the API. Every entry carries a date and a source. The mocks in `tests/support/wow_mock.lua` may only imitate APIs from this document.
 
-## Cliente
-- Versión 1.60.1, `## Interface: 16001`. Lanzamiento 2026-11-04. (2026-11-03, github.com/everbuff/everbuff-wow-addon/issues/1)
-- Los TOC con sufijo `_Forever` o `_Camelot` tienen prioridad; `[AllowLoadGameType camelot]` marca archivos solo-Forever. (2026-11-03, forevermeta.me)
-- `WOW_PROJECT_CAMELOT = 18`; en Forever `WOW_PROJECT_ID == WOW_PROJECT_CAMELOT` (desde la build 70170). (2026-11-03, forevermeta.me)
+## Client
+- Version 1.60.1, `## Interface: 16001`. Release 2026-11-04. (2026-11-03, github.com/everbuff/everbuff-wow-addon/issues/1)
+- TOCs with a `_Forever` or `_Camelot` suffix take priority; `[AllowLoadGameType camelot]` marks Forever-only files. (2026-11-03, forevermeta.me)
+- `WOW_PROJECT_CAMELOT = 18`; in Forever `WOW_PROJECT_ID == WOW_PROJECT_CAMELOT` (since build 70170). (2026-11-03, forevermeta.me)
 
-## Arquitectura de la API
-- Comparte la arquitectura de UI y la mayoría de APIs de retail 12.1.5 (C_QuestLog, C_Map, C_Item, C_Spell, C_Traits). Un addon de Classic Era no carga tal cual. (2026-11-03, Blizzard en el Discord de UI dev, vía forevermeta.me)
-- Restricciones de "secrets" de Midnight activas. (ídem)
-- Unos 1.041 globales de FrameXML de retail eliminados en la 1.60.1. Lista: warcraft.wiki.gg, página "Patch 1.60.1/API changes".
-- Títulos de quest: `C_QuestLog.GetTitleForQuestID`. (2026-11-03, changelogs de addons)
+## API architecture
+- Shares the UI architecture and most APIs of retail 12.1.5 (C_QuestLog, C_Map, C_Item, C_Spell, C_Traits). A Classic Era addon does not load as is. (2026-11-03, Blizzard in the UI dev Discord, via forevermeta.me)
+- Midnight "secrets" restrictions active. (idem)
+- About 1,041 retail FrameXML globals removed in 1.60.1. List: warcraft.wiki.gg, page "Patch 1.60.1/API changes".
+- Quest titles: `C_QuestLog.GetTitleForQuestID`. (2026-11-03, addon changelogs)
 
-## Comportamiento del cliente que emulan los tests
-| Comportamiento | Emulación en `tests/support/` | Fuente |
+## Client behavior emulated by the tests
+| Behavior | Emulation in `tests/support/` | Source |
 |---|---|---|
-| Carga los archivos en el orden del TOC; los `.xml` cargan sus `<Script file>`; cada archivo recibe `(addonName, ns)` | `client.lua` | warcraft.wiki.gg/wiki/TOC_format |
-| SavedVariables: se restauran tras ejecutar los archivos del addon y antes de `ADDON_LOADED` | `client.lua` | warcraft.wiki.gg/wiki/Saving_variables_between_game_sessions |
-| Orden de eventos al entrar: `ADDON_LOADED` → `PLAYER_LOGIN` | `client.lua` | warcraft.wiki.gg/wiki/AddOn_loading_process |
-| Slash: para cada `KEY` de `SlashCmdList`, los alias son `SLASH_<KEY>1`, `SLASH_<KEY>2`... | `client.lua` | warcraft.wiki.gg/wiki/Creating_a_slash_command |
+| Loads files in TOC order; `.xml` files load their `<Script file>`; each file receives `(addonName, ns)` | `client.lua` | warcraft.wiki.gg/wiki/TOC_format |
+| SavedVariables: restored after running the addon files and before `ADDON_LOADED` | `client.lua` | warcraft.wiki.gg/wiki/Saving_variables_between_game_sessions |
+| Event order on login: `ADDON_LOADED` → `PLAYER_LOGIN` | `client.lua` | warcraft.wiki.gg/wiki/AddOn_loading_process |
+| `CreateFrame(type, name)` with `name` registers the frame as global `_G[name]` | `wow_mock.lua` | warcraft.wiki.gg/wiki/API_CreateFrame |
+| Slash: for each `KEY` in `SlashCmdList`, the aliases are `SLASH_<KEY>1`, `SLASH_<KEY>2`... | `client.lua` | warcraft.wiki.gg/wiki/Creating_a_slash_command |
 
-## APIs emuladas / usadas por el addon
-| API | Uso | Verificado |
+## Emulated / used APIs
+| API | Use | Verified |
 |---|---|---|
-| `C_AddOns.GetAddOnMetadata(addon, field)` | campos `## Field:` del TOC | anotaciones Ketho |
-| `CreateFrame("Frame")`, `:RegisterEvent`, `:UnregisterEvent`, `:SetScript("OnEvent")` | eventos | anotaciones Ketho |
-| `DEFAULT_CHAT_FRAME:AddMessage(msg)`, `print(...)` | chat | anotaciones Ketho |
-| `GetLocale()` | locale del cliente | anotaciones Ketho |
-| `WOW_PROJECT_ID`, `WOW_PROJECT_CAMELOT`, `WOW_PROJECT_MAINLINE` | detección | forevermeta.me |
+| `C_AddOns.GetAddOnMetadata(addon, field)` | `## Field:` fields of the TOC | Ketho annotations |
+| `CreateFrame("Frame")`, `:RegisterEvent`, `:UnregisterEvent`, `:SetScript("OnEvent")` | events | Ketho annotations |
+| `DEFAULT_CHAT_FRAME:AddMessage(msg)`, `print(...)` | chat | Ketho annotations |
+| `GetLocale()` | client locale | Ketho annotations |
+| `WOW_PROJECT_ID`, `WOW_PROJECT_CAMELOT`, `WOW_PROJECT_MAINLINE` | detection | forevermeta.me |
 
-## Pendiente de verificar en el juego
-- Carpeta de instalación de Forever en Windows (`_forever_`, `_camelot_`...). `scripts/deploy.ps1` prueba varias.
+## To be verified in game
+- Forever install folder on Windows (`_forever_`, `_camelot_`...). `scripts/deploy.ps1` tries several.
 
 ## Tooling
-- LSP: plugin `wow-lua-lsp` (lua-language-server 3.19 + anotaciones Ketho mainline en `.vendor/`).
+- LSP: `wow-lua-lsp` plugin (lua-language-server 3.19 + Ketho mainline annotations in `.vendor/`).
+- `.luarc.json` declares `SlashCmdList`, `DEFAULT_CHAT_FRAME` and `WOW_PROJECT_CAMELOT` as globals because Ketho's `Annotations/FrameXML` is a git submodule that `tools/fetch_annotations.sh` does not download, so LuaLS does not know them. `WOW_PROJECT_CAMELOT` is also Forever-exclusive (it does not exist in the Classic annotations).
 ```
 
-- [ ] **Paso 2: `tests/support/wow_mock.lua`**
+- [ ] **Step 2: `tests/support/wow_mock.lua`**
 
 ```lua
 -- Minimal WoW Forever API emulation for out-of-game tests.
@@ -394,7 +396,7 @@ end
 return WowMock
 ```
 
-- [ ] **Paso 3: `tests/support/client.lua`**
+- [ ] **Step 3: `tests/support/client.lua`**
 
 ```lua
 -- Emulates how the WoW client loads and drives the addon (see docs/api/forever-api.md).
@@ -536,7 +538,7 @@ end
 return Client
 ```
 
-- [ ] **Paso 4: `tests/acceptance/toc_spec.lua`**
+- [ ] **Step 4: `tests/acceptance/toc_spec.lua`**
 
 ```lua
 local Client = require("support.client")
@@ -564,7 +566,7 @@ describe("TOC (acceptance)", function()
 end)
 ```
 
-- [ ] **Paso 5: `tests/acceptance/addon_spec.lua`**
+- [ ] **Step 5: `tests/acceptance/addon_spec.lua`**
 
 ```lua
 local Client = require("support.client")
@@ -649,7 +651,7 @@ describe("Addon (acceptance)", function()
 end)
 ```
 
-- [ ] **Paso 6: paquetes de Python**
+- [ ] **Step 6: Python packages**
 
 ```bash
 mkdir -p tools/tests/acceptance
@@ -658,7 +660,7 @@ mkdir -p tools/tests/acceptance
 : > tools/tests/acceptance/__init__.py
 ```
 
-- [ ] **Paso 7: `tools/tests/acceptance/support.py`**
+- [ ] **Step 7: `tools/tests/acceptance/support.py`**
 
 ```python
 """Black-box helpers for acceptance tests: run CLIs, build fixture routes, copy the repo."""
@@ -759,7 +761,7 @@ def copy_repo(destination: Path) -> Path:
     return repo
 ```
 
-- [ ] **Paso 8: `tools/tests/acceptance/dump_guide.lua`**
+- [ ] **Step 8: `tools/tests/acceptance/dump_guide.lua`**
 
 ```lua
 -- Usage: luajit dump_guide.lua <compiled-guide.lua> <guide-id>
@@ -826,7 +828,7 @@ end
 io.write(encode(guide))
 ```
 
-- [ ] **Paso 9: `tools/tests/acceptance/test_route_pipeline.py`**
+- [ ] **Step 9: `tools/tests/acceptance/test_route_pipeline.py`**
 
 ```python
 """Acceptance tests for the route pipeline CLIs (spec §11.1). Frozen: do not edit without user approval."""
@@ -1014,7 +1016,7 @@ if __name__ == "__main__":
     unittest.main()
 ```
 
-- [ ] **Paso 10: `tools/tests/acceptance/test_tooling.py`**
+- [ ] **Step 10: `tools/tests/acceptance/test_tooling.py`**
 
 ```python
 """Acceptance tests for tools/check.sh and the Claude Code post-edit hook (spec §11.3).
@@ -1108,20 +1110,20 @@ if __name__ == "__main__":
     unittest.main()
 ```
 
-- [ ] **Paso 11: lint de los tests**
+- [ ] **Step 11: lint the tests**
 
 Run: `stylua tests tools/tests && luacheck tests tools/tests/acceptance/dump_guide.lua`
-Esperado: `Total: 0 warnings / 0 errors`.
+Expected: `Total: 0 warnings / 0 errors`.
 
-- [ ] **Paso 12: confirmar que TODO está en rojo**
+- [ ] **Step 12: confirm that EVERYTHING is red**
 
 ```bash
 ~/.luarocks/bin/busted; echo "busted exit=$?"
 python3 -m unittest discover -s tools/tests -t . 2>&1 | tail -3
 ```
-Esperado: busted termina con errores (`missing file addon/LaRutaDel60/LaRutaDel60.toc`) y exit ≠ 0. unittest termina con `FAILED (failures=…, errors=…)` y **ningún test en verde**: las CLIs no existen (python devuelve exit 2, no el 1 que esperan los tests) y `check.sh`/el hook no existen (error al ejecutarlos). Si algún test pasa, el test está mal escrito: corregirlo ahora, antes de congelarlo.
+Expected: busted ends with errors (`missing file addon/LaRutaDel60/LaRutaDel60.toc`) and exit ≠ 0. unittest ends with `FAILED (failures=…, errors=…)` and **no test green**: the CLIs do not exist (python returns exit 2, not the 1 the tests expect) and `check.sh`/the hook do not exist (error when running them). If any test passes, the test is badly written: fix it now, before freezing it.
 
-- [ ] **Paso 13: commit (en rojo)**
+- [ ] **Step 13: commit (in red)**
 
 ```bash
 git add docs/api tests tools/__init__.py tools/tests
@@ -1130,24 +1132,24 @@ git commit -m "test: black-box acceptance tests for the technical base (red)"
 
 ---
 
-### Tarea 3: Pipeline de rutas (validador + compilador + ruta de ejemplo)
+### Task 3: Route pipeline (validator + compiler + example route)
 
-**Objetivo de la tarea:** poner en verde `tools/tests/acceptance/test_route_pipeline.py` sin modificarlo.
+**Task goal:** turn `tools/tests/acceptance/test_route_pipeline.py` green without modifying it.
 
 **Archivos:**
 - Crear: `tools/validate_routes.py`, `tools/compile_guides.py`, `data/routes/alliance/alliance-northshire-example.json`
 - Generados: `addon/LaRutaDel60/Guides/alliance-northshire-example.lua`, `addon/LaRutaDel60/Guides/Guides.xml`
 
 **Interfaces:**
-- Consume: los contratos de la Tarea 2.
-- Produce: `validate_routes.validate_all(routes_dir) -> list[str]`, `validate_routes.ROOT`, `ROUTES_DIR`; las guías generadas que carga el addon (Tarea 4).
+- Consumes: the contracts of Task 2.
+- Produce: `validate_routes.validate_all(routes_dir) -> list[str]`, `validate_routes.ROOT`, `ROUTES_DIR`; the generated guides that the addon loads (Task 4).
 
-- [ ] **Paso 1: ver en rojo**
+- [ ] **Step 1: see it red**
 
 Run: `python3 -m unittest tools.tests.acceptance.test_route_pipeline 2>&1 | tail -1`
-Esperado: `FAILED (...)`.
+Expected: `FAILED (...)`.
 
-- [ ] **Paso 2: `tools/validate_routes.py`**
+- [ ] **Step 2: `tools/validate_routes.py`**
 
 ```python
 """Validates leveling routes under data/routes against the La Ruta del 60 guide format.
@@ -1343,7 +1345,7 @@ if __name__ == "__main__":
     sys.exit(main())
 ```
 
-- [ ] **Paso 3: `tools/compile_guides.py`**
+- [ ] **Step 3: `tools/compile_guides.py`**
 
 ```python
 """Compiles data/routes/**/*.json into addon/LaRutaDel60/Guides/*.lua plus Guides.xml.
@@ -1484,9 +1486,9 @@ if __name__ == "__main__":
     sys.exit(main())
 ```
 
-- [ ] **Paso 4: ruta de ejemplo**
+- [ ] **Step 4: example route**
 
-`data/routes/alliance/alliance-northshire-example.json` (datos de Classic, solo para probar el pipeline; **no verificados en Forever**):
+`data/routes/alliance/alliance-northshire-example.json` (Classic data, only to test the pipeline; **not verified in Forever**):
 ```json
 {
   "id": "alliance-northshire-example",
@@ -1528,15 +1530,15 @@ if __name__ == "__main__":
 }
 ```
 
-- [ ] **Paso 5: generar guías y poner en verde**
+- [ ] **Step 5: generate guides and turn green**
 
 ```bash
 python3 tools/compile_guides.py
 python3 -m unittest tools.tests.acceptance.test_route_pipeline -v 2>&1 | tail -3
 ```
-Esperado: `OK: compiled 1 guide(s)…` y `OK` en los tests del pipeline. Si alguno falla, arreglar el código de `tools/` (nunca el test).
+Expected: `OK: compiled 1 guide(s)…` and `OK` in the pipeline tests. If any fails, fix the `tools/` code (never the test).
 
-- [ ] **Paso 6: commit**
+- [ ] **Step 6: commit**
 
 ```bash
 git add tools/validate_routes.py tools/compile_guides.py data/routes addon/LaRutaDel60/Guides
@@ -1545,23 +1547,23 @@ git commit -m "feat: route validator and JSON-to-Lua guide compiler"
 
 ---
 
-### Tarea 4: Addon "hola mundo"
+### Task 4: "Hello world" addon
 
-**Objetivo de la tarea:** poner en verde `tests/acceptance/*_spec.lua` sin modificarlos.
+**Task goal:** turn `tests/acceptance/*_spec.lua` green without modifying them.
 
 **Archivos:**
 - Crear: `addon/LaRutaDel60/LaRutaDel60.toc`, `addon/LaRutaDel60/LaRutaDel60_Forever.toc`, `addon/LaRutaDel60/Locales/Locales.lua`, `addon/LaRutaDel60/Locales/enUS.lua`, `addon/LaRutaDel60/Locales/esES.lua`, `addon/LaRutaDel60/Core/Init.lua`
 
 **Interfaces:**
-- Consume: `Guides/Guides.xml` y `ns.Guides[id]` (Tarea 3).
-- Produce: `ns.L` (tabla de textos con fallback a la clave), `ns.Print(msg)`, `ns.Guides`. Claves de locale: `ADDON_TITLE`, `LOADED`, `NOT_FOREVER`, `VERSION_INFO`.
+- Consume: `Guides/Guides.xml` y `ns.Guides[id]` (Task 3).
+- Produce: `ns.L` (text table with fallback to the key), `ns.Print(msg)`, `ns.Guides`. Locale keys: `ADDON_TITLE`, `LOADED`, `NOT_FOREVER`, `VERSION_INFO`.
 
-- [ ] **Paso 1: ver en rojo**
+- [ ] **Step 1: see it red**
 
 Run: `~/.luarocks/bin/busted 2>&1 | tail -2`
-Esperado: errores por el TOC inexistente.
+Expected: errors because the TOC does not exist.
 
-- [ ] **Paso 2: TOC**
+- [ ] **Step 2: TOC**
 
 `addon/LaRutaDel60/LaRutaDel60.toc`:
 ```
@@ -1583,7 +1585,7 @@ Guides\Guides.xml
 
 Run: `cp addon/LaRutaDel60/LaRutaDel60.toc addon/LaRutaDel60/LaRutaDel60_Forever.toc`
 
-- [ ] **Paso 3: locales**
+- [ ] **Step 3: locales**
 
 `addon/LaRutaDel60/Locales/Locales.lua`:
 ```lua
@@ -1623,7 +1625,7 @@ L.NOT_FOREVER = "Aviso: este cliente no es WoW Forever; las guías pueden fallar
 L.VERSION_INFO = "Versión %s - %d guía(s) cargada(s)."
 ```
 
-- [ ] **Paso 4: `addon/LaRutaDel60/Core/Init.lua`**
+- [ ] **Step 4: `addon/LaRutaDel60/Core/Init.lua`**
 
 ```lua
 local ADDON_NAME, ns = ...
@@ -1666,12 +1668,12 @@ SlashCmdList.LARUTADEL60 = function()
 end
 ```
 
-- [ ] **Paso 5: poner en verde**
+- [ ] **Step 5: turn green**
 
 Run: `stylua addon && luacheck addon && ~/.luarocks/bin/busted`
-Esperado: luacheck `0 warnings / 0 errors`; busted `12 successes / 0 failures / 0 errors`. Si falla un spec, arreglar el addon (nunca el spec).
+Expected: luacheck `0 warnings / 0 errors`; busted `12 successes / 0 failures / 0 errors`. If a spec fails, fix the addon (never the spec).
 
-- [ ] **Paso 6: commit**
+- [ ] **Step 6: commit**
 
 ```bash
 git add addon/LaRutaDel60
@@ -1680,14 +1682,14 @@ git commit -m "feat: hello-world addon with /ruta, enUS/esES and Forever detecti
 
 ---
 
-### Tarea 5: Verificación completa (`tools/check.sh`)
+### Task 5: Full verification (`tools/check.sh`)
 
-**Objetivo de la tarea:** poner en verde `CheckScriptTest` de `test_tooling.py`.
+**Task goal:** turn `CheckScriptTest` in `test_tooling.py` green.
 
 **Archivos:**
 - Crear: `tools/luals_check.sh`, `tools/check.sh`
 
-- [ ] **Paso 1: `tools/luals_check.sh`**
+- [ ] **Step 1: `tools/luals_check.sh`**
 
 ```bash
 #!/usr/bin/env bash
@@ -1701,7 +1703,7 @@ trap 'rm -rf "$LOGDIR"' EXIT
 lua-language-server --check "$PWD" --configpath "$PWD/.luarc.json" --checklevel=Warning --logpath "$LOGDIR"
 ```
 
-- [ ] **Paso 2: comprobar que LuaLS detecta errores reales**
+- [ ] **Step 2: check that LuaLS detects real errors**
 
 ```bash
 chmod +x tools/luals_check.sh
@@ -1710,9 +1712,9 @@ tools/luals_check.sh; echo "exit=$?"
 rm addon/LaRutaDel60/Core/Broken.lua
 tools/luals_check.sh; echo "exit=$?"
 ```
-Esperado: la primera vez `undefined-global` y `exit=1`; la segunda, `no problems found` y `exit=0`. Si la segunda marca avisos en el addon, corregir el código (no desactivar diagnósticos).
+Expected: the first time `undefined-global` and `exit=1`; the second, `no problems found` and `exit=0`. If the second flags warnings in the addon, fix the code (do not disable diagnostics).
 
-- [ ] **Paso 3: `tools/check.sh`**
+- [ ] **Step 3: `tools/check.sh`**
 
 ```bash
 #!/usr/bin/env bash
@@ -1738,15 +1740,15 @@ step "LuaLS"; tools/luals_check.sh
 printf '\nOK: all green\n'
 ```
 
-- [ ] **Paso 4: poner en verde**
+- [ ] **Step 4: turn green**
 
 ```bash
 chmod +x tools/check.sh
 python3 -m unittest tools.tests.acceptance.test_tooling.CheckScriptTest -v 2>&1 | tail -3
 ```
-Esperado: `OK` (4 tests).
+Expected: `OK` (4 tests).
 
-- [ ] **Paso 5: commit**
+- [ ] **Step 5: commit**
 
 ```bash
 git add tools/check.sh tools/luals_check.sh
@@ -1755,14 +1757,14 @@ git commit -m "chore: full verification script"
 
 ---
 
-### Tarea 6: Hook post-edición y permisos de Claude Code
+### Task 6: Post-edit hook and Claude Code permissions
 
-**Objetivo de la tarea:** poner en verde `PostEditHookTest` y, con ello, el `tools/check.sh` completo.
+**Task goal:** turn `PostEditHookTest` green and, with it, the full `tools/check.sh`.
 
 **Archivos:**
 - Crear: `.claude/hooks/post-edit.sh`, `.claude/settings.json`
 
-- [ ] **Paso 1: `.claude/hooks/post-edit.sh`**
+- [ ] **Step 1: `.claude/hooks/post-edit.sh`**
 
 ```bash
 #!/usr/bin/env bash
@@ -1792,7 +1794,7 @@ esac
 exit 0
 ```
 
-- [ ] **Paso 2: `.claude/settings.json`**
+- [ ] **Step 2: `.claude/settings.json`**
 
 ```json
 {
@@ -1830,7 +1832,7 @@ exit 0
 }
 ```
 
-- [ ] **Paso 3: poner en verde todo**
+- [ ] **Step 3: turn everything green**
 
 ```bash
 chmod +x .claude/hooks/post-edit.sh
@@ -1838,9 +1840,9 @@ python3 -m json.tool .claude/settings.json > /dev/null && echo JSON_OK
 python3 -m unittest tools.tests.acceptance.test_tooling -v 2>&1 | tail -3
 tools/check.sh
 ```
-Esperado: `JSON_OK`, `OK` (9 tests) y `OK: all green`.
+Expected: `JSON_OK`, `OK` (9 tests) y `OK: all green`.
 
-- [ ] **Paso 4: commit**
+- [ ] **Step 4: commit**
 
 ```bash
 git add .claude/settings.json .claude/hooks/post-edit.sh
@@ -1849,13 +1851,13 @@ git commit -m "chore: Claude Code post-edit hook and permissions"
 
 ---
 
-### Tarea 7: Plugin LSP local para Claude Code
+### Task 7: Local LSP plugin for Claude Code
 
 **Archivos:**
 - Crear: `.claude-plugin/marketplace.json`, `claude-plugins/wow-lua-lsp/.claude-plugin/plugin.json`
-- Modificar: `.claude/settings.json` (lo modifica el CLI al instalar con `--scope project`)
+- Modificar: `.claude/settings.json` (modified by the CLI when installing with `--scope project`)
 
-- [ ] **Paso 1: `.claude-plugin/marketplace.json`**
+- [ ] **Step 1: `.claude-plugin/marketplace.json`**
 
 ```json
 {
@@ -1872,7 +1874,7 @@ git commit -m "chore: Claude Code post-edit hook and permissions"
 }
 ```
 
-- [ ] **Paso 2: `claude-plugins/wow-lua-lsp/.claude-plugin/plugin.json`**
+- [ ] **Step 2: `claude-plugins/wow-lua-lsp/.claude-plugin/plugin.json`**
 
 ```json
 {
@@ -1891,12 +1893,12 @@ git commit -m "chore: Claude Code post-edit hook and permissions"
 }
 ```
 
-- [ ] **Paso 3: validar**
+- [ ] **Step 3: validar**
 
 Run: `claude plugin validate ./claude-plugins/wow-lua-lsp && claude plugin validate .`
-Esperado: `Validation passed` en ambos (si hay warnings, que no sean de `lspServers`).
+Expected: `Validation passed` in both (if there are warnings, they must not be about `lspServers`).
 
-- [ ] **Paso 4: instalar a nivel de proyecto**
+- [ ] **Step 4: install at project level**
 
 ```bash
 claude plugin marketplace add ./
@@ -1904,18 +1906,18 @@ claude plugin install wow-lua-lsp@larutadel60 --scope project
 git diff .claude/settings.json
 claude plugin list
 ```
-Esperado: `.claude/settings.json` gana `enabledPlugins` con `"wow-lua-lsp@larutadel60": true`, y `claude plugin list` lo muestra sin errores. Si el CLI no añade `extraKnownMarketplaces`, añadirlo a mano:
+Expected: `.claude/settings.json` gains `enabledPlugins` with `"wow-lua-lsp@larutadel60": true`, and `claude plugin list` shows it without errors. If the CLI does not add `extraKnownMarketplaces`, add it by hand:
 ```json
 "extraKnownMarketplaces": {
   "larutadel60": { "source": { "source": "directory", "path": "./" } }
 }
 ```
 
-- [ ] **Paso 5: verificación manual (se apunta para el checklist final)**
+- [ ] **Step 5: manual verification (noted for the final checklist)**
 
-En una sesión nueva de Claude Code: «usa la herramienta LSP para hacer hover sobre `C_AddOns` en `addon/LaRutaDel60/Core/Init.lua`». Esperado: devuelve la documentación de la anotación de Ketho. Si falla, el respaldo es `tools/luals_check.sh` dentro de `check.sh`; anotarlo en `docs/api/forever-api.md`, sección "Tooling".
+In a new Claude Code session: "use the LSP tool to hover over `C_AddOns` in `addon/LaRutaDel60/Core/Init.lua`". Expected: it returns the documentation from the Ketho annotation. If it fails, the fallback is `tools/luals_check.sh` inside `check.sh`; note it in `docs/api/forever-api.md`, section "Tooling".
 
-- [ ] **Paso 6: `tools/check.sh` en verde y commit**
+- [ ] **Step 6: `tools/check.sh` green and commit**
 
 ```bash
 tools/check.sh
@@ -1925,74 +1927,74 @@ git commit -m "chore: local LSP plugin (lua-language-server) for Claude Code"
 
 ---
 
-### Tarea 8: Subagentes
+### Task 8: Subagents
 
-**Archivos:** crear `.claude/agents/{wow-api-expert,addon-engineer,route-researcher,route-optimizer,route-validator,lua-reviewer}.md`
+**Files:** create `.claude/agents/{wow-api-expert,addon-engineer,route-researcher,route-optimizer,route-validator,lua-reviewer}.md`
 
-- [ ] **Paso 1: `wow-api-expert.md`**
+- [ ] **Step 1: `wow-api-expert.md`**
 
 ```markdown
 ---
 name: wow-api-expert
-description: Verifica si una función, evento, widget o constante de la API de WoW existe y cómo se comporta en WoW Forever 1.60.1 (Interface 16001). Úsalo ANTES de usar cualquier API de WoW que no esté ya en el código o en docs/api/forever-api.md. Solo lectura.
+description: Verifies whether a WoW API function, event, widget or constant exists and how it behaves in WoW Forever 1.60.1 (Interface 16001). Use it BEFORE using any WoW API that is not already in the code or in docs/api/forever-api.md. Read-only.
 tools: Read, Grep, Glob, WebFetch, WebSearch
 ---
 
-Eres el experto en la API de addons de WoW Forever (cliente 1.60.1, Interface 16001, Lua 5.1).
+You are the expert on the WoW Forever addon API (client 1.60.1, Interface 16001, Lua 5.1).
 
-Contexto fijo:
-- Forever usa la arquitectura de UI de retail 12.x (C_QuestLog, C_Map, C_Item, C_Spell...), NO la de Classic Era 1.15.
-- Las restricciones de "secrets" de Midnight están activas. Se eliminaron unos 1.041 globales de FrameXML de retail.
-- Detección: WOW_PROJECT_ID == WOW_PROJECT_CAMELOT (18).
+Fixed context:
+- Forever uses the retail 12.x UI architecture (C_QuestLog, C_Map, C_Item, C_Spell...), NOT the Classic Era 1.15 one.
+- Midnight "secrets" restrictions are active. About 1,041 retail FrameXML globals were removed.
+- Detection: WOW_PROJECT_ID == WOW_PROJECT_CAMELOT (18).
 
-Proceso para cada API:
-1. Busca en `docs/api/forever-api.md` (conocimiento ya verificado).
-2. `Grep` en `.vendor/vscode-wow-api/Annotations/Core` para sacar firma, parámetros y retornos.
-3. Si hay dudas sobre Forever, consulta warcraft.wiki.gg (incluida "Patch 1.60.1/API changes").
-4. Responde con: existe sí/no/incierto, firma exacta, eventos relacionados, restricciones (protegida, combat lockdown, secret), alternativa si no existe y URLs consultadas.
+Process for each API:
+1. Search `docs/api/forever-api.md` (already verified knowledge).
+2. `Grep` in `.vendor/vscode-wow-api/Annotations/Core` to get the signature, parameters and returns.
+3. If in doubt about Forever, consult warcraft.wiki.gg (including "Patch 1.60.1/API changes").
+4. Answer with: exists yes/no/uncertain, exact signature, related events, restrictions (protected, combat lockdown, secret), alternative if it does not exist and URLs consulted. Reply to the user in Spanish; everything written to the repo is in English.
 
-Si confirmas algo nuevo, propón (sin escribirlo) la línea para `docs/api/forever-api.md` y, si es una global, para `read_globals` de `.luacheckrc` y para `tests/support/wow_mock.lua`.
-Nunca inventes una API: "incierto" es una respuesta válida.
+If you confirm something new, propose (without writing it) the line for `docs/api/forever-api.md` and, if it is a global, for `read_globals` in `.luacheckrc` and for `tests/support/wow_mock.lua` (frozen file: the proposal goes to the user for approval and only additively).
+Never invent an API: "uncertain" is a valid answer.
 ```
 
-- [ ] **Paso 2: `addon-engineer.md`**
+- [ ] **Step 2: `addon-engineer.md`**
 
 ```markdown
 ---
 name: addon-engineer
-description: Implementa funcionalidad del addon (motor de guía, flecha, auto-quest, UI, módulos) en addon/LaRutaDel60 haciendo pasar tests de aceptación ya escritos. Úsalo para cualquier cambio de código Lua del addon.
+description: Implements addon functionality (guide engine, arrow, auto-quest, UI, modules) in addon/LaRutaDel60 by making already-written acceptance tests pass. Use it for any Lua code change in the addon.
 tools: Read, Edit, Write, Grep, Glob, Bash
 ---
 
-Implementas código del addon La Ruta del 60 para WoW Forever (Interface 16001, Lua 5.1).
+You implement code for the La Ruta del 60 addon for WoW Forever (Interface 16001, Lua 5.1).
 
-Reglas no negociables (ver CLAUDE.md):
-- Código 100% en inglés (identificadores, comentarios, strings). Tus explicaciones al usuario, en castellano.
-- Los tests de aceptación (`tests/acceptance/`, `tests/support/`, `tools/tests/acceptance/`) están congelados. Tu trabajo es ponerlos en verde sin tocarlos. Si un test parece incorrecto, PARA y explícalo; no lo cambies.
-- Si la funcionalidad no tiene tests de aceptación, pídelos antes de escribir código (deben derivarse de la spec, no de tu implementación).
-- Sin globals nuevas: todo en `ns` (`local ADDON_NAME, ns = ...`). Permitidas: LaRutaDel60DB, SLASH_LARUTADEL601, SlashCmdList.LARUTADEL60.
-- Cada API de WoW nueva: verifícala (skill `wow-forever-api` o agente `wow-api-expert`) y añádela a `.luacheckrc` y a `docs/api/forever-api.md`.
-- Un módulo por archivo, en AMBOS TOC (idénticos). Skill `new-module`.
-- Textos visibles siempre vía `ns.L`, con clave en `Locales/enUS.lua` y en `Locales/esES.lua`.
-- Nunca edites `addon/LaRutaDel60/Guides/` (es generado).
-- Rendimiento: nada pesado en OnUpdate sin throttle; usa eventos.
-- No copies código de RestedXP ni de otros addons.
+Non-negotiable rules (see CLAUDE.md):
+- Code 100% in English (identifiers, comments, strings). Reply to the user in Spanish; everything written to the repo is in English.
+- The acceptance tests (`tests/acceptance/`, `tests/support/`, `tools/tests/acceptance/`) are frozen. Your job is to turn them green without touching them. If a test looks incorrect, STOP and explain it; do not change it.
+- If the feature has no acceptance tests, ask for them before writing code (they must be derived from the spec, not from your implementation).
+- No new globals: everything in `ns` (`local ADDON_NAME, ns = ...`). Allowed: LaRutaDel60DB, SLASH_LARUTADEL601, SlashCmdList.LARUTADEL60.
+- Every new WoW API: verify it by reading `.claude/skills/wow-forever-api/SKILL.md` and `docs/api/forever-api.md` (you cannot invoke skills or agents); if you still have doubts about the API, STOP and report it to the main agent so it consults `wow-api-expert`. Once verified, add it to `.luacheckrc` and to `docs/api/forever-api.md`.
+- One module per file, in BOTH TOCs (identical). Follow `.claude/skills/new-module/SKILL.md` (read it directly).
+- Visible texts always via `ns.L`, with a key in `Locales/enUS.lua` and in `Locales/esES.lua`.
+- Never edit `addon/LaRutaDel60/Guides/` (it is generated).
+- Performance: nothing heavy in OnUpdate without a throttle; use events.
+- Do not copy code from RestedXP or other addons.
 
-Termina siempre ejecutando `tools/check.sh` y reporta su salida final.
+Always finish by running `tools/check.sh` and report its final output.
 ```
 
-- [ ] **Paso 3: `route-researcher.md`**
+- [ ] **Step 3: `route-researcher.md`**
 
 ```markdown
 ---
 name: route-researcher
-description: Investiga en bases de datos web (Wowhead y similares con datos de WoW Forever) quests, NPCs, coordenadas, niveles y prerrequisitos de una zona o tramo, y los guarda como JSON crudo en data/raw/. Primer paso de la skill add-route-segment.
+description: Researches quests, NPCs, coordinates, levels and prerequisites of a zone or segment in web databases (Wowhead and similar, with WoW Forever data) and saves them as raw JSON in data/raw/. First step of the add-route-segment skill.
 tools: Read, Write, Grep, Glob, WebFetch, WebSearch
 ---
 
-Recopilas datos crudos para rutas de leveo de WoW Forever. NO creas rutas, solo datos.
+You collect raw data for WoW Forever leveling routes. You do NOT create routes, only data.
 
-Salida: `data/raw/<zona-kebab>.json` (claves en inglés):
+Output: `data/raw/<zone-kebab>.json` (keys in English):
 {
   "zone": "Elwynn Forest", "mapId": 1429, "faction": "Alliance",
   "retrievedAt": "YYYY-MM-DD",
@@ -2007,219 +2009,224 @@ Salida: `data/raw/<zona-kebab>.json` (claves en inglés):
   "flightPaths": [], "innkeepers": [], "notes": []
 }
 
-Reglas:
-- Prioriza fuentes con datos de WoW Forever 1.60.1. Forever tiene unas 1.000 quests nuevas y la XP de mazmorras va por quests, así que los datos de Classic Era pueden estar mal. Pon `"forever": false` en cada quest cuyo dato solo encuentres para Classic Era.
-- Cada quest DEBE tener `source` (URL). No inventes nada: si falta un dato, omítelo y anótalo en `notes`.
-- Coordenadas en porcentaje 0-100 del mapa `mapId` (uiMapID).
-- Si el archivo de la zona ya existe, fusiona sin borrar datos verificados.
+Rules:
+- Never copy data or routes from RestedXP or other commercial or paid guides. Use only public quest databases, citing `source`.
+- Prioritize sources with WoW Forever 1.60.1 data. Forever has about 1,000 new quests and dungeon XP comes from quests, so Classic Era data may be wrong. Set `"forever": false` on every quest whose data you only find for Classic Era.
+- Every quest MUST have `source` (URL). Do not invent anything: if a datum is missing, omit it and note it in `notes`.
+- Coordinates as a 0-100 percentage of map `mapId` (uiMapID).
+- If the zone file already exists, merge without deleting verified data.
+- Reply to the user in Spanish; everything written to the repo is in English.
 ```
 
-- [ ] **Paso 4: `route-optimizer.md`**
+- [ ] **Step 4: `route-optimizer.md`**
 
 ```markdown
 ---
 name: route-optimizer
-description: Construye u optimiza una ruta de leveo (data/routes/<faccion>/<id>.json) a partir de los datos crudos de data/raw/, minimizando el tiempo hasta el nivel objetivo. Úsalo tras route-researcher.
+description: Builds or optimizes a leveling route (data/routes/<faction>/<id>.json) from the raw data in data/raw/, minimizing the time to the target level. Use it after route-researcher.
 tools: Read, Write, Edit, Grep, Glob, Bash
 ---
 
-Diseñas las rutas de leveo más rápidas posibles para WoW Forever, en el formato de la skill `guide-format`.
+You design the fastest possible leveling routes for WoW Forever, in the format of the `guide-format` skill.
 
-Criterios, en orden:
-1. XP por minuto: agrupa quests por área, acepta todo lo cercano antes de salir y entrega en lote.
-2. Menos desplazamiento: no vuelvas sobre tus pasos; usa `hearth` y `fly` cuando ahorren tiempo; indica con un `note` dónde fijar la piedra de hogar.
-3. El jugador nunca debe quedarse sin nivel: estima la XP acumulada con el `xp` de data/raw y respeta minLevel.
-4. Entrenamiento de clase (`train`) en los niveles pares cuando pases cerca de un entrenador.
-5. Variantes por raza o clase solo cuando cambia la zona de inicio o hay quests de clase.
+Criteria, in order:
+1. XP per minute: group quests by area, accept everything nearby before leaving and turn in in batches.
+2. Less travel: do not backtrack; use `hearth` and `fly` when they save time; use a `note` to indicate where to set the hearthstone.
+3. The player must never be under-leveled: estimate the accumulated XP with the `xp` from data/raw and respect minLevel.
+4. Class training (`train`) on even levels when you pass near a trainer.
+5. Race or class variants only when the starting zone changes or there are class quests.
 
-Reglas:
-- Solo usa quests de data/raw que tengan `source`, y copia `source` al paso.
-- Las quests aceptadas en rutas anteriores van en `carriedQuests`. Enlaza tramos con `next`.
-- Los textos de los pasos (`text`) llevan enUS y esES.
-- Al terminar: `python3 tools/validate_routes.py && python3 tools/compile_guides.py`, y corrige hasta que pase.
-- En tu respuesta final, explica en castellano por qué elegiste ese orden y la XP estimada al final del tramo.
+Rules:
+- Never copy data or routes from RestedXP or other commercial or paid guides. Use only public quest databases, citing `source`.
+- Only use quests from data/raw that have `source`, and copy `source` into the step.
+- Quests accepted in earlier routes go in `carriedQuests`. Link segments with `next`.
+- Step texts (`text`) carry enUS and esES.
+- When done: `python3 tools/validate_routes.py && python3 tools/compile_guides.py`, and fix until it passes.
+- Reply to the user in Spanish; everything written to the repo is in English. In your final answer, explain why you chose that order and the estimated XP at the end of the segment.
 ```
 
-- [ ] **Paso 5: `route-validator.md`**
+- [ ] **Step 5: `route-validator.md`**
 
 ```markdown
 ---
 name: route-validator
-description: Revisa la coherencia de las rutas de data/routes contra los datos crudos de data/raw (prerrequisitos, niveles, coordenadas, facción, XP hasta el nivel objetivo). Solo lectura; reporta problemas. Úsalo tras route-optimizer y antes de commitear rutas.
+description: Reviews the consistency of the routes in data/routes against the raw data in data/raw (prerequisites, levels, coordinates, faction, XP up to the target level). Read-only; reports problems. Use it after route-optimizer and before committing routes.
 tools: Read, Grep, Glob, Bash
 ---
 
-Eres un revisor escéptico de rutas de leveo: asume que hay errores hasta demostrar lo contrario.
+You are a skeptical reviewer of leveling routes: assume there are errors until proven otherwise.
 
-1. Ejecuta `python3 tools/validate_routes.py` (reglas estructurales). Si falla, repórtalo y para.
-2. Para cada ruta indicada, comprueba contra data/raw que:
-   - cada questId existe en data/raw y la facción coincide;
-   - los prerrequisitos se aceptan y entregan antes, en esta ruta o en la cadena `next` anterior;
-   - el nivel estimado del jugador (por XP acumulada) es >= minLevel de cada quest al aceptarla;
-   - las coordenadas de cada paso coinciden con las de start/end del NPC (tolerancia 1.0);
-   - el último tramo de la cadena llega a maxLevel 60.
-   Además, señala como riesgo las quests con `"forever": false`.
-3. Informe en castellano: lista numerada `ruta:steps[n] — problema — evidencia`, de más a menos grave. Si no hay problemas, dilo explícitamente.
-No edites archivos.
+1. Run `python3 tools/validate_routes.py` (structural rules). If it fails, report it and stop.
+2. For each given route, check against data/raw that:
+   - every questId exists in data/raw and the faction matches;
+   - prerequisites are accepted and turned in earlier, in this route or in the previous `next` chain;
+   - the player's estimated level (from accumulated XP) is >= each quest's minLevel when accepting it;
+   - each step's coordinates match the NPC's start/end ones (tolerance 1.0);
+   - the last segment of the chain reaches maxLevel 60.
+   Also flag quests with `"forever": false` as a risk.
+3. Reply to the user in Spanish; everything written to the repo is in English. Report: numbered list `route:steps[n] — problem — evidence`, from most to least severe. If there are no problems, say so explicitly.
+Do not edit files.
 ```
 
-- [ ] **Paso 6: `lua-reviewer.md`**
+- [ ] **Step 6: `lua-reviewer.md`**
 
 ```markdown
 ---
 name: lua-reviewer
-description: Revisa los cambios de código Lua del addon antes de commitear (taint, rendimiento, globals, compatibilidad con Forever 16001, Lua 5.1, idioma, tests congelados). Solo lectura. Úsalo al terminar cada tarea de código.
+description: Reviews the addon's Lua code changes before committing (taint, performance, globals, Forever 16001 compatibility, Lua 5.1, language, frozen tests). Read-only. Use it when finishing each code task.
 tools: Read, Grep, Glob, Bash
 ---
 
-Revisas el diff actual (`git diff` y `git diff --cached`) del addon La Ruta del 60.
+You review the current diff (`git diff` and `git diff --cached`) and also the untracked files (`git status --porcelain`) of the La Ruta del 60 addon.
 
 Checklist:
-- Tests congelados: ningún cambio en `tests/acceptance/`, `tests/support/` ni `tools/tests/acceptance/` sin aprobación explícita del usuario. Si los hay, es un hallazgo crítico.
-- Idioma: código, comentarios y strings en inglés (salvo las traducciones de `Locales/esES.lua`).
-- Lua 5.1: sin goto, //, operadores de bits nativos, table.unpack sin fallback, <const>/<close>.
-- Globals: ninguna fuera de las permitidas en CLAUDE.md.
-- APIs de WoW: existen en Forever (si dudas, pregunta a wow-api-expert) y están en `.luacheckrc` y en `docs/api/forever-api.md`.
-- Taint: no tocar frames protegidos ni llamar funciones protegidas en combate (InCombatLockdown()); usar hooksecurefunc en vez de reemplazar funciones de Blizzard.
-- Rendimiento: OnUpdate con throttle, nada de crear tablas o closures por frame, desregistrar eventos que ya no hacen falta.
-- Textos visibles vía ns.L, con clave en enUS y esES. Archivos nuevos en ambos TOC.
-- Ejecuta `tools/check.sh`.
+- Frozen tests: no change in `tests/acceptance/`, `tests/support/` or `tools/tests/acceptance/` without explicit user approval. If there are any, it is a critical finding.
+- Language: code, comments and strings in English (except the translations in `Locales/esES.lua`).
+- Lua 5.1: no goto, //, native bitwise operators, table.unpack without fallback, <const>/<close>.
+- Globals: none outside those allowed in CLAUDE.md.
+- WoW APIs: they exist in Forever (if in doubt, STOP and report it to the main agent so it consults `wow-api-expert`; you cannot invoke agents or skills; read `.claude/skills/wow-forever-api/SKILL.md`) and they are in `.luacheckrc` and in `docs/api/forever-api.md`.
+- Taint: do not touch protected frames or call protected functions in combat (InCombatLockdown()); use hooksecurefunc instead of replacing Blizzard functions.
+- Performance: OnUpdate with a throttle, no creating tables or closures per frame, unregister events that are no longer needed.
+- Visible texts via ns.L, with a key in enUS and esES. New files in both TOCs.
+- Run `tools/check.sh`.
 
-Salida en castellano: hallazgos `archivo:línea — problema — arreglo sugerido`, de más a menos grave; o "Sin hallazgos" junto con la salida de check.sh.
-No edites archivos.
+Reply to the user in Spanish; everything written to the repo is in English. Output: findings `file:line — problem — suggested fix`, from most to least severe; or "No findings" together with the output of check.sh.
+Do not edit files.
 ```
 
-- [ ] **Paso 7: verificar y commit**
+- [ ] **Step 7: verificar y commit**
 
 ```bash
 for f in .claude/agents/*.md; do sed -n 2p "$f"; done
 git add .claude/agents
 git commit -m "feat: specialized subagents for addon and route work"
 ```
-Esperado: seis líneas `name: …` que coinciden con los nombres de archivo.
+Expected: six `name: …` lines matching the file names.
 
 ---
 
-### Tarea 9: Skills
+### Task 9: Skills
 
-**Archivos:** crear `.claude/skills/{wow-forever-api,guide-format,add-route-segment,new-module,release,debug-in-game}/SKILL.md`
+**Files:** create `.claude/skills/{wow-forever-api,guide-format,add-route-segment,new-module,release,debug-in-game}/SKILL.md`
 
-- [ ] **Paso 1: `wow-forever-api/SKILL.md`**
+- [ ] **Step 1: `wow-forever-api/SKILL.md`**
 
 ```markdown
 ---
 name: wow-forever-api
-description: Usar antes de escribir o revisar código Lua que llame a la API de WoW en este proyecto (WoW Forever 1.60.1, Interface 16001). Explica cómo verificar una API, qué arquitectura usa Forever y qué tocar al añadir una API nueva.
+description: Use before writing or reviewing Lua code that calls the WoW API in this project (WoW Forever 1.60.1, Interface 16001). Explains how to verify an API, which architecture Forever uses and what to touch when adding a new API.
 ---
 
-# API de WoW Forever
+# WoW Forever API
 
-Forever = API moderna de retail 12.x sobre Lua 5.1, con las restricciones de Midnight. NO es la API de Classic Era 1.15 ni la de 1.12.
+Forever = modern retail 12.x API on Lua 5.1, with the Midnight restrictions. It is NOT the Classic Era 1.15 API nor the 1.12 one.
 
-## Antes de usar una API
-1. Mira `docs/api/forever-api.md`. Si está, úsala.
-2. Si no está: `Grep` en `.vendor/vscode-wow-api/Annotations/Core` (firma y tipos). Si tampoco está ahí, NO la uses.
-3. Si es de quests, mapa, gossip o items, o hay dudas sobre Forever: delega en el agente `wow-api-expert`.
+## Before using an API
+1. Check `docs/api/forever-api.md`. If it is there, use it.
+2. If it is not: `Grep` in `.vendor/vscode-wow-api/Annotations/Core` (signature and types). If it is not there either, do NOT use it.
+3. If it concerns quests, map, gossip or items, or there are doubts about Forever: delegate to the `wow-api-expert` agent.
 
-## Al añadir una API al código
-- Ponla en `read_globals` de `.luacheckrc` (solo el nombre raíz, p. ej. `C_QuestLog`).
-- Añade su fila en "APIs emuladas / usadas por el addon" de `docs/api/forever-api.md`, con la fuente.
-- Si los tests de aceptación de la funcionalidad la necesitan, la emulación de `tests/support/wow_mock.lua` se amplía **como parte de escribir esos tests** (antes del código), nunca para que pase una implementación.
+## When adding an API to the code
+- Put it in `read_globals` of `.luacheckrc` (only the root name, e.g. `C_QuestLog`).
+- Add its row in "Emulated / used APIs" of `docs/api/forever-api.md`, with the source.
+- If the feature's acceptance tests need it, the emulation in `tests/support/wow_mock.lua` is extended **as part of writing those tests** (before the code), never to make an implementation pass. Only NEW test files (`*_spec.lua`) are added and `tests/support/` is only extended additively (new emulated functions or APIs) without changing existing behavior. Any change in `tests/support/` requires explicit user approval, because `lua-reviewer` treats it as critical. Never modify existing tests or emulations; if one looks wrong, STOP and ask the user.
 
-## Eventos clave para una guía de leveo (verificar cada uno antes de usarlo)
+## Key events for a leveling guide (verify each one before using it)
 QUEST_ACCEPTED, QUEST_TURNED_IN, QUEST_REMOVED, QUEST_LOG_UPDATE, QUEST_DETAIL, QUEST_PROGRESS, QUEST_COMPLETE, GOSSIP_SHOW, QUEST_GREETING, PLAYER_LEVEL_UP, PLAYER_XP_UPDATE, ZONE_CHANGED_NEW_AREA, TAXIMAP_OPENED.
 
-## Trampas habituales
-- Funciones protegidas y combate: comprueba `InCombatLockdown()` antes de tocar frames seguros.
-- APIs de Classic Era (`GetQuestLogTitle`, `GetNumQuestLogEntries`) pueden no existir: usa `C_QuestLog.*`.
-- Coordenadas: `C_Map.GetPlayerMapPosition(uiMapID, "player")` devuelve 0-1, mientras que el formato de guía usa 0-100.
+## Common pitfalls
+- Protected functions and combat: check `InCombatLockdown()` before touching secure frames.
+- Classic Era APIs (`GetQuestLogTitle`, `GetNumQuestLogEntries`) may not exist: use `C_QuestLog.*`.
+- Coordinates: `C_Map.GetPlayerMapPosition(uiMapID, "player")` returns a `Vector2DMixin` (`pos:GetXY()`, values 0-1) or `nil` (e.g. in instances), not two numbers, whereas the guide format uses 0-100.
 ```
 
-- [ ] **Paso 2: `guide-format/SKILL.md`**
+- [ ] **Step 2: `guide-format/SKILL.md`**
 
 ```markdown
 ---
 name: guide-format
-description: Usar al crear, editar o leer rutas de leveo (data/routes/**/*.json) o al trabajar con las guías compiladas (addon/LaRutaDel60/Guides). Define el esquema JSON de una ruta, sus reglas de validación y cómo se compila a Lua.
+description: Use when creating, editing or reading leveling routes (data/routes/**/*.json) or working with the compiled guides (addon/LaRutaDel60/Guides). Defines a route's JSON schema, its validation rules and how it compiles to Lua.
 ---
 
-# Formato de guía
+# Guide format
 
-Las rutas son DATOS. Fuente: `data/routes/<alliance|horde|both>/<id>.json`. Se compilan a `addon/LaRutaDel60/Guides/<id>.lua` + `Guides.xml`, que nunca se editan a mano.
+Routes are DATA. Source: `data/routes/<alliance|horde|both>/<id>.json`. They are compiled to `addon/LaRutaDel60/Guides/<id>.lua` + `Guides.xml`, which are never edited by hand.
 
-## Ruta
-| Campo | Tipo | Regla |
+## Route
+| Field | Type | Rule |
 |---|---|---|
-| id | string | kebab-case; igual al nombre del archivo; único |
-| name | {enUS, esES?} | enUS obligatorio |
-| faction | string | Alliance, Horde o Both |
-| races, classes | string[] | opcional (p. ej. "Human", "Warrior") |
+| id | string | kebab-case; equal to the file name; unique |
+| name | {enUS, esES?} | enUS required |
+| faction | string | Alliance, Horde or Both |
+| races, classes | string[] | optional (e.g. "Human", "Warrior") |
 | minLevel, maxLevel | int | 1..60, min <= max |
-| next | string | opcional, id de una ruta existente |
-| carriedQuests | int[] | quests aceptadas en rutas anteriores |
-| steps | Step[] | no vacía |
+| next | string | optional, id of an existing route |
+| carriedQuests | int[] | quests accepted in earlier routes |
+| steps | Step[] | non-empty |
 
 ## Step
-| type | Obligatorio | Significado |
+| type | Required | Meaning |
 |---|---|---|
-| accept | questId | aceptar la quest |
-| complete | questId (aceptada antes o en carriedQuests) | completar objetivos |
-| turnin | questId (aceptada antes o en carriedQuests) | entregar |
-| goto | coords | ir a un punto |
-| hearth | — | usar la piedra de hogar |
-| fly | — | volar (destino en text/coords) |
-| train | — | entrenar clase o profesión |
-| note | text | instrucción libre |
+| accept | questId | accept the quest |
+| complete | questId (accepted earlier or in carriedQuests) | complete objectives |
+| turnin | questId (accepted earlier or in carriedQuests) | turn in |
+| goto | coords | go to a point |
+| hearth | — | use the hearthstone |
+| fly | — | fly (destination in text/coords) |
+| train | — | train class or profession |
+| note | text | free-form instruction |
 
-Opcionales en cualquier paso: `npcId` (int > 0), `coords {mapId, x, y}` (x e y en 0-100; mapId = uiMapID), `text {enUS, esES?}`, `source` (URL).
+Optional on any step: `npcId` (int > 0), `coords {mapId, x, y}` (x and y in 0-100; mapId = uiMapID), `text {enUS, esES?}`, `source` (URL).
 
-## En Lua
-`ns.Guides["<id>"]` contiene exactamente los mismos datos que el JSON (lo garantiza un test de aceptación de ida y vuelta).
+Unknown keys or `null` → error.
 
-## Comandos
-- Validar: `python3 tools/validate_routes.py`
-- Compilar: `python3 tools/compile_guides.py` (`--check` en CI)
-El hook post-edición valida al guardar cualquier JSON de data/routes.
+## In Lua
+`ns.Guides["<id>"]` contains exactly the same data as the JSON (guaranteed by a round-trip acceptance test).
 
-## Ejemplo
+## Commands
+- Validate: `python3 tools/validate_routes.py`
+- Compile: `python3 tools/compile_guides.py` (`--check` in CI)
+The post-edit hook validates any data/routes JSON on save.
+
+## Example
 `data/routes/alliance/alliance-northshire-example.json`.
 ```
 
-- [ ] **Paso 3: `add-route-segment/SKILL.md`**
+- [ ] **Step 3: `add-route-segment/SKILL.md`**
 
 ```markdown
 ---
 name: add-route-segment
-description: Usar cuando el usuario pida añadir o rehacer un tramo de ruta de leveo (p. ej. "ruta humano 1-10", "Horda 30-40 en Stranglethorn"). Orquesta investigar → JSON crudo → optimizar → validar → compilar → commit.
+description: Use when the user asks to add or redo a leveling route segment (e.g. "human route 1-10", "Horde 30-40 in Stranglethorn"). Orchestrates research → raw JSON → optimize → validate → compile → commit.
 ---
 
-# Añadir un tramo de ruta
+# Add a route segment
 
-Entrada: facción, raza o clase (si aplica), rango de niveles y zonas.
+Input: faction, race or class (if applicable), level range and zones.
 
-1. **Plan:** decide el id (`<faccion>-<zona>-<min>-<max>`), la ruta anterior (para su `next`) y las quests arrastradas.
-2. **Investigar:** agente `route-researcher` por zona → `data/raw/<zona>.json`. Comprueba que cada quest tenga `source`.
-3. **Optimizar:** agente `route-optimizer` → `data/routes/<faccion>/<id>.json`. Actualiza el `next` de la ruta anterior.
-4. **Validar:** agente `route-validator`. Si hay problemas, vuelve al paso 3 con el informe (máx. 3 vueltas; si siguen, informa al usuario).
-5. **Compilar:** `python3 tools/compile_guides.py` y `tools/check.sh` en verde.
-6. **Commit:** `git add data/ addon/LaRutaDel60/Guides && git commit -m "feat(routes): <id>"`.
-7. Informa al usuario en castellano: niveles cubiertos, nº de pasos, quests con `"forever": false`, y pide que lo pruebe en el juego.
+1. **Plan:** decide the id (`<faction>-<zone>-<min>-<max>`), the previous route (for its `next`) and the carried quests.
+2. **Research:** `route-researcher` agent per zone → `data/raw/<zone>.json`. Check that every quest has `source`.
+3. **Optimize:** `route-optimizer` agent → `data/routes/<faction>/<id>.json`. Update the `next` of the previous route.
+4. **Validate:** `route-validator` agent. If there are problems, go back to step 3 with the report (max. 3 rounds; if they persist, inform the user).
+5. **Compile:** `python3 tools/compile_guides.py` and `tools/check.sh` green.
+6. **Commit:** `git add data/ addon/LaRutaDel60/Guides && git commit -m "feat(routes): <id>"` (with the `Co-Authored-By` trailer).
+7. Reply to the user in Spanish; everything written to the repo is in English. Report: levels covered, number of steps, quests with `"forever": false`, and ask them to test it in the game.
 
-No inventes datos: lo que falte se marca en el informe, nunca se rellena.
+Do not invent data: whatever is missing is flagged in the report, never filled in.
 ```
 
-- [ ] **Paso 4: `new-module/SKILL.md`**
+- [ ] **Step 4: `new-module/SKILL.md`**
 
 ````markdown
 ---
 name: new-module
-description: Usar al crear un archivo o módulo Lua nuevo en addon/LaRutaDel60 (Core, UI o Modules). Flujo de tests de aceptación primero, plantilla del módulo, registro en ambos TOC y textos localizados.
+description: Use when creating a new Lua file or module in addon/LaRutaDel60 (Core, UI or Modules). Acceptance-tests-first flow, module template, registration in both TOCs and localized texts.
 ---
 
-# Nuevo módulo
+# New module
 
-1. **Tests de aceptación primero**, derivados de la spec de la funcionalidad y no de la implementación: `tests/acceptance/<feature>_spec.lua` usando solo `require("support.client")` (`Client.boot(opts)`, `client.login()`, `client.slash("/ruta ...")`, `client.fire(event, ...)`, `client.messages()`). Si hace falta emular más API del cliente, se amplía `tests/support/` en este mismo paso. Commit en rojo: `test: acceptance tests for <feature> (red)`. A partir de aquí quedan congelados.
-2. Archivo `addon/LaRutaDel60/<Folder>/<Name>.lua` (código en inglés):
+1. **Acceptance tests first**, derived from the feature's spec and not from the implementation: `tests/acceptance/<feature>_spec.lua` using only `require("support.client")` (`Client.boot(opts)`, `client.login()`, `client.slash("/ruta ...")`, `client.fire(event, ...)`, `client.messages()`). If more client API needs emulating, `tests/support/` is extended in this same step. Only NEW test files (`*_spec.lua`) are added and `tests/support/` is only extended additively (new emulated functions or APIs) without changing existing behavior. Any change in `tests/support/` requires explicit user approval, because `lua-reviewer` treats it as critical. Never modify existing tests or emulations; if one looks wrong, STOP and ask the user. Commit in red: `test: acceptance tests for <feature> (red)` (with the `Co-Authored-By` trailer); it is the only allowed exception to "`tools/check.sh` green before every commit". From here on they are frozen.
+2. File `addon/LaRutaDel60/<Folder>/<Name>.lua` (code in English):
 
 ```lua
 local _, ns = ...
@@ -2232,126 +2239,137 @@ function Module.Example()
 end
 ```
 
-3. Regístralo en `LaRutaDel60.toc` en su orden de carga (después de `Core\Init.lua` si usa `ns.Print`) y copia el TOC: `cp addon/LaRutaDel60/LaRutaDel60.toc addon/LaRutaDel60/LaRutaDel60_Forever.toc`.
-4. Textos: claves en `Locales/enUS.lua` y `Locales/esES.lua`.
-5. APIs de WoW nuevas: skill `wow-forever-api`.
-6. `tools/check.sh` en verde → agente `lua-reviewer` → commit.
+3. Register it in `LaRutaDel60.toc` in its load order (after `Core\Init.lua` if it uses `ns.Print`) and copy the TOC: `cp addon/LaRutaDel60/LaRutaDel60.toc addon/LaRutaDel60/LaRutaDel60_Forever.toc`.
+   The guides (`Guides\Guides.xml`) are loaded AFTER Core in the TOC: a module must read `ns.Guides` in `PLAYER_LOGIN` (or later), never when the file loads.
+4. Texts: keys in `Locales/enUS.lua` and `Locales/esES.lua`.
+5. New WoW APIs: skill `wow-forever-api`.
+6. `tools/check.sh` green → `lua-reviewer` agent → commit (with the `Co-Authored-By` trailer).
 ````
-
-- [ ] **Paso 5: `release/SKILL.md`**
+- [ ] **Step 5: `release/SKILL.md`**
 
 ```markdown
 ---
 name: release
-description: Usar cuando el usuario pida publicar o sacar una versión del addon. Sube la versión en los TOC, actualiza CHANGELOG.md, crea el tag vX.Y.Z y, con confirmación, lo empuja para que el CI publique el zip.
+description: Use when the user asks to publish or cut an addon release. Bumps the version in the TOCs, updates CHANGELOG.md, creates the vX.Y.Z tag and, with confirmation, pushes it so CI publishes the zip.
 ---
 
 # Release
 
-1. `tools/check.sh` en verde y working tree limpio (`git status`).
-2. Versión semver (fix → patch, funcionalidad → minor). Si dudas, pregunta.
-3. Cambia `## Version:` en `addon/LaRutaDel60/LaRutaDel60.toc` y cópialo a `_Forever.toc`.
-4. Añade al principio de `CHANGELOG.md` (créalo si no existe; en inglés): `## vX.Y.Z - YYYY-MM-DD` con viñetas a partir de `git log --oneline <tag-anterior>..HEAD`.
-5. `git commit -am "chore: release vX.Y.Z"` y `git tag vX.Y.Z`.
-6. Pide confirmación al usuario antes de `git push origin main --tags` (es público).
-7. `.github/workflows/ci.yml` comprueba que el tag coincide con la versión del TOC y publica `LaRutaDel60-vX.Y.Z.zip` en GitHub Releases.
-8. Recuerda al usuario: en Windows, `scripts\deploy.ps1 -Source release -Repo <owner>/<repo>`.
+1. `tools/check.sh` green and clean working tree (`git status`). You must be on `main` with the work already integrated (`git branch --show-current` = main) and with a remote configured (`git remote -v`); otherwise stop and tell the user.
+2. Semver version (fix → patch, feature → minor). If in doubt, ask.
+3. Change `## Version:` in `addon/LaRutaDel60/LaRutaDel60.toc` and copy it to `_Forever.toc`.
+4. Add at the top of `CHANGELOG.md` (create it if it does not exist; in English): `## vX.Y.Z - YYYY-MM-DD` with bullets from `git log --oneline <previous-tag>..HEAD` (if it is the first release and there is no previous tag, `git log --oneline` with the whole history).
+5. `git add CHANGELOG.md addon/LaRutaDel60/LaRutaDel60.toc addon/LaRutaDel60/LaRutaDel60_Forever.toc && git commit -m "chore: release vX.Y.Z"` (with the `Co-Authored-By` trailer) and `git tag vX.Y.Z`.
+6. Ask the user for confirmation before `git push origin main vX.Y.Z` (it is public).
+7. `.github/workflows/ci.yml` checks that the tag matches the TOC version and publishes `LaRutaDel60-vX.Y.Z.zip` to GitHub Releases.
+8. Remind the user: on Windows, `scripts\deploy.ps1 -Source release -Repo <owner>/<repo>`.
+9. Reply to the user in Spanish; everything written to the repo is in English.
 ```
 
-- [ ] **Paso 6: `debug-in-game/SKILL.md`**
+- [ ] **Step 6: `debug-in-game/SKILL.md`**
 
 ```markdown
 ---
 name: debug-in-game
-description: Usar cuando el usuario pegue un error del juego (BugSack/BugGrabber, mensaje de chat, Lua error) o su SavedVariables, o diga que algo del addon no funciona en WoW. Convierte el fallo en un test de aceptación que lo reproduce y luego lo arregla.
+description: Use when the user pastes an in-game error (BugSack/BugGrabber, chat message, Lua error) or their SavedVariables, or says something in the addon does not work in WoW. Turns the failure into an acceptance test that reproduces it and then fixes it.
 ---
 
-# Depurar un fallo del juego
+# Debug an in-game failure
 
-Usa también `superpowers:systematic-debugging`.
+Also use `superpowers:systematic-debugging`.
 
-1. Pide lo que falte: error completo con stack (en BugSack, copiar), versión del addon (`/ruta`), qué estaba haciendo y, si es de datos, `WTF\Account\<CUENTA>\SavedVariables\LaRutaDel60.lua`.
-2. Localiza el `archivo:línea` del stack dentro de `addon/LaRutaDel60`. Si el error está en código de Blizzard, busca qué llamada nuestra lo provoca.
-3. "attempt to call a nil value" sobre una API de WoW = API inexistente en Forever → agente `wow-api-expert`.
-4. Escribe un test de aceptación en `tests/acceptance/` que reproduzca lo que vio el jugador. Si hace falta, amplía la emulación de `tests/support/` con el comportamiento real observado y documéntalo en `docs/api/forever-api.md`. Debe fallar. Commit en rojo y avisa al usuario de que ese test queda congelado.
-5. Arregla, deja `tools/check.sh` en verde y haz commit `fix: ...`.
-6. Pide al usuario que lo verifique en el juego (`scripts\deploy.ps1` + `/reload`).
+1. Ask for whatever is missing: the full error with stack (in BugSack, copy it), addon version (`/ruta`), what they were doing and, if it is a data problem, `WTF\Account\<ACCOUNT>\SavedVariables\LaRutaDel60.lua`.
+2. Locate the `file:line` of the stack inside `addon/LaRutaDel60`. If the error is in Blizzard code, find which call of ours triggers it.
+3. "attempt to call a nil value" on a WoW API = API does not exist in Forever → `wow-api-expert` agent.
+4. Write an acceptance test in `tests/acceptance/` that reproduces what the player saw. If needed, extend the emulation in `tests/support/` with the real observed behavior and document it in `docs/api/forever-api.md`. Only NEW test files (`*_spec.lua`) are added and `tests/support/` is only extended additively (new emulated functions or APIs) without changing existing behavior. Any change in `tests/support/` requires explicit user approval, because `lua-reviewer` treats it as critical. Never modify existing tests or emulations; if one looks wrong, STOP and ask the user. It must fail. Commit in red and tell the user that test is now frozen.
+5. If the failure shows that an existing frozen test encodes incorrect behavior, STOP, explain it to the user and wait for their approval before touching that test.
+6. Fix it, leave `tools/check.sh` green and commit `fix: ...`.
+7. Ask the user to verify it in the game (`scripts\deploy.ps1` + `/reload`).
+8. Reply to the user in Spanish; everything written to the repo is in English.
 ```
 
-- [ ] **Paso 7: verificar y commit**
+- [ ] **Step 7: verificar y commit**
 
 ```bash
 ls .claude/skills/*/SKILL.md | wc -l && grep -h '^name:' .claude/skills/*/SKILL.md
 git add .claude/skills
 git commit -m "feat: project skills"
 ```
-Esperado: `6` y los seis nombres.
+Expected: `6` and the six names.
 
 ---
 
-### Tarea 10: CLAUDE.md
+### Task 10: CLAUDE.md
 
-**Archivos:** crear `CLAUDE.md`
+**Files:** create `CLAUDE.md`
 
-- [ ] **Paso 1: escribir `CLAUDE.md`**
+- [ ] **Step 1: escribir `CLAUDE.md`**
 
 ````markdown
 # La Ruta del 60
 
-Addon gratuito para **WoW Forever** (Classic+ oficial, cliente 1.60.1, `## Interface: 16001`) que guía a cualquier personaje de 1 a 60 por la ruta más rápida. Se desarrolla 100% con IA en macOS y se juega en Windows.
+Free addon for **WoW Forever** (official Classic+, client 1.60.1, `## Interface: 16001`) that guides any character from level 1 to 60 along the fastest route. It is developed 100% with AI on macOS and played on Windows.
 
-## Reglas
-- **Idioma:** el código va SIEMPRE en inglés (identificadores, comentarios, strings, mensajes de CLI, nombres de tests y commits). Las explicaciones van SIEMPRE en castellano (chat, specs, planes, este archivo, agentes y skills). Los textos al jugador se localizan en enUS y esES.
-- **Tests de aceptación primero:** antes de escribir código de una funcionalidad hay tests de caja negra derivados de su spec, commiteados en rojo. `tests/acceptance/`, `tests/support/` y `tools/tests/acceptance/` están **congelados**: se ponen en verde sin modificarlos. Si un test parece mal, PARA y pregunta al usuario.
-- **API:** Forever usa la API moderna de retail 12.x sobre Lua 5.1, no la de Classic Era. Antes de usar cualquier API de WoW: skill `wow-forever-api` / agente `wow-api-expert`. Lo verificado está en `docs/api/forever-api.md`.
-- **Lua 5.1:** sin `goto`, `//`, operadores de bits nativos, `<const>`.
-- **Sin globals:** todo en `ns` (`local ADDON_NAME, ns = ...`). Solo se permiten `LaRutaDel60DB`, `SLASH_LARUTADEL601` y `SlashCmdList.LARUTADEL60`.
-- **Rutas = datos:** `data/routes/**/*.json` (skill `guide-format`). `addon/LaRutaDel60/Guides/` es GENERADO: nunca se edita a mano.
-- **TOC:** `LaRutaDel60.toc` y `LaRutaDel60_Forever.toc` siempre idénticos.
-- **Textos al jugador:** siempre vía `ns.L`, con clave en `Locales/enUS.lua` y `Locales/esES.lua`.
-- **Original:** no se copia código ni guías de RestedXP u otros addons.
-- Commits pequeños con Conventional Commits. No se hace push sin que el usuario lo pida.
+## Rules
+- **Language:** Everything committed to the repo is in English: code, comments, strings, CLI messages, tests, commits, README, CLAUDE.md, agents, skills, specs, plans and docs. Player-facing texts are localized (enUS + esES). The assistant explains and talks to the user in Spanish in chat.
+- **Acceptance tests first:** before writing code for a feature, there are black-box tests derived from its spec, committed in red. `tests/acceptance/`, `tests/support/` and `tools/tests/acceptance/` are **frozen**: they are turned green without modifying them. If a test looks wrong, STOP and ask the user.
+  - The freeze is enforced with the `acceptance-frozen` tag: `tools/check.sh` (and CI) fails if anything modified, deleted or renamed relative to the tag changes under those paths, both in the working tree and in commits. Adding new tests is allowed.
+  - A new feature adds NEW acceptance tests; after committing them in red, the tag is moved (`git tag -f acceptance-frozen`), only with user approval.
+  - The push must include the tags (`git push --follow-tags` or `git push origin acceptance-frozen`; if it was moved, `--force` on that tag with user approval).
+- **API:** Forever uses the modern retail 12.x API on Lua 5.1, not the Classic Era one. Before using any WoW API: skill `wow-forever-api` / agent `wow-api-expert`. What has been verified is in `docs/api/forever-api.md`.
+- **Lua 5.1:** no `goto`, `//`, native bitwise operators, `<const>`.
+- **No globals:** everything in `ns` (`local ADDON_NAME, ns = ...`). Only `LaRutaDel60DB`, `SLASH_LARUTADEL601` and `SlashCmdList.LARUTADEL60` are allowed.
+- **Routes = data:** `data/routes/**/*.json` (skill `guide-format`). `addon/LaRutaDel60/Guides/` is GENERATED: never edit it by hand.
+- **TOC:** `LaRutaDel60.toc` and `LaRutaDel60_Forever.toc` always identical.
+- **Player-facing texts:** always via `ns.L`, with a key in `Locales/enUS.lua` and `Locales/esES.lua`.
+- **Original:** no code or guides are copied from RestedXP or other addons.
+- Small commits using Conventional Commits. No push unless the user asks.
 
-## Comandos
-| Qué | Comando |
+## Setup (fresh clone, macOS)
+1. `tools/setup.sh`: installs the toolchain and the API annotations. If `~/.luarocks/bin` is not in the PATH, it warns: add it yourself in your shell profile (`check.sh` works anyway).
+2. LSP plugin for Claude Code (needs `lua-language-server` in the PATH): `claude plugin marketplace add ./` and then `claude plugin install wow-lua-lsp@larutadel60 --scope project`. Then restart Claude Code.
+3. `tools/check.sh` must end with `OK: all green`.
+
+## Commands
+| What | Command |
 |---|---|
-| Verificación completa (obligatoria antes de commit) | `tools/check.sh` |
-| Tests Lua | `~/.luarocks/bin/busted` (o `busted`) |
-| Tests Python | `python3 -m unittest discover -s tools/tests -t . -q` |
-| Validar / compilar rutas | `python3 tools/validate_routes.py` / `python3 tools/compile_guides.py` |
+| Full verification (mandatory before commit) | `tools/check.sh` |
+| Lua tests | `~/.luarocks/bin/busted` (or `busted`) |
+| Python tests | `python3 -m unittest discover -s tools/tests -t . -q` |
+| Validate / compile routes | `python3 tools/validate_routes.py` / `python3 tools/compile_guides.py` |
 | LuaLS | `tools/luals_check.sh` |
-| Instalar el toolchain (macOS) | `tools/setup.sh` |
-| Instalar en Windows | `scripts\deploy.ps1` (PowerShell) |
+| Install the toolchain (macOS) | `tools/setup.sh` |
+| Install on Windows | `scripts\deploy.ps1` (PowerShell) |
 
-Los hooks de `.claude/settings.json` formatean y lintan cada `.lua` editado y validan cada JSON de rutas. Si devuelven error, corrígelo antes de seguir.
+The hooks in `.claude/settings.json` format and lint every edited `.lua` and validate every route JSON. If they return an error, fix it before continuing.
 
-## Agentes (`.claude/agents/`)
-- `wow-api-expert`: verifica APIs de Forever (solo lectura).
-- `addon-engineer`: implementa código del addon contra tests de aceptación.
-- `route-researcher`: datos crudos de quests desde la web → `data/raw/`.
-- `route-optimizer`: construye rutas óptimas → `data/routes/`.
-- `route-validator`: revisa la coherencia de las rutas (solo lectura).
-- `lua-reviewer`: revisión de código antes de commit (solo lectura).
+## Agents (`.claude/agents/`)
+- `wow-api-expert`: verifies Forever APIs (read-only).
+- `addon-engineer`: implements addon code against acceptance tests.
+- `route-researcher`: raw quest data from the web → `data/raw/`.
+- `route-optimizer`: builds optimal routes → `data/routes/`.
+- `route-validator`: reviews route consistency (read-only).
+- `lua-reviewer`: code review before commit (read-only).
 
 ## Skills (`.claude/skills/`)
 `wow-forever-api`, `guide-format`, `add-route-segment`, `new-module`, `release`, `debug-in-game`.
 
-## Estructura
+## Structure
 ```
-addon/LaRutaDel60/   addon (lo que se copia a Interface\AddOns)
-  Core/ UI/ Modules/ Locales/ Libs/ Guides/(generado)
-data/raw/            datos crudos de la web (con source)
-data/routes/         rutas fuente (JSON)
-tools/               scripts Python/bash (validador, compilador, check)
-tools/tests/         tests de aceptación de las herramientas (congelados)
-tests/support/       emulación del cliente WoW (congelada)
-tests/acceptance/    tests de aceptación del addon (congelados)
-scripts/deploy.ps1   despliegue en Windows
-docs/                specs, planes, API
+addon/LaRutaDel60/   addon (what gets copied to Interface\AddOns)
+  Core/ UI/ Modules/ Locales/ Libs/ Guides/(generated)
+data/raw/            raw data from the web (with source)
+data/routes/         source routes (JSON)
+tools/               Python/bash scripts (validator, compiler, check)
+tools/tests/         acceptance tests for the tools (frozen)
+tests/support/       WoW client emulation (frozen)
+tests/acceptance/    addon acceptance tests (frozen)
+scripts/deploy.ps1   deployment on Windows
+docs/                specs, plans, API
 ```
 ````
 
-- [ ] **Paso 2: commit**
+- [ ] **Step 2: commit**
 
 ```bash
 git add CLAUDE.md
@@ -2360,11 +2378,11 @@ git commit -m "docs: CLAUDE.md with rules, commands, agents and skills"
 
 ---
 
-### Tarea 11: CI (GitHub Actions) y despliegue a Windows
+### Task 11: CI (GitHub Actions) and deployment to Windows
 
-**Archivos:** crear `.github/workflows/ci.yml`, `scripts/deploy.ps1`
+**Files:** create `.github/workflows/ci.yml`, `scripts/deploy.ps1`
 
-- [ ] **Paso 1: `.github/workflows/ci.yml`**
+- [ ] **Step 1: `.github/workflows/ci.yml`**
 
 ```yaml
 name: CI
@@ -2444,7 +2462,7 @@ jobs:
           generate_release_notes: true
 ```
 
-- [ ] **Paso 2: `scripts/deploy.ps1`**
+- [ ] **Step 2: `scripts/deploy.ps1`**
 
 ```powershell
 <#
@@ -2513,16 +2531,16 @@ Write-Host "Installed into $Target" -ForegroundColor Green
 Write-Host "In game: /reload  (then /ruta to see the version)"
 ```
 
-- [ ] **Paso 3: comprobaciones locales**
+- [ ] **Step 3: comprobaciones locales**
 
 ```bash
 python3 -c "t=open('.github/workflows/ci.yml').read(); assert '\t' not in t; print('YAML_NO_TABS_OK')"
 command -v pwsh >/dev/null && pwsh -NoProfile -Command "\$e=\$null; [System.Management.Automation.Language.Parser]::ParseFile('scripts/deploy.ps1',[ref]\$null,[ref]\$e) > \$null; if (\$e) { \$e; exit 1 } else { 'PS_OK' }" || echo "pwsh not installed: validate on Windows"
 tools/check.sh
 ```
-Esperado: `YAML_NO_TABS_OK`, `PS_OK` o el aviso de que no hay pwsh, y `OK: all green`.
+Expected: `YAML_NO_TABS_OK`, `PS_OK` or the warning that pwsh is not available, and `OK: all green`.
 
-- [ ] **Paso 4: commit**
+- [ ] **Step 4: commit**
 
 ```bash
 git add .github/workflows/ci.yml scripts/deploy.ps1
@@ -2531,28 +2549,28 @@ git commit -m "ci: verification and release workflow; deploy.ps1 for Windows"
 
 ---
 
-### Tarea 12: Verificación final, publicación y checklist manual
+### Task 12: Final verification, publishing and manual checklist
 
-- [ ] **Paso 1: verificación completa**
+- [ ] **Step 1: full verification**
 
 Run: `tools/check.sh && git status --short`
-Esperado: `OK: all green` y working tree limpio.
+Expected: `OK: all green` y working tree limpio.
 
-- [ ] **Paso 2: tests congelados intactos**
+- [ ] **Step 2: tests congelados intactos**
 
 Run: `git diff --stat acceptance-frozen HEAD -- tests/acceptance tests/support tools/tests/acceptance`
-Esperado: sin salida (ningún cambio desde el commit en rojo).
+Expected: no output (no changes since the red commit).
 
-- [ ] **Paso 3: publicar en GitHub (requiere confirmación del usuario)**
+- [ ] **Step 3: publish on GitHub (requires user confirmation)**
 
-Preguntar al usuario el nombre y la visibilidad del repo. Después:
+Ask the user for the repo name and visibility. Then:
 ```bash
 gh repo create <usuario>/larutadel60 --<public|private> --source . --remote origin --push
 gh run watch --exit-status
 ```
-Esperado: CI en verde.
+Expected: CI green.
 
-- [ ] **Paso 4: checklist manual para el usuario (spec §11.5)**
+- [ ] **Step 4: manual checklist for the user (spec §11.5)**
 
 1. En Windows:
    ```powershell
@@ -2560,6 +2578,6 @@ Esperado: CI en verde.
    cd larutadel60
    powershell -ExecutionPolicy Bypass -File .\scripts\deploy.ps1
    ```
-2. En el juego (cliente en español): aparece `La Ruta del 60: Cargado. Escribe /ruta para más info.` y `/ruta` muestra `Versión 0.1.0 - 1 guía(s) cargada(s).`
-3. Si aparece el aviso de "no es WoW Forever" o no se encuentra la carpeta, anotar el valor o la ruta reales en `docs/api/forever-api.md` y en `deploy.ps1`.
-4. En Claude Code, que el LSP responda al hover (Tarea 7, Paso 5).
+2. In the game (Spanish client): it shows `La Ruta del 60: Cargado. Escribe /ruta para más info.` and `/ruta` shows `Versión 0.1.0 - 1 guía(s) cargada(s).`
+3. If the "not WoW Forever" warning appears or the folder is not found, record the real value or path in `docs/api/forever-api.md` and in `deploy.ps1`.
+4. In Claude Code, the LSP must respond to hover (Task 7, Step 5).

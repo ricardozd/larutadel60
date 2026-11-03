@@ -1,16 +1,17 @@
 ---
 name: debug-in-game
-description: Usar cuando el usuario pegue un error del juego (BugSack/BugGrabber, mensaje de chat, Lua error) o su SavedVariables, o diga que algo del addon no funciona en WoW. Convierte el fallo en un test de aceptación que lo reproduce y luego lo arregla.
+description: Use when the user pastes an in-game error (BugSack/BugGrabber, chat message, Lua error) or their SavedVariables, or says something in the addon does not work in WoW. Turns the failure into an acceptance test that reproduces it and then fixes it.
 ---
 
-# Depurar un fallo del juego
+# Debug an in-game failure
 
-Usa también `superpowers:systematic-debugging`.
+Also use `superpowers:systematic-debugging`.
 
-1. Pide lo que falte: error completo con stack (en BugSack, copiar), versión del addon (`/ruta`), qué estaba haciendo y, si es de datos, `WTF\Account\<CUENTA>\SavedVariables\LaRutaDel60.lua`.
-2. Localiza el `archivo:línea` del stack dentro de `addon/LaRutaDel60`. Si el error está en código de Blizzard, busca qué llamada nuestra lo provoca.
-3. "attempt to call a nil value" sobre una API de WoW = API inexistente en Forever → agente `wow-api-expert`.
-4. Escribe un test de aceptación en `tests/acceptance/` que reproduzca lo que vio el jugador. Si hace falta, amplía la emulación de `tests/support/` con el comportamiento real observado y documéntalo en `docs/api/forever-api.md`. Solo se añaden archivos de test NUEVOS (`*_spec.lua`) y `tests/support/` solo se amplía de forma aditiva (funciones o APIs emuladas nuevas) sin cambiar el comportamiento existente. Cualquier cambio en `tests/support/` requiere aprobación explícita del usuario, porque `lua-reviewer` lo trata como crítico. Nunca modifiques tests ni emulaciones existentes; si alguno parece incorrecto, PARA y pregunta al usuario. Debe fallar. Commit en rojo y avisa al usuario de que ese test queda congelado.
-5. Si el fallo demuestra que un test congelado existente codifica un comportamiento incorrecto, PARA, explícaselo al usuario y espera su aprobación antes de tocar ese test.
-6. Arregla, deja `tools/check.sh` en verde y haz commit `fix: ...`.
-7. Pide al usuario que lo verifique en el juego (`scripts\deploy.ps1` + `/reload`).
+1. Ask for whatever is missing: the full error with stack (in BugSack, copy it), addon version (`/ruta`), what they were doing and, if it is a data problem, `WTF\Account\<ACCOUNT>\SavedVariables\LaRutaDel60.lua`.
+2. Locate the `file:line` of the stack inside `addon/LaRutaDel60`. If the error is in Blizzard code, find which call of ours triggers it.
+3. "attempt to call a nil value" on a WoW API = API does not exist in Forever → `wow-api-expert` agent.
+4. Write an acceptance test in `tests/acceptance/` that reproduces what the player saw. If needed, extend the emulation in `tests/support/` with the real observed behavior and document it in `docs/api/forever-api.md`. Only NEW test files (`*_spec.lua`) are added and `tests/support/` is only extended additively (new emulated functions or APIs) without changing existing behavior. Any change in `tests/support/` requires explicit user approval, because `lua-reviewer` treats it as critical. Never modify existing tests or emulations; if one looks wrong, STOP and ask the user. It must fail. Commit in red and tell the user that test is now frozen.
+5. If the failure shows that an existing frozen test encodes incorrect behavior, STOP, explain it to the user and wait for their approval before touching that test.
+6. Fix it, leave `tools/check.sh` green and commit `fix: ...`.
+7. Ask the user to verify it in the game (`scripts\deploy.ps1` + `/reload`).
+8. Reply to the user in Spanish; everything written to the repo is in English.

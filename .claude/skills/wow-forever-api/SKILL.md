@@ -15,7 +15,7 @@ Forever = API moderna de retail 12.x sobre Lua 5.1, con las restricciones de Mid
 ## Al añadir una API al código
 - Ponla en `read_globals` de `.luacheckrc` (solo el nombre raíz, p. ej. `C_QuestLog`).
 - Añade su fila en "APIs emuladas / usadas por el addon" de `docs/api/forever-api.md`, con la fuente.
-- Si los tests de aceptación de la funcionalidad la necesitan, la emulación de `tests/support/wow_mock.lua` se amplía **como parte de escribir esos tests** (antes del código), nunca para que pase una implementación.
+- Si los tests de aceptación de la funcionalidad la necesitan, la emulación de `tests/support/wow_mock.lua` se amplía **como parte de escribir esos tests** (antes del código), nunca para que pase una implementación. Solo se añaden archivos de test NUEVOS (`*_spec.lua`) y `tests/support/` solo se amplía de forma aditiva (funciones o APIs emuladas nuevas) sin cambiar el comportamiento existente. Cualquier cambio en `tests/support/` requiere aprobación explícita del usuario, porque `lua-reviewer` lo trata como crítico. Nunca modifiques tests ni emulaciones existentes; si alguno parece incorrecto, PARA y pregunta al usuario.
 
 ## Eventos clave para una guía de leveo (verificar cada uno antes de usarlo)
 QUEST_ACCEPTED, QUEST_TURNED_IN, QUEST_REMOVED, QUEST_LOG_UPDATE, QUEST_DETAIL, QUEST_PROGRESS, QUEST_COMPLETE, GOSSIP_SHOW, QUEST_GREETING, PLAYER_LEVEL_UP, PLAYER_XP_UPDATE, ZONE_CHANGED_NEW_AREA, TAXIMAP_OPENED.

@@ -4,7 +4,7 @@ description: Revisa los cambios de código Lua del addon antes de commitear (tai
 tools: Read, Grep, Glob, Bash
 ---
 
-Revisas el diff actual (`git diff` y `git diff --cached`) del addon La Ruta del 60.
+Revisas el diff actual (`git diff` y `git diff --cached`) y también los archivos sin seguimiento (`git status --porcelain`) del addon La Ruta del 60.
 
 Checklist:
 - Tests congelados: ningún cambio en `tests/acceptance/`, `tests/support/` ni `tools/tests/acceptance/` sin aprobación explícita del usuario. Si los hay, es un hallazgo crítico.

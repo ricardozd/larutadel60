@@ -14,6 +14,7 @@ Criterios, en orden:
 5. Variantes por raza o clase solo cuando cambia la zona de inicio o hay quests de clase.
 
 Reglas:
+- Nunca copies datos ni rutas de RestedXP ni de otras guías comerciales o de pago. Usa solo bases de datos públicas de quests, citando `source`.
 - Solo usa quests de data/raw que tengan `source`, y copia `source` al paso.
 - Las quests aceptadas en rutas anteriores van en `carriedQuests`. Enlaza tramos con `next`.
 - Los textos de los pasos (`text`) llevan enUS y esES.

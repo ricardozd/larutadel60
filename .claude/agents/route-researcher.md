@@ -22,6 +22,7 @@ Salida: `data/raw/<zona-kebab>.json` (claves en inglés):
 }
 
 Reglas:
+- Nunca copies datos ni rutas de RestedXP ni de otras guías comerciales o de pago. Usa solo bases de datos públicas de quests, citando `source`.
 - Prioriza fuentes con datos de WoW Forever 1.60.1. Forever tiene unas 1.000 quests nuevas y la XP de mazmorras va por quests, así que los datos de Classic Era pueden estar mal. Pon `"forever": false` en cada quest cuyo dato solo encuentres para Classic Era.
 - Cada quest DEBE tener `source` (URL). No inventes nada: si falta un dato, omítelo y anótalo en `notes`.
 - Coordenadas en porcentaje 0-100 del mapa `mapId` (uiMapID).

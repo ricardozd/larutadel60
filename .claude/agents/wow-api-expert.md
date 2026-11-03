@@ -17,5 +17,5 @@ Proceso para cada API:
 3. Si hay dudas sobre Forever, consulta warcraft.wiki.gg (incluida "Patch 1.60.1/API changes").
 4. Responde con: existe sí/no/incierto, firma exacta, eventos relacionados, restricciones (protegida, combat lockdown, secret), alternativa si no existe y URLs consultadas.
 
-Si confirmas algo nuevo, propón (sin escribirlo) la línea para `docs/api/forever-api.md` y, si es una global, para `read_globals` de `.luacheckrc` y para `tests/support/wow_mock.lua`.
+Si confirmas algo nuevo, propón (sin escribirlo) la línea para `docs/api/forever-api.md` y, si es una global, para `read_globals` de `.luacheckrc` y para `tests/support/wow_mock.lua` (archivo congelado: la propuesta va al usuario para su aprobación y solo de forma aditiva).
 Nunca inventes una API: "incierto" es una respuesta válida.

@@ -1,36 +1,36 @@
 # La Ruta del 60
 
-Addon **gratuito** para **World of Warcraft: Forever** (cliente 1.60.1) que te guía paso a paso de nivel 1 a 60 por la ruta más rápida, sea cual sea tu personaje.
+A **free** addon for **World of Warcraft: Forever** (client 1.60.1) that guides any character from level 1 to 60 along the fastest route, step by step.
 
-> **Estado: en desarrollo (v0.1.0).** Por ahora el addon carga, detecta WoW Forever y responde a `/ruta`. La primera ruta jugable, no-muerto del 1 al 20 (Claros de Tirisfal y Bosque de Argénteos), está en camino.
+> **Status: in development (v0.1.0).** The addon currently loads, detects WoW Forever and answers `/ruta`. The first playable route, Undead 1-20 (Tirisfal Glades and Silverpine Forest), is in progress.
 
-## Qué hará
+## Planned features
 
-- Una ventana con el paso actual y los siguientes, que avanza sola al aceptar, completar o entregar quests.
-- Una flecha en pantalla que apunta al siguiente objetivo, con la distancia.
-- Elige sola la ruta según tu facción, raza y nivel. También puedes cambiarla a mano.
-- Textos en inglés y en español.
+- A step window showing the current and upcoming steps. It advances on its own when you accept, complete or turn in quests.
+- An on-screen arrow pointing to the next objective, with the distance.
+- Automatic route selection by faction, race and level, with manual switching.
+- English and Spanish texts.
 
-Todas las rutas son propias: no se copia contenido de otros addons ni de guías de pago.
+All routes are original work. Nothing is copied from other addons or paid guides.
 
-## Instalación en Windows
+## Installation on Windows
 
-### Opción A: descarga manual (la más sencilla)
+### Option A: manual download (simplest)
 
-1. Descarga la última versión desde [Releases](../../releases): el archivo `LaRutaDel60-vX.Y.Z.zip`.
-   Si todavía no hay ninguna release, pulsa **Code → Download ZIP** en esta página.
-2. Abre la carpeta de WoW Forever. Normalmente es `C:\Program Files (x86)\World of Warcraft\_forever_\`. El nombre exacto de la carpeta `_forever_` puede variar.
-3. Entra en `Interface\AddOns\`. Si no existe, créala.
-4. Copia ahí la carpeta **`LaRutaDel60`**:
-   - del zip de la release, tal cual;
-   - del ZIP del repositorio, la que está en `addon\LaRutaDel60`.
+1. Download `LaRutaDel60-vX.Y.Z.zip` from the latest [release](../../releases).
+   If there is no release yet, click **Code → Download ZIP** on this page.
+2. Open your WoW Forever folder, usually `C:\Program Files (x86)\World of Warcraft\_forever_\`. The exact name of the `_forever_` folder may differ.
+3. Go into `Interface\AddOns\`, and create it if it doesn't exist.
+4. Copy the **`LaRutaDel60`** folder there:
+   - from a release zip, copy the `LaRutaDel60` folder as it is;
+   - from the repository ZIP, copy the one inside `addon\LaRutaDel60`.
 
-   Tiene que quedar así: `...\_forever_\Interface\AddOns\LaRutaDel60\LaRutaDel60.toc`.
-5. Arranca el juego. En la pantalla de personajes, pulsa **AddOns** y comprueba que **La Ruta del 60** está activado.
+   The result must look like this: `...\_forever_\Interface\AddOns\LaRutaDel60\LaRutaDel60.toc`.
+5. Start the game. On the character screen, click **AddOns** and make sure **La Ruta del 60** is enabled.
 
-### Opción B: con el script de instalación (se actualiza con un comando)
+### Option B: install script (one command to update)
 
-Requiere [Git para Windows](https://git-scm.com/download/win).
+Requires [Git for Windows](https://git-scm.com/download/win).
 
 ```powershell
 git clone https://github.com/ricardozd/larutadel60.git
@@ -38,19 +38,19 @@ cd larutadel60
 powershell -ExecutionPolicy Bypass -File .\scripts\deploy.ps1
 ```
 
-El script busca la carpeta de WoW Forever, descarga los últimos cambios y copia el addon. Si no encuentra el juego, indícale dónde está:
+The script finds your WoW Forever folder, pulls the latest changes and copies the addon. If it can't find the game, tell it where it is:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\deploy.ps1 -WowPath "D:\Juegos\World of Warcraft\_forever_"
+powershell -ExecutionPolicy Bypass -File .\scripts\deploy.ps1 -WowPath "D:\Games\World of Warcraft\_forever_"
 ```
 
-Para actualizar, vuelve a ejecutar el mismo comando. Si el juego estaba abierto, escribe `/reload` en el chat.
+To update, run the same command again. If the game was open, type `/reload` in chat.
 
-## Uso
+## Usage
 
-- Al entrar con un personaje verás en el chat: `La Ruta del 60: Cargado. Escribe /ruta para más info.`
-- `/ruta` muestra la versión y cuántas guías hay cargadas.
+- When you log in, the chat shows `La Ruta del 60: Loaded. Type /ruta for info.` (in Spanish on Spanish clients).
+- `/ruta` shows the version and the number of loaded guides.
 
-## Desarrollo
+## Development
 
-El addon se desarrolla íntegramente con IA (Claude Code) en macOS. Las reglas del proyecto, los comandos y la estructura están en [`CLAUDE.md`](CLAUDE.md). Para preparar el entorno, ejecuta `tools/setup.sh`; `tools/check.sh` lanza todas las verificaciones.
+The addon is developed entirely with AI (Claude Code) on macOS. Project rules, commands and structure are in [`CLAUDE.md`](CLAUDE.md). Run `tools/setup.sh` to set up the environment and `tools/check.sh` to run every check.

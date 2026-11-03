@@ -18,6 +18,9 @@ FACTIONS = {"Alliance", "Horde", "Both"}
 STEP_TYPES = {"accept", "complete", "turnin", "goto", "hearth", "fly", "train", "note"}
 QUEST_STEPS = {"accept", "complete", "turnin"}
 LOCALES = {"enUS", "esES"}
+ROUTE_KEYS = {"id", "name", "faction", "races", "classes", "minLevel", "maxLevel", "next", "carriedQuests", "steps"}
+STEP_KEYS = {"type", "questId", "npcId", "coords", "text", "source"}
+COORDS_KEYS = {"mapId", "x", "y"}
 MIN_LEVEL, MAX_LEVEL = 1, 60
 ID_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 
@@ -39,6 +42,14 @@ def _is_number(value) -> bool:
     return isinstance(value, (int, float)) and not isinstance(value, bool)
 
 
+def _check_keys(obj: dict, allowed: set[str], where: str, errors: list[str]) -> None:
+    for key in sorted(obj, key=str):
+        if key not in allowed:
+            errors.append(f"{where}: unknown key '{key}'")
+        elif obj[key] is None:
+            errors.append(f"{where}: '{key}' cannot be null (omit the key instead)")
+
+
 def _check_localized(value, where: str, field: str, errors: list[str], required: bool) -> None:
     if value is None:
         if required:
@@ -58,6 +69,7 @@ def _check_coords(coords, where: str, errors: list[str]) -> None:
     if not isinstance(coords, dict):
         errors.append(f"{where}: 'coords' must be an object")
         return
+    _check_keys(coords, COORDS_KEYS, f"{where}: coords", errors)
     map_id = coords.get("mapId")
     if not _is_int(map_id) or map_id <= 0:
         errors.append(f"{where}: 'coords.mapId' must be an integer > 0")
@@ -80,6 +92,7 @@ def _check_step(step, index: int, accepted: set[int], errors: list[str]) -> None
     if not isinstance(step, dict):
         errors.append(f"{where}: a step must be an object")
         return
+    _check_keys(step, STEP_KEYS, where, errors)
     step_type = step.get("type")
     if step_type not in STEP_TYPES:
         errors.append(f"{where}: unknown step type '{step_type}'")
@@ -116,6 +129,7 @@ def validate_route(route) -> list[str]:
     if not isinstance(route, dict):
         return ["a route must be a JSON object"]
     errors: list[str] = []
+    _check_keys(route, ROUTE_KEYS, "route", errors)
 
     route_id = route.get("id")
     if not isinstance(route_id, str) or not ID_RE.match(route_id):

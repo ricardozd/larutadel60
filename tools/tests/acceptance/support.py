@@ -25,6 +25,7 @@ VALID_ROUTE = {
     "maxLevel": 2,
     "steps": [
         {"type": "note", "text": {"enUS": "Start", "esES": "Empieza"}},
+        {"type": "note", "text": {"enUS": 'Say "hi"\nback\\slash', "esES": "Habla con él: más"}},
         {
             "type": "accept",
             "questId": 783,
@@ -48,6 +49,7 @@ def run(args: list, cwd: Path = ROOT, env: dict | None = None, stdin: str | None
         input=stdin,
         capture_output=True,
         text=True,
+        encoding="utf-8",
         timeout=900,
     )
 

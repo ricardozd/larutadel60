@@ -9,6 +9,26 @@ Client.FOREVER_TOC = Client.ADDON_DIR .. "LaRutaDel60_Forever.toc"
 
 local originalPrint = print
 
+local function keysOf(t)
+	local keys = {}
+	for key in pairs(t) do
+		keys[key] = true
+	end
+	return keys
+end
+
+-- Globals present before any test ran; everything else is test pollution to be removed.
+local baselineGlobals = keysOf(_G)
+
+local function resetGlobals()
+	for key in pairs(keysOf(_G)) do
+		if not baselineGlobals[key] then
+			_G[key] = nil
+		end
+	end
+	_G.print = originalPrint
+end
+
 function Client.readFile(path)
 	local handle = assert(io.open(path, "r"), "missing file " .. path)
 	local content = handle:read("*a")
@@ -17,7 +37,7 @@ function Client.readFile(path)
 end
 
 function Client.tocField(field)
-	return Client.readFile(Client.TOC):match("##%s*" .. field .. "%s*:%s*([^\r\n]-)%s*[\r\n]")
+	return (Client.readFile(Client.TOC) .. "\n"):match("##%s*" .. field .. "%s*:%s*([^\r\n]-)%s*[\r\n]")
 end
 
 local function tocEntries(tocPath)
@@ -48,14 +68,6 @@ function Client.addonFiles()
 	return files
 end
 
-local function keysOf(t)
-	local keys = {}
-	for key in pairs(t) do
-		keys[key] = true
-	end
-	return keys
-end
-
 local function newKeys(before, after)
 	local added = {}
 	for key in pairs(after) do
@@ -70,6 +82,7 @@ end
 -- opts: { locale = "enUS", projectId = 18, savedVariables = <table|nil> }
 function Client.boot(opts)
 	opts = opts or {}
+	resetGlobals()
 	local client = WowMock.install({
 		locale = opts.locale,
 		projectId = opts.projectId,
@@ -89,6 +102,7 @@ function Client.boot(opts)
 	if opts.savedVariables ~= nil then
 		_G.LaRutaDel60DB = opts.savedVariables
 	end
+	client.fire("ADDON_LOADED", "Blizzard_Foo")
 	client.fire("ADDON_LOADED", Client.ADDON_NAME)
 
 	function client.login()
@@ -131,7 +145,7 @@ function Client.boot(opts)
 end
 
 function Client.shutdown()
-	_G.print = originalPrint
+	resetGlobals()
 end
 
 return Client

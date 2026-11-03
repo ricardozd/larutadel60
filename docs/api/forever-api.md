@@ -19,6 +19,7 @@ Fuente de verdad del proyecto sobre la API. Cada entrada lleva fecha y fuente. L
 | Carga los archivos en el orden del TOC; los `.xml` cargan sus `<Script file>`; cada archivo recibe `(addonName, ns)` | `client.lua` | warcraft.wiki.gg/wiki/TOC_format |
 | SavedVariables: se restauran tras ejecutar los archivos del addon y antes de `ADDON_LOADED` | `client.lua` | warcraft.wiki.gg/wiki/Saving_variables_between_game_sessions |
 | Orden de eventos al entrar: `ADDON_LOADED` → `PLAYER_LOGIN` | `client.lua` | warcraft.wiki.gg/wiki/AddOn_loading_process |
+| `CreateFrame(tipo, nombre)` con `nombre` registra el frame como global `_G[nombre]` | `wow_mock.lua` | warcraft.wiki.gg/wiki/API_CreateFrame |
 | Slash: para cada `KEY` de `SlashCmdList`, los alias son `SLASH_<KEY>1`, `SLASH_<KEY>2`... | `client.lua` | warcraft.wiki.gg/wiki/Creating_a_slash_command |
 
 ## APIs emuladas / usadas por el addon

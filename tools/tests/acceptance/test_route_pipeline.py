@@ -1,6 +1,7 @@
 """Acceptance tests for the route pipeline CLIs (spec §11.1). Frozen: do not edit without user approval."""
 
 import json
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -24,7 +25,6 @@ INVALID_ROUTES = [
     ("min level above max level", {"minLevel": 10, "maxLevel": 5}),
     ("name without enUS", {"name": {"esES": "Ruta"}}),
     ("missing name", {"name": None}),
-    ("non kebab-case id", {"id": "Bad Id"}),
     ("empty steps", {"steps": []}),
     ("unknown step type", {"steps": [{"type": "dance"}]}),
     ("quest step without questId", {"steps": [{"type": "accept"}]}),
@@ -38,6 +38,12 @@ INVALID_ROUTES = [
     ("text without enUS", {"steps": [{"type": "note", "text": {"esES": "Hola"}}]}),
     ("source that is not a URL", {"steps": [{"type": "accept", "questId": 1, "source": "wowhead"}]}),
     ("non positive npcId", {"steps": [{"type": "accept", "questId": 1, "npcId": 0}]}),
+    ("races that is not a list", {"races": "Human"}),
+    ("classes that is not a list of strings", {"classes": [1]}),
+    ("carriedQuests that is not a list of ints", {"carriedQuests": ["x"]}),
+    ("fractional minLevel", {"minLevel": 1.5}),
+    ("string maxLevel", {"maxLevel": "2"}),
+    ("next that is not a string", {"next": 5}),
 ]
 
 
@@ -50,7 +56,7 @@ class ValidateCliTest(unittest.TestCase):
         self._tmp.cleanup()
 
     def validate(self, routes_dir=None):
-        return run(["python3", VALIDATE, routes_dir or self.routes])
+        return run([sys.executable, VALIDATE, routes_dir or self.routes])
 
     def test_accepts_a_valid_route(self):
         write_route(self.routes, valid_route())
@@ -63,7 +69,7 @@ class ValidateCliTest(unittest.TestCase):
         self.assertEqual(0, result.returncode, result.stderr)
 
     def test_accepts_the_repository_routes(self):
-        result = run(["python3", VALIDATE])
+        result = run([sys.executable, VALIDATE])
         self.assertEqual(0, result.returncode, result.stderr)
 
     def test_rejects_every_rule_violation_naming_the_file(self):
@@ -77,6 +83,18 @@ class ValidateCliTest(unittest.TestCase):
                 result = self.validate(routes)
                 self.assertEqual(1, result.returncode, f"{label}: {result.stdout}{result.stderr}")
                 self.assertIn("test-route.json", result.stderr, label)
+
+    def test_rejects_an_id_that_is_not_kebab_case(self):
+        write_route(self.routes, valid_route(id="Bad_Id"), filename="Bad_Id.json")
+        result = self.validate()
+        self.assertEqual(1, result.returncode)
+        self.assertIn("Bad_Id.json", result.stderr)
+
+    def test_accepts_hearth_fly_and_train_steps(self):
+        steps = [{"type": "hearth"}, {"type": "fly"}, {"type": "train"}]
+        write_route(self.routes, valid_route(steps=steps))
+        result = self.validate()
+        self.assertEqual(0, result.returncode, result.stderr)
 
     def test_rejects_a_file_name_that_does_not_match_the_id(self):
         write_route(self.routes, valid_route(), filename="other-name.json")
@@ -124,7 +142,7 @@ class CompileCliTest(unittest.TestCase):
         self._tmp.cleanup()
 
     def compile(self, *extra, routes=None, out=None):
-        return run(["python3", COMPILE, "--routes", routes or self.routes, "--out", out or self.out, *extra])
+        return run([sys.executable, COMPILE, "--routes", routes or self.routes, "--out", out or self.out, *extra])
 
     def test_writes_one_guide_per_route_and_an_index(self):
         result = self.compile()
@@ -174,8 +192,22 @@ class CompileCliTest(unittest.TestCase):
         self.assertFalse((self.out / "second-route.lua").exists())
         self.assertNotIn("second-route", (self.out / "Guides.xml").read_text(encoding="utf-8"))
 
+    def test_check_detects_stale_guide_files(self):
+        self.assertEqual(0, self.compile().returncode)
+        self.assertEqual(0, self.compile("--check").returncode)
+        (self.out / "stale-route.lua").write_text("-- stale\n", encoding="utf-8")
+        self.assertEqual(1, self.compile("--check").returncode)
+
+    def test_failed_compile_leaves_existing_output_untouched(self):
+        self.assertEqual(0, self.compile().returncode)
+        before = {p.name: p.read_bytes() for p in self.out.iterdir()}
+        write_route(self.routes / "alliance", {"id": "broken-route"})
+        self.assertEqual(1, self.compile().returncode)
+        after = {p.name: p.read_bytes() for p in self.out.iterdir()}
+        self.assertEqual(before, after)
+
     def test_repository_guides_are_up_to_date(self):
-        result = run(["python3", COMPILE, "--check"])
+        result = run([sys.executable, COMPILE, "--check"])
         self.assertEqual(0, result.returncode, result.stderr)
 
 

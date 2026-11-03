@@ -54,7 +54,7 @@ function WowMock.install(opts)
 		end,
 	}
 
-	_G.CreateFrame = function()
+	_G.CreateFrame = function(_, frameName)
 		local frame = { events = {}, scripts = {} }
 		function frame:RegisterEvent(event)
 			self.events[event] = true
@@ -64,6 +64,9 @@ function WowMock.install(opts)
 		end
 		function frame:SetScript(name, handler)
 			self.scripts[name] = handler
+		end
+		if frameName then
+			_G[frameName] = frame
 		end
 		client.frames[#client.frames + 1] = frame
 		return frame

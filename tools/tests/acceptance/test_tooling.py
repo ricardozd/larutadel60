@@ -55,7 +55,17 @@ class PostEditHookTest(unittest.TestCase):
         self._tmp.cleanup()
 
     def run_hook(self, path: Path):
-        payload = json.dumps({"tool_name": "Edit", "tool_input": {"file_path": str(path)}})
+        payload = json.dumps(
+            {
+                "session_id": "test",
+                "transcript_path": "/dev/null",
+                "cwd": str(self.repo),
+                "hook_event_name": "PostToolUse",
+                "tool_name": "Edit",
+                "tool_input": {"file_path": str(path)},
+                "tool_response": {"success": True},
+            }
+        )
         return run([self.hook], cwd=self.repo, env={"CLAUDE_PROJECT_DIR": str(self.repo)}, stdin=payload)
 
     def test_blocks_a_lua_file_with_lint_errors(self):

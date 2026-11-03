@@ -98,11 +98,12 @@ function Client.boot(opts)
 		chunk(Client.ADDON_NAME, ns)
 	end
 
-	-- The client restores saved variables after the addon files ran, before ADDON_LOADED.
+	-- Other addons may finish loading first, before our saved variables exist.
+	client.fire("ADDON_LOADED", "Blizzard_Foo")
+	-- The client restores saved variables after the addon files ran, before our ADDON_LOADED.
 	if opts.savedVariables ~= nil then
 		_G.LaRutaDel60DB = opts.savedVariables
 	end
-	client.fire("ADDON_LOADED", "Blizzard_Foo")
 	client.fire("ADDON_LOADED", Client.ADDON_NAME)
 
 	function client.login()

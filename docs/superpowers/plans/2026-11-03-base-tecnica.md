@@ -2540,7 +2540,7 @@ Esperado: `OK: all green` y working tree limpio.
 
 - [ ] **Paso 2: tests congelados intactos**
 
-Run: `git diff --stat $(git log --format=%H --grep='acceptance tests for the technical base' -n 1) HEAD -- tests/acceptance tests/support tools/tests/acceptance`
+Run: `git diff --stat acceptance-frozen HEAD -- tests/acceptance tests/support tools/tests/acceptance`
 Esperado: sin salida (ningún cambio desde el commit en rojo).
 
 - [ ] **Paso 3: publicar en GitHub (requiere confirmación del usuario)**

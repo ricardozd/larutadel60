@@ -16,11 +16,11 @@ jobs:
         with:
           python-version: "3.12"
 
-      - uses: leafo/gh-actions-lua@v10
+      - uses: leafo/gh-actions-lua@v13.1.0
         with:
           luaVersion: "luajit-2.1"
 
-      - uses: leafo/gh-actions-luarocks@v4
+      - uses: leafo/gh-actions-luarocks@v6.1.1
 
       - name: Install busted and luacheck
         run: |
@@ -33,6 +33,10 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           version: v2.6.0
           args: --version
+
+      - name: Parse deploy.ps1
+        run: |
+          pwsh -NoProfile -Command '$errors = $null; [System.Management.Automation.Language.Parser]::ParseFile("scripts/deploy.ps1", [ref]$null, [ref]$errors) > $null; if ($errors) { $errors; exit 1 }'
 
       - name: Install lua-language-server
         run: |

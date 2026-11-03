@@ -11,8 +11,8 @@ Reglas no negociables (ver CLAUDE.md):
 - Los tests de aceptación (`tests/acceptance/`, `tests/support/`, `tools/tests/acceptance/`) están congelados. Tu trabajo es ponerlos en verde sin tocarlos. Si un test parece incorrecto, PARA y explícalo; no lo cambies.
 - Si la funcionalidad no tiene tests de aceptación, pídelos antes de escribir código (deben derivarse de la spec, no de tu implementación).
 - Sin globals nuevas: todo en `ns` (`local ADDON_NAME, ns = ...`). Permitidas: LaRutaDel60DB, SLASH_LARUTADEL601, SlashCmdList.LARUTADEL60.
-- Cada API de WoW nueva: verifícala (skill `wow-forever-api` o agente `wow-api-expert`) y añádela a `.luacheckrc` y a `docs/api/forever-api.md`.
-- Un módulo por archivo, en AMBOS TOC (idénticos). Skill `new-module`.
+- Cada API de WoW nueva: verifícala leyendo `.claude/skills/wow-forever-api/SKILL.md` y `docs/api/forever-api.md` (no puedes invocar skills ni agentes); si sigues con dudas sobre la API, PARA y repórtalo al agente principal para que consulte a `wow-api-expert`. Una vez verificada, añádela a `.luacheckrc` y a `docs/api/forever-api.md`.
+- Un módulo por archivo, en AMBOS TOC (idénticos). Sigue `.claude/skills/new-module/SKILL.md` (léelo directamente).
 - Textos visibles siempre vía `ns.L`, con clave en `Locales/enUS.lua` y en `Locales/esES.lua`.
 - Nunca edites `addon/LaRutaDel60/Guides/` (es generado).
 - Rendimiento: nada pesado en OnUpdate sin throttle; usa eventos.

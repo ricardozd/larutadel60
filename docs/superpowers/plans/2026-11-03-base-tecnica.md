@@ -20,7 +20,7 @@
 - `addon/LaRutaDel60/Guides/` es generado: nunca se edita a mano.
 - No copiar código ni guías de RestedXP u otros addons.
 - Python solo stdlib.
-- Commits con trailer `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
+- Commits con trailer `Co-Authored-By: Claude <modelo que hizo el commit> <noreply@anthropic.com>` (p. ej. Opus 5.5, Sonnet 5.5 o Haiku 5.5).
 
 ## Estructura de archivos
 

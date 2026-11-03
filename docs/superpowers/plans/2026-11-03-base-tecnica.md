@@ -993,7 +993,8 @@ class CompileCliTest(unittest.TestCase):
         self.assertEqual(1, self.compile("--check").returncode)
 
     def test_check_does_not_write(self):
-        self.compile("--check")
+        result = self.compile("--check")
+        self.assertEqual(1, result.returncode, result.stderr)
         self.assertFalse(self.out.exists() and any(self.out.iterdir()))
 
     def test_removes_guides_of_deleted_routes(self):

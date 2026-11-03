@@ -22,6 +22,15 @@ MIN_LEVEL, MAX_LEVEL = 1, 60
 ID_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 
 
+def _reject_constant(name: str):
+    raise ValueError(f"{name} is not allowed in JSON")
+
+
+def load_route_json(path: Path):
+    """Reads a route file as strict JSON (rejects NaN/Infinity). Raises ValueError, OSError or UnicodeDecodeError."""
+    return json.loads(path.read_text(encoding="utf-8"), parse_constant=_reject_constant)
+
+
 def _is_int(value) -> bool:
     return isinstance(value, int) and not isinstance(value, bool)
 
@@ -151,12 +160,18 @@ def validate_all(routes_dir: Path = ROUTES_DIR) -> list[str]:
     ids: dict[str, str] = {}
     routes: list[tuple[str, dict]] = []
 
+    if not routes_dir.is_dir():
+        return [f"routes directory '{routes_dir}' does not exist or is not a directory"]
+
     for path in sorted(routes_dir.rglob("*.json")):
         label = path.relative_to(routes_dir).as_posix()
         try:
-            data = json.loads(path.read_text(encoding="utf-8"))
-        except json.JSONDecodeError as exc:
+            data = load_route_json(path)
+        except (ValueError, UnicodeDecodeError) as exc:  # JSONDecodeError is a ValueError
             errors.append(f"{label}: invalid JSON: {exc}")
+            continue
+        except OSError as exc:
+            errors.append(f"{label}: cannot read file: {exc}")
             continue
         errors.extend(f"{label}: {err}" for err in validate_route(data))
         if isinstance(data, dict) and isinstance(data.get("id"), str):

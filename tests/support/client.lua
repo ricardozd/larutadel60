@@ -6,6 +6,8 @@ Client.ADDON_NAME = "LaRutaDel60"
 Client.ADDON_DIR = "addon/LaRutaDel60/"
 Client.TOC = Client.ADDON_DIR .. "LaRutaDel60.toc"
 Client.FOREVER_TOC = Client.ADDON_DIR .. "LaRutaDel60_Forever.toc"
+-- uiMapID that C_Map.GetBestMapForUnit("player") reports inside an instance by default.
+Client.INSTANCE_MAP = WowMock.DEFAULT_INSTANCE_MAP
 
 local originalPrint = print
 

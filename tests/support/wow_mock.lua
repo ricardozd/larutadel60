@@ -149,9 +149,14 @@ function WowMock.newWorld(opts)
 	}
 end
 
--- Text as the player reads it: color (|cAARRGGBB ... |r) and texture (|T...|t) escapes removed.
+-- Text as the player reads it: color (|cAARRGGBB, |cn<NAME>:, |r), texture (|T...|t) and atlas
+-- (|A...|a) escapes removed, and the escaped pipe || shown as a single |.
 local function stripEscapes(text)
-	return (text:gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", ""):gsub("|T.-|t", ""))
+	local PIPE = "\0"
+	text = text:gsub("||", PIPE)
+	text = text:gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|cn[%w_]+:", ""):gsub("|r", "")
+	text = text:gsub("|T.-|t", ""):gsub("|A.-|a", "")
+	return (text:gsub("%z", "|"))
 end
 WowMock.stripEscapes = stripEscapes
 
@@ -493,8 +498,13 @@ function WowMock.install(opts)
 			function frame:GetText()
 				return self.text
 			end
-			-- The button's own label region; its text is the button text.
+			-- The button's own label region; its text is the button text. As in retail it does not exist
+			-- until SetText was called, unless a button template (e.g. UIPanelButtonTemplate) provides it.
 			function frame:GetFontString()
+				local templateLabel = type(template) == "string" and template:find("ButtonTemplate", 1, true)
+				if self.text == nil and not self.fontString and not templateLabel then
+					return nil
+				end
 				if not self.fontString then
 					local fontString = newRegion("FontString", self, nil)
 					fontString.buttonLabel = true

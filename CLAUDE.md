@@ -15,7 +15,7 @@ Addon gratuito para **WoW Forever** (Classic+ oficial, cliente 1.60.1, `## Inter
 - Commits pequeños con Conventional Commits. No se hace push sin que el usuario lo pida.
 
 ## Puesta en marcha (clon nuevo, macOS)
-1. `tools/setup.sh`: instala el toolchain y las anotaciones de la API. Añade `~/.luarocks/bin` al PATH.
+1. `tools/setup.sh`: instala el toolchain y las anotaciones de la API. Si `~/.luarocks/bin` no está en el PATH, avisa: añádelo tú en tu perfil de shell (`check.sh` funciona igual).
 2. Plugin LSP para Claude Code (necesita `lua-language-server` en el PATH): `claude plugin marketplace add ./` y luego `claude plugin install wow-lua-lsp@larutadel60 --scope project`. Después, reinicia Claude Code.
 3. `tools/check.sh` tiene que terminar en `OK: all green`.
 

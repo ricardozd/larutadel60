@@ -1,7 +1,7 @@
 # La Ruta del 60 — Base técnica (diseño)
 
 Fecha: 2026-11-03
-Estado: aprobado (pendiente revisión final del documento)
+Estado: aprobado e implementado (rama feat/base-tecnica)
 
 ## 1. Contexto
 
@@ -49,7 +49,7 @@ larutadel60/
 │   └── routes/
 ├── tools/
 ├── tests/
-│   └── mocks/
+│   └── support/
 ├── scripts/deploy.ps1
 ├── .github/workflows/ci.yml
 └── docs/
@@ -69,7 +69,7 @@ Principios:
 | lua-language-server | LSP: diagnósticos, tipos API WoW | `.luarc.json` (runtime Lua 5.1, library = anotaciones Ketho `vscode-wow-api` mainline, globals del addon) |
 | luacheck | Lint (globals, variables sin usar) | `.luacheckrc` con `std = "lua51"` + globals WoW leídos |
 | stylua | Formato | `.stylua.toml` (tabs, 120 col) |
-| busted | Tests unitarios fuera del juego | `tests/`, mocks en `tests/mocks/wow.lua` |
+| busted | Tests unitarios fuera del juego | `tests/`, mocks en `tests/support/` |
 | python3 | Herramientas de datos | `tools/` (scraper, validador, compilador) |
 
 Instalación en macOS vía `brew` (lua-language-server, luacheck, stylua, luarocks) y `luarocks install busted`. Las anotaciones de Ketho se descargan a `.vendor/` (en `.gitignore`) mediante `tools/setup.sh`.

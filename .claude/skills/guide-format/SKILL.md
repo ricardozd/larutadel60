@@ -33,6 +33,8 @@ Las rutas son DATOS. Fuente: `data/routes/<alliance|horde|both>/<id>.json`. Se c
 
 Opcionales en cualquier paso: `npcId` (int > 0), `coords {mapId, x, y}` (x e y en 0-100; mapId = uiMapID), `text {enUS, esES?}`, `source` (URL).
 
+Claves desconocidas o `null` → error.
+
 ## En Lua
 `ns.Guides["<id>"]` contiene exactamente los mismos datos que el JSON (lo garantiza un test de aceptación de ida y vuelta).
 

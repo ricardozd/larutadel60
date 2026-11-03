@@ -23,4 +23,4 @@ QUEST_ACCEPTED, QUEST_TURNED_IN, QUEST_REMOVED, QUEST_LOG_UPDATE, QUEST_DETAIL, 
 ## Trampas habituales
 - Funciones protegidas y combate: comprueba `InCombatLockdown()` antes de tocar frames seguros.
 - APIs de Classic Era (`GetQuestLogTitle`, `GetNumQuestLogEntries`) pueden no existir: usa `C_QuestLog.*`.
-- Coordenadas: `C_Map.GetPlayerMapPosition(uiMapID, "player")` devuelve 0-1, mientras que el formato de guía usa 0-100.
+- Coordenadas: `C_Map.GetPlayerMapPosition(uiMapID, "player")` devuelve un `Vector2DMixin` (`pos:GetXY()`, valores 0-1) o `nil` (p. ej. en instancias), no dos números, mientras que el formato de guía usa 0-100.

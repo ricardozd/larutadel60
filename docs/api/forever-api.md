@@ -36,3 +36,4 @@ Fuente de verdad del proyecto sobre la API. Cada entrada lleva fecha y fuente. L
 
 ## Tooling
 - LSP: plugin `wow-lua-lsp` (lua-language-server 3.19 + anotaciones Ketho mainline en `.vendor/`).
+- `.luarc.json` declara como globals `SlashCmdList`, `DEFAULT_CHAT_FRAME` y `WOW_PROJECT_CAMELOT` porque `Annotations/FrameXML` de Ketho es un submódulo git que `tools/fetch_annotations.sh` no descarga, así que LuaLS no las conoce. `WOW_PROJECT_CAMELOT` además es exclusiva de Forever (no existe en las anotaciones de Classic).

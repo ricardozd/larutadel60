@@ -20,6 +20,7 @@ end
 ```
 
 3. Regístralo en `LaRutaDel60.toc` en su orden de carga (después de `Core\Init.lua` si usa `ns.Print`) y copia el TOC: `cp addon/LaRutaDel60/LaRutaDel60.toc addon/LaRutaDel60/LaRutaDel60_Forever.toc`.
+   Las guías (`Guides\Guides.xml`) se cargan DESPUÉS de Core en el TOC: un módulo debe leer `ns.Guides` en `PLAYER_LOGIN` (o más tarde), nunca al cargar el archivo.
 4. Textos: claves en `Locales/enUS.lua` y `Locales/esES.lua`.
 5. APIs de WoW nuevas: skill `wow-forever-api`.
 6. `tools/check.sh` en verde → agente `lua-reviewer` → commit (con el trailer `Co-Authored-By`).

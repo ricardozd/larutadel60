@@ -92,6 +92,9 @@ WowMock.DEFAULT_MAPS = {
 	[1421] = { continent = 0, left = 3450.0, top = 1666.7, width = 4200.0, height = 2800.0 },
 }
 
+-- uiMapID reported by C_Map.GetBestMapForUnit inside an instance when no other ID is given.
+WowMock.DEFAULT_INSTANCE_MAP = 9999
+
 -- Player, quest and position state. It outlives a /reload (see client.reload).
 -- opts: { player = {...}, quests = {...}, position = {...}, maps = {...} } (see docs/api/forever-api.md)
 function WowMock.newWorld(opts)
@@ -119,23 +122,38 @@ function WowMock.newWorld(opts)
 		quests.titles[id] = title
 	end
 
-	local position
+	local position, instanceMapId
 	if opts.position then
 		position = {
 			mapId = opts.position.mapId,
 			x = opts.position.x,
 			y = opts.position.y,
-			facing = opts.position.facing or 0,
+			facing = (opts.position.facing or 0) % (2 * math.pi),
 		}
+	else
+		instanceMapId = WowMock.DEFAULT_INSTANCE_MAP
+	end
+
+	-- opts.maps is merged over the defaults; both are copied so tests never share or mutate them.
+	local maps = WowMock.deepCopy(WowMock.DEFAULT_MAPS)
+	for id, rect in pairs(opts.maps or {}) do
+		maps[id] = WowMock.deepCopy(rect)
 	end
 
 	return {
 		player = player,
 		quests = quests,
 		position = position,
-		maps = opts.maps or WowMock.DEFAULT_MAPS,
+		instanceMapId = instanceMapId,
+		maps = maps,
 	}
 end
+
+-- Text as the player reads it: color (|cAARRGGBB ... |r) and texture (|T...|t) escapes removed.
+local function stripEscapes(text)
+	return (text:gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", ""):gsub("|T.-|t", ""))
+end
+WowMock.stripEscapes = stripEscapes
 
 local function normalizeAngle(radians)
 	local twoPi = 2 * math.pi
@@ -194,6 +212,7 @@ function WowMock.install(opts)
 
 	local function register(object)
 		client.objects[#client.objects + 1] = object
+		object.serial = #client.objects
 	end
 
 	local function noop() end
@@ -214,11 +233,12 @@ function WowMock.install(opts)
 		end
 		function object:SetPoint(point, ...)
 			local relativeTo, relativePoint, x, y
+			local argCount = select("#", ...)
 			local args = { ... }
 			local first = args[1]
 			if type(first) == "number" then
 				x, y = args[1], args[2]
-			elseif first == nil and #args == 0 then
+			elseif argCount == 0 then
 				x, y = 0, 0
 			else
 				relativeTo = first
@@ -279,6 +299,9 @@ function WowMock.install(opts)
 		function object:GetParent()
 			return self.parent
 		end
+		function object:GetName()
+			return self.name
+		end
 		function object:Show()
 			if not self.shown then
 				self.shown = true
@@ -320,7 +343,7 @@ function WowMock.install(opts)
 	end
 
 	local function newRegion(kind, parent, name)
-		local region = { kind = kind, parent = parent }
+		local region = { kind = kind, parent = parent, name = name }
 		addRegionMethods(region)
 		if kind == "Texture" then
 			for _, method in ipairs({ "SetTexture", "SetColorTexture", "SetTexCoord", "SetAtlas", "SetBlendMode" }) do
@@ -362,8 +385,14 @@ function WowMock.install(opts)
 		return region
 	end
 
-	local function newFrame(frameType, frameName, parent)
-		local frame = { events = {}, scripts = {}, frameType = frameType or "Frame", parent = parent }
+	local function newFrame(frameType, frameName, parent, template)
+		local frame = {
+			events = {},
+			scripts = {},
+			frameType = frameType or "Frame",
+			parent = parent,
+			name = frameName,
+		}
 		addRegionMethods(frame)
 		function frame:RegisterEvent(event)
 			self.events[event] = true
@@ -396,17 +425,25 @@ function WowMock.install(opts)
 			end)
 		end
 		for _, method in ipairs({
-			"EnableMouse",
 			"SetClampedToScreen",
 			"SetFrameStrata",
 			"SetFrameLevel",
-			"SetBackdrop",
-			"SetBackdropColor",
-			"SetBackdropBorderColor",
 			"SetUserPlaced",
 			"SetToplevel",
 		}) do
 			frame[method] = noop
+		end
+		-- Since 9.0 the backdrop API only exists on frames that inherit BackdropTemplate.
+		if type(template) == "string" and template:find("BackdropTemplate", 1, true) then
+			frame.SetBackdrop = noop
+			frame.SetBackdropColor = noop
+			frame.SetBackdropBorderColor = noop
+		end
+		function frame:EnableMouse(enabled)
+			self.mouseEnabled = enabled and true or false
+		end
+		function frame:IsMouseEnabled()
+			return self.mouseEnabled == true
 		end
 		function frame:SetMovable(movable)
 			self.movable = movable and true or false
@@ -456,6 +493,22 @@ function WowMock.install(opts)
 			function frame:GetText()
 				return self.text
 			end
+			-- The button's own label region; its text is the button text.
+			function frame:GetFontString()
+				if not self.fontString then
+					local fontString = newRegion("FontString", self, nil)
+					fontString.buttonLabel = true
+					local button = self
+					fontString.SetText = function(_, text)
+						button:SetText(text)
+					end
+					fontString.GetText = function()
+						return button.text
+					end
+					self.fontString = fontString
+				end
+				return self.fontString
+			end
 			function frame:Enable()
 				self.enabled = true
 			end
@@ -485,8 +538,8 @@ function WowMock.install(opts)
 	-- UIParent is the root of the UI; it is always shown and is not tracked in client.frames.
 	_G.UIParent = newFrame("Frame", nil, nil)
 
-	_G.CreateFrame = function(frameType, frameName, parent, _)
-		local frame = newFrame(frameType, frameName, parent)
+	_G.CreateFrame = function(frameType, frameName, parent, template)
+		local frame = newFrame(frameType, frameName, parent, template)
 		client.frames[#client.frames + 1] = frame
 		register(frame)
 		return frame
@@ -621,19 +674,41 @@ function WowMock.install(opts)
 	end
 	_G.CreateVector2D = vector2
 
+	-- Like real C_ functions, a nil or non-number uiMapID is a Lua error, not a nil return.
+	local function checkMapId(apiName, uiMapID)
+		if type(uiMapID) ~= "number" then
+			error(
+				"bad argument #1 to '"
+					.. apiName
+					.. "' (outgoing value type: number expected, got "
+					.. type(uiMapID)
+					.. ")",
+				3
+			)
+		end
+	end
+
 	_G.C_Map = {
+		-- Inside an instance the player has the instance's own uiMapID but no map position.
 		GetBestMapForUnit = function(unit)
-			if isPlayer(unit) and world.position then
+			if not isPlayer(unit) then
+				return nil
+			end
+			if world.position then
 				return world.position.mapId
 			end
+			return world.instanceMapId
 		end,
+		-- Only the player's current map has a position; any other map returns nil.
 		GetPlayerMapPosition = function(uiMapID, unit)
+			checkMapId("GetPlayerMapPosition", uiMapID)
 			local position = world.position
 			if isPlayer(unit) and position and position.mapId == uiMapID then
 				return vector2(position.x / 100, position.y / 100)
 			end
 		end,
 		GetWorldPosFromMapPos = function(uiMapID, mapPosition)
+			checkMapId("GetWorldPosFromMapPos", uiMapID)
 			local rect = world.maps[uiMapID]
 			if not rect or not mapPosition then
 				return nil
@@ -652,6 +727,7 @@ function WowMock.install(opts)
 	function client.moveTo(mapId, x, y)
 		local facing = world.position and world.position.facing or 0
 		world.position = { mapId = mapId, x = x, y = y, facing = facing }
+		world.instanceMapId = nil
 	end
 
 	function client.face(radians)
@@ -659,8 +735,10 @@ function WowMock.install(opts)
 		world.position.facing = radians % (2 * math.pi)
 	end
 
-	function client.enterInstance()
+	-- Inside an instance GetBestMapForUnit keeps a uiMapID; map position and facing are nil.
+	function client.enterInstance(mapId)
 		world.position = nil
+		world.instanceMapId = mapId or WowMock.DEFAULT_INSTANCE_MAP
 	end
 
 	------------------------------------------------------------------------------------------------
@@ -782,23 +860,38 @@ function WowMock.install(opts)
 		return object.kind == "FontString"
 	end
 
-	-- Texts of every visible font string and button, in creation order. Empty texts are not shown.
+	-- Text as the player reads it, or nil when nothing would be displayed.
+	local function displayedText(object)
+		if object.text == nil then
+			return nil
+		end
+		local text = stripEscapes(object.text)
+		if text == "" then
+			return nil
+		end
+		return text
+	end
+
+	-- Texts of every visible font string and button, in creation order, with escape codes removed.
+	-- Empty texts are not shown. A button's own label (GetFontString) is reported once, as the button.
 	function client.visibleTexts()
 		local texts = {}
 		for _, object in ipairs(client.objects) do
-			if (isFontString(object) or object.isButton) and object.text and object.text ~= "" then
-				if object:IsVisible() then
-					texts[#texts + 1] = object.text
+			if (isFontString(object) and not object.buttonLabel) or object.isButton then
+				local text = displayedText(object)
+				if text and object:IsVisible() then
+					texts[#texts + 1] = text
 				end
 			end
 		end
 		return texts
 	end
 
-	-- Clicks the visible, enabled button with that text. Errors when there is none.
+	-- Clicks the visible, enabled button whose displayed text (escapes removed) is `label`.
+	-- Errors when there is none.
 	function client.click(label)
 		for _, object in ipairs(client.objects) do
-			if object.isButton and object.text == label and object:IsVisible() and object.enabled then
+			if object.isButton and displayedText(object) == label and object:IsVisible() and object.enabled then
 				local handler = object.scripts.OnClick
 				if handler then
 					handler(object, "LeftButton", false)
@@ -809,52 +902,45 @@ function WowMock.install(opts)
 		error("no visible button labelled " .. tostring(label), 2)
 	end
 
-	local function isInside(region, ancestor)
-		local current = region.parent
-		while current do
-			if current == ancestor then
-				return true
-			end
-			current = current.parent
-		end
-		return false
-	end
-
-	-- The first visible texture whose rotation was set. `rotation` is normalized to [-pi, pi);
-	-- `label` is the first visible, non-empty font string in the texture's frame (or its children).
+	-- The arrow is the first visible texture whose rotation was set. `rotation` is normalized to
+	-- [-pi, pi). `label` is the visible, non-empty font string with the SAME parent frame as the
+	-- texture; with several, the first created after the texture (else the first one).
 	function client.arrow()
 		for _, object in ipairs(client.objects) do
 			if object.kind == "Texture" and object.rotation ~= nil and object:IsVisible() then
-				local label
+				local label, before
 				for _, other in ipairs(client.objects) do
-					local hasText = isFontString(other) and other.text and other.text ~= ""
-					if hasText and other:IsVisible() and isInside(other, object.parent) then
-						label = other.text
-						break
+					local text = isFontString(other) and other.parent == object.parent and displayedText(other)
+					if text and other:IsVisible() then
+						if other.serial > object.serial then
+							label = text
+							break
+						end
+						before = before or text
 					end
 				end
-				return { shown = true, rotation = normalizeAngle(object.rotation), label = label }
+				return { shown = true, rotation = normalizeAngle(object.rotation), label = label or before }
 			end
 		end
 		return { shown = false }
 	end
 
-	-- Movable frames (SetMovable(true)), in creation order.
+	-- Frames the player can drag: SetMovable(true) and EnableMouse(true), in creation order.
 	function client.movableFrames()
 		local movable = {}
 		for _, frame in ipairs(client.frames) do
-			if frame.movable then
+			if frame.movable and frame.mouseEnabled then
 				movable[#movable + 1] = frame
 			end
 		end
 		return movable
 	end
 
-	-- Drags the frameIndex-th movable frame: OnDragStart, the frame lands at the given SetPoint
+	-- Drags the frameIndex-th draggable frame: OnDragStart, the frame lands at the given SetPoint
 	-- anchor if it is moving, then OnDragStop. Returns the frame so tests can read GetPoint().
 	function client.drag(frameIndex, ...)
 		local frame = client.movableFrames()[frameIndex]
-		assert(frame, "no movable frame #" .. tostring(frameIndex))
+		assert(frame, "no movable, mouse-enabled frame #" .. tostring(frameIndex))
 		assert(frame:IsVisible(), "movable frame #" .. tostring(frameIndex) .. " is not visible")
 		if frame.dragButtons and frame.scripts.OnDragStart then
 			frame.scripts.OnDragStart(frame, "LeftButton")

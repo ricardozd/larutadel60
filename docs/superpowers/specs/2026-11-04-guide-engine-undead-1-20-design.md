@@ -132,7 +132,7 @@ New client actions, each firing the real event sequence:
 - `client.acceptQuest(id)`: adds the quest to the log and fires `QUEST_ACCEPTED(id)` and `QUEST_LOG_UPDATE`.
 - `client.completeObjectives(id)`: marks the quest ready and fires `QUEST_LOG_UPDATE`.
 - `client.turnInQuest(id)`: removes the quest from the log, marks it completed, and fires `QUEST_TURNED_IN(id, 0, 0)`, `QUEST_REMOVED(id)` and `QUEST_LOG_UPDATE`.
-- `client.moveTo(mapId, x, y)`, `client.face(radians)`, `client.enterInstance()`: the last one sets the position and facing to nil.
+- `client.moveTo(mapId, x, y)`, `client.face(radians)`, `client.enterInstance(mapId?)`: the last one keeps a non-nil current map (`GetBestMapForUnit` returns `mapId`, default 9999) while the map position and facing are nil.
 - `client.levelUp(level)`: fires `PLAYER_LEVEL_UP(level)`.
 - `client.advance(seconds)`: runs `OnUpdate` handlers with elapsed time, and fires due `C_Timer.After` and `C_Timer.NewTicker` callbacks.
 - `client.reload()`: boots again, keeping `LaRutaDel60DB` and the player and quest state. This is the equivalent of `/reload`.
@@ -144,16 +144,16 @@ Emulated API surface:
 - `UnitFactionGroup`, `UnitRace`, `UnitClass`, `UnitLevel`, `UnitName`, `GetRealmName`.
 - `C_Timer.After`, `C_Timer.NewTicker` (with `:Cancel()`).
 - Frames, black-box but inspectable:
-  - `CreateFrame(type, name, parent, template)` returns objects with no-op layout methods: `SetPoint`, `SetSize`, `SetMovable`, `EnableMouse`, `RegisterForDrag`, `StartMoving`, `StopMovingOrSizing`, `SetClampedToScreen`, `SetFrameStrata`, `SetBackdrop`, `ClearAllPoints`.
+  - `CreateFrame(type, name, parent, template)` returns objects with no-op layout methods: `SetPoint`, `SetSize`, `SetMovable`, `EnableMouse`, `RegisterForDrag`, `StartMoving`, `StopMovingOrSizing`, `SetClampedToScreen`, `SetFrameStrata`, `ClearAllPoints`. Backdrop methods (`SetBackdrop`, `SetBackdropColor`, `SetBackdropBorderColor`) exist only on frames created with a template containing `BackdropTemplate`.
   - `GetPoint` returns the last `SetPoint`.
-  - `Show`, `Hide` and `IsShown` include the parent visibility.
+  - `IsShown` is the frame's own flag; `IsVisible` includes the parents' visibility. The inspection helpers use `IsVisible`.
   - `CreateTexture` and `CreateFontString` return regions with `SetTexture`, `SetRotation`/`GetRotation`, `SetText`/`GetText` and `SetAllPoints`.
   - `"Button"` frames support `SetText`/`GetText` and an `OnClick` script.
 - Inspection helpers:
-  - `client.visibleTexts()`: the texts of all shown font strings and buttons, in creation order.
-  - `client.click(label)`: runs `OnClick` of the shown button with that text, and errors if there is none.
-  - `client.arrow()`: `{ shown, rotation, label }` of the shown texture whose rotation was set, or `{ shown = false }`.
-  - `client.drag(frameIndex, point...)`: simulates a drag that ends with a `SetPoint`.
+  - `client.visibleTexts()`: the texts of all visible font strings and buttons, in creation order, with color and texture escape codes stripped; empty texts are excluded.
+  - `client.click(label)`: runs `OnClick` of the visible button with that text (escape codes stripped), and errors if there is none.
+  - `client.arrow()`: `{ shown, rotation, label }` of the visible texture whose rotation was set, or `{ shown = false }`. The arrow texture and its distance label live in their own frame: `label` is the visible font string with the same parent as the texture (the first created after it).
+  - `client.drag(frameIndex, point...)`: simulates a drag that ends with a `SetPoint`. `frameIndex` indexes the movable (`SetMovable(true)`), mouse-enabled (`EnableMouse(true)`) frames in creation order.
 
 Workflow for this extension:
 1. Edit `tests/support/` and write the new acceptance tests.

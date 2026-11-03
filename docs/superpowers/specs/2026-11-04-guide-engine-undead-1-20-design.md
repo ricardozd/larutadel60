@@ -57,7 +57,7 @@ A route matches when all of these hold:
 - `classes` is absent or contains the class file token;
 - `minLevel <= level <= maxLevel`.
 
-Among the matches, a route that lists `races` beats one that doesn't. Ties are broken by the lowest `minLevel`, then by the `id` sorted alphabetically. Saved progress wins over selection as long as its route still exists and still matches faction and race. Level is not checked here, so a player who outlevels a route keeps it until they switch.
+Among the matches, a route that lists `races` beats one that doesn't. Ties are broken by the lowest `minLevel`, then by the `id` sorted alphabetically. Saved progress wins over selection as long as its route still exists and still matches faction, race and class. Level is not checked here, so a player who outlevels a route keeps it until they switch.
 
 The selected route is saved as progress as soon as it is chosen.
 
@@ -134,7 +134,7 @@ Line contract:
 | `/ruta list` / `/ruta lista` | lists the routes that match the character, one line each | `<id> - <name>` | same |
 | `/ruta <id>` | switches to that route, step 1 | `Route: <name>` | `Ruta: <name>` |
 | `/ruta <unknown id>` | nothing changes | `Unknown route: <id>` | `Ruta desconocida: <id>` |
-| `/ruta reset` / `/ruta reiniciar` | back to step 1 of the current route, then catch-up | `Route restarted.` | `Ruta reiniciada.` |
+| `/ruta reset` / `/ruta reiniciar` | back to step 1 of the current route, then catch-up; with no route it only prints the message | `Route restarted.` | `Ruta reiniciada.` |
 | `/ruta show` / `/ruta mostrar` | shows the window | none | none |
 | `/ruta hide` / `/ruta ocultar` | hides the window | none | none |
 

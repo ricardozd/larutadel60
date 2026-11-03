@@ -23,8 +23,8 @@ $AddonName = "LaRutaDel60"
 if (-not $WowPath) {
     $roots = @("C:\Program Files (x86)\World of Warcraft", "C:\Program Files\World of Warcraft", "D:\World of Warcraft")
     $flavors = @("_forever_", "_camelot_", "_classic_")
-    $WowPath = @(foreach ($root in $roots) {
-        foreach ($flavor in $flavors) {
+    $WowPath = @(foreach ($flavor in $flavors) {
+        foreach ($root in $roots) {
             $candidate = Join-Path $root $flavor
             if (Test-Path -LiteralPath $candidate) { $candidate }
         }

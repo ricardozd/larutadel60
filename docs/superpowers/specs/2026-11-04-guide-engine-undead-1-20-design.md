@@ -126,6 +126,8 @@ The extension is additive. Existing functions keep their behavior, so the frozen
 - `position = { mapId, x, y, facing }`, with x and y as percentages from 0 to 100. Nil position means an instance.
 - `maps = { [mapId] = { continent = c, left = yards, top = yards, width = yards, height = yards } }`. These are the world rectangles used by `GetWorldPosFromMapPos`. Defaults cover the two maps used here: Tirisfal Glades 1420 and Silverpine Forest 1421 (the Classic uiMapIDs, still to verify on Forever), with continent 0. The routes must use whatever uiMapIDs `route-researcher` confirms. If those differ, the defaults are updated in the same change, before the code.
 
+- `guides = { <route table>, ... }` plus `replaceGuides = true|false`. These emulate extra guide files appended to the TOC: each table is registered as `ns.Guides[route.id] = route` after the addon's own files. With `replaceGuides = true`, the addon's `Guides/Guides.xml` is skipped, so only the fixture routes exist. Engine acceptance tests use fixture routes defined in the tests, so route data changes never break them. The real routes are covered by the tools acceptance test (§5, "Routes").
+
 New client actions, each firing the real event sequence:
 - `client.acceptQuest(id)`: adds the quest to the log and fires `QUEST_ACCEPTED(id)` and `QUEST_LOG_UPDATE`.
 - `client.completeObjectives(id)`: marks the quest ready and fires `QUEST_LOG_UPDATE`.

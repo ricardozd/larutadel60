@@ -5,6 +5,9 @@ Addon gratuito para **WoW Forever** (Classic+ oficial, cliente 1.60.1, `## Inter
 ## Reglas
 - **Idioma:** el código va SIEMPRE en inglés (identificadores, comentarios, strings, mensajes de CLI, nombres de tests y commits). Las explicaciones van SIEMPRE en castellano (chat, specs, planes, este archivo, agentes y skills). Los textos al jugador se localizan en enUS y esES.
 - **Tests de aceptación primero:** antes de escribir código de una funcionalidad hay tests de caja negra derivados de su spec, commiteados en rojo. `tests/acceptance/`, `tests/support/` y `tools/tests/acceptance/` están **congelados**: se ponen en verde sin modificarlos. Si un test parece mal, PARA y pregunta al usuario.
+  - El congelado se hace cumplir con el tag `acceptance-frozen`: `tools/check.sh` (y el CI) falla si algo modificado, borrado o renombrado respecto al tag cambia bajo esas rutas, tanto en el working tree como en commits. Añadir tests nuevos está permitido.
+  - Una funcionalidad nueva añade tests de aceptación NUEVOS; tras commitearlos en rojo se mueve el tag (`git tag -f acceptance-frozen`), solo con aprobación del usuario.
+  - El push debe incluir los tags (`git push --follow-tags` o `git push origin acceptance-frozen`; si se movió, `--force` sobre ese tag con aprobación del usuario).
 - **API:** Forever usa la API moderna de retail 12.x sobre Lua 5.1, no la de Classic Era. Antes de usar cualquier API de WoW: skill `wow-forever-api` / agente `wow-api-expert`. Lo verificado está en `docs/api/forever-api.md`.
 - **Lua 5.1:** sin `goto`, `//`, operadores de bits nativos, `<const>`.
 - **Sin globals:** todo en `ns` (`local ADDON_NAME, ns = ...`). Solo se permiten `LaRutaDel60DB`, `SLASH_LARUTADEL601` y `SlashCmdList.LARUTADEL60`.

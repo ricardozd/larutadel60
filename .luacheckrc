@@ -12,9 +12,21 @@ globals = {
 -- WoW API the addon reads. Add every new API here (see docs/api/forever-api.md).
 read_globals = {
 	"C_AddOns",
+	"C_Map",
+	"C_QuestLog",
+	"C_Timer",
 	"CreateFrame",
+	"CreateVector2D",
 	"DEFAULT_CHAT_FRAME",
 	"GetLocale",
+	"GetPlayerFacing",
+	"GetRealmName",
+	"UIParent",
+	"UnitClass",
+	"UnitFactionGroup",
+	"UnitLevel",
+	"UnitName",
+	"UnitRace",
 	"WOW_PROJECT_CAMELOT",
 	"WOW_PROJECT_ID",
 }

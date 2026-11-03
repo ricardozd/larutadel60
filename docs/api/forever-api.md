@@ -21,6 +21,19 @@ The project's source of truth about the API. Every entry carries a date and a so
 | Event order on login: `ADDON_LOADED` → `PLAYER_LOGIN` | `client.lua` | warcraft.wiki.gg/wiki/AddOn_loading_process |
 | `CreateFrame(type, name)` with `name` registers the frame as global `_G[name]` | `wow_mock.lua` | warcraft.wiki.gg/wiki/API_CreateFrame |
 | Slash: for each `KEY` in `SlashCmdList`, the aliases are `SLASH_<KEY>1`, `SLASH_<KEY>2`... | `client.lua` | warcraft.wiki.gg/wiki/Creating_a_slash_command |
+| `/reload`: new Lua state; SavedVariables are serialized (a copy; functions dropped) and restored before `ADDON_LOADED`; `PLAYER_LOGIN` fires again. Player, quest and position state are kept | `client.reload()` | warcraft.wiki.gg/wiki/AddOn_loading_process |
+| Extra guide files appended to the TOC (`opts.guides`); `opts.replaceGuides` skips `Guides/Guides.xml` | `client.lua` | test-only (spec §4) |
+| `QUEST_ACCEPTED(questID)`: one argument, as in retail | `client.acceptQuest(id)`: log += id, then `QUEST_ACCEPTED(id)`, `QUEST_LOG_UPDATE` | Ketho annotations (Data/Event.lua). Not verified on Forever |
+| Quest objectives done: `ReadyForTurnIn` becomes true; `QUEST_LOG_UPDATE` | `client.completeObjectives(id)` | Ketho annotations. Not verified on Forever |
+| Turn-in: `QUEST_TURNED_IN(questID, xpReward, moneyReward)`, `QUEST_REMOVED(questID, wasReplayQuest)`, `QUEST_LOG_UPDATE` | `client.turnInQuest(id)` fires `(id, 0, 0)`, `(id, false)`, then `QUEST_LOG_UPDATE` | Ketho annotations. Not verified on Forever |
+| Uncached quest title: `GetTitleForQuestID` returns nil until `QUEST_DATA_LOAD_RESULT(questID, success)` | `client.loadQuestData(id)`: title `"Quest Title <id>"`, fires `(id, true)` | Ketho annotations, warcraft.wiki.gg/wiki/API_C_QuestLog.RequestLoadQuestByID. Not verified on Forever |
+| `PLAYER_LEVEL_UP(level)`; `UnitLevel("player")` may still return the old level inside the handler | `client.levelUp(level)` updates the level after the event | warcraft.wiki.gg/wiki/PLAYER_LEVEL_UP. Not verified on Forever |
+| Position and instances: inside an instance there is no map position and no facing (nil) | `opts.position`, `client.moveTo(mapId, x%, y%)`, `client.face(radians)`, `client.enterInstance()` | warcraft.wiki.gg/wiki/API_C_Map.GetPlayerMapPosition, API_GetPlayerFacing. Not verified on Forever |
+| World coordinates: world X grows to the **north**, world Y grows to the **west**; map x grows east and map y grows south. So `worldX = top - mapY * height`, `worldY = left - mapX * width`, and the bearing to a target, counterclockwise from north like `GetPlayerFacing`, is `atan2(targetY - playerY, targetX - playerX)` | `opts.maps` rectangles `{ continent, left, top, width, height }` in yards; defaults 1420 and 1421 (continent 0) are approximations, not real data | warcraft.wiki.gg/wiki/API_C_Map.GetWorldPosFromMapPos (Elwynn example: map (0,0) → (-7939.6, 1535.4), (1,1) → (-10254.2, -1935.4)); HereBeDragons. Not verified on Forever |
+| `OnUpdate(self, elapsed)` runs every rendered frame on visible frames only; `C_Timer` callbacks fire when due (the ticker receives itself) | `client.advance(seconds)` in 50 ms frames | warcraft.wiki.gg/wiki/UIHANDLER_OnUpdate, API_C_Timer.NewTicker |
+| `IsShown` is the frame's own flag; `IsVisible` also requires every parent to be shown; frames and regions start shown | `wow_mock.lua` | warcraft.wiki.gg/wiki/API_ScriptRegion_IsShown, API_ScriptRegion_IsVisible |
+| `OnClick` only exists on buttons (`SetScript` errors on a plain Frame) | `wow_mock.lua` | warcraft.wiki.gg/wiki/UIHANDLER_OnClick |
+| Inspection: `client.visibleTexts()`, `client.click(label)`, `client.arrow()` (rotation normalized to [-π, π)), `client.drag(i, point...)` (i = i-th movable frame), `client.movableFrames()` | `wow_mock.lua` | test-only (spec §4) |
 
 ## Emulated / used APIs
 | API | Use | Verified |
@@ -30,6 +43,20 @@ The project's source of truth about the API. Every entry carries a date and a so
 | `DEFAULT_CHAT_FRAME:AddMessage(msg)`, `print(...)` | chat | Ketho annotations |
 | `GetLocale()` | client locale | Ketho annotations |
 | `WOW_PROJECT_ID`, `WOW_PROJECT_CAMELOT`, `WOW_PROJECT_MAINLINE` | detection | forevermeta.me |
+| `C_QuestLog.IsQuestFlaggedCompleted(id)`, `.IsOnQuest(id)`, `.ReadyForTurnIn(id)`, `.GetTitleForQuestID(id)`, `.RequestLoadQuestByID(id)` | quest state and titles | Ketho annotations. Not verified on Forever |
+| `C_Map.GetBestMapForUnit("player")` → uiMapID or nil | current map | Ketho annotations. Not verified on Forever |
+| `C_Map.GetPlayerMapPosition(uiMapID, "player")` → vector2 (`:GetXY()`, 0-1) or nil | map position | Ketho annotations. Not verified on Forever |
+| `C_Map.GetWorldPosFromMapPos(uiMapID, vector2)` → `continentID, vector2(worldX, worldY)` in yards | distances, bearing | Ketho annotations, warcraft.wiki.gg. Not verified on Forever |
+| `CreateVector2D(x, y)` → vector2 with `.x`, `.y`, `:GetXY()` | map positions | Ketho annotations (FrameXML Vector2D) |
+| `GetPlayerFacing()` → radians, 0 = north, counterclockwise; nil in instances | arrow | Ketho annotations, warcraft.wiki.gg/wiki/API_GetPlayerFacing. Not verified on Forever |
+| `UnitName("player")`, `GetRealmName()` | character key | Ketho annotations |
+| `UnitFactionGroup("player")` → `"Horde"`/`"Alliance"`, localized | selection | Ketho annotations |
+| `UnitRace("player")` → localized, English token (Undead = `"Scourge"`), raceID | selection | Ketho annotations, warcraft.wiki.gg/wiki/API_UnitRace |
+| `UnitClass("player")` → localized, class file (`"WARRIOR"`...), classID | selection | Ketho annotations |
+| `UnitLevel("player")` | selection | Ketho annotations |
+| `C_Timer.After(seconds, cb)`, `C_Timer.NewTicker(seconds, cb, iterations?)` → ticker with `:Cancel()` | polling | Ketho annotations |
+| `UIParent` | parent of the addon's frames | Ketho annotations (FrameXML) |
+| Frames: `CreateFrame(type, name, parent, template)`; layout methods (`SetPoint`, `GetPoint`, `ClearAllPoints`, `SetSize`, `SetMovable`, `EnableMouse`, `RegisterForDrag`, `StartMoving`, `StopMovingOrSizing`, `SetClampedToScreen`, `SetFrameStrata`, `SetBackdrop`); `Show`/`Hide`/`IsShown`/`IsVisible`; `CreateTexture` (`SetTexture`, `SetRotation`/`GetRotation`), `CreateFontString` (`SetText`/`GetText`); `Button` (`SetText`/`GetText`, `OnClick`, `Enable`/`Disable`) | step window, arrow | Ketho annotations. `BackdropTemplate` availability not verified on Forever |
 
 ## To be verified in game
 - Forever install folder on Windows (`_forever_`, `_camelot_`...). `scripts/deploy.ps1` tries several.

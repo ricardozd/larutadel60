@@ -4,6 +4,6 @@
   "workspace.library": [".vendor/vscode-wow-api/Annotations/Core"],
   "workspace.ignoreDir": [".vendor", "tests", "tools", "addon/LaRutaDel60/Libs"],
   "workspace.checkThirdParty": false,
-  "diagnostics.globals": ["LaRutaDel60DB", "SLASH_LARUTADEL601"],
+  "diagnostics.globals": ["LaRutaDel60DB", "SLASH_LARUTADEL601", "SlashCmdList", "DEFAULT_CHAT_FRAME", "WOW_PROJECT_CAMELOT"],
   "telemetry.enable": false
 }

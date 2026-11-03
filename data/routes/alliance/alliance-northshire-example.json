@@ -1,0 +1,38 @@
+{
+  "id": "alliance-northshire-example",
+  "name": {
+    "enUS": "Example: Northshire Valley (pipeline test)",
+    "esES": "Ejemplo: Valle de Villanorte (prueba del pipeline)"
+  },
+  "faction": "Alliance",
+  "races": ["Human"],
+  "minLevel": 1,
+  "maxLevel": 2,
+  "steps": [
+    {
+      "type": "note",
+      "text": {
+        "enUS": "Example route: data not verified for WoW Forever.",
+        "esES": "Ruta de ejemplo: datos no verificados para WoW Forever."
+      }
+    },
+    {
+      "type": "accept",
+      "questId": 783,
+      "npcId": 823,
+      "coords": { "mapId": 1429, "x": 48.2, "y": 42.9 },
+      "source": "https://www.wowhead.com/classic/quest=783"
+    },
+    {
+      "type": "goto",
+      "coords": { "mapId": 1429, "x": 48.9, "y": 41.6 }
+    },
+    {
+      "type": "turnin",
+      "questId": 783,
+      "npcId": 197,
+      "coords": { "mapId": 1429, "x": 48.9, "y": 41.6 },
+      "source": "https://www.wowhead.com/classic/quest=783"
+    }
+  ]
+}

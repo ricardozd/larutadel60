@@ -1,0 +1,14 @@
+## Interface: 16001
+## Title: La Ruta del 60
+## Notes: Fastest 1-60 leveling guide for WoW Forever.
+## Notes-esES: La guía de leveo 1-60 más rápida para WoW Forever.
+## Author: Ricardo Olivera
+## Version: 0.1.0
+## SavedVariables: LaRutaDel60DB
+## Category: Quests
+
+Locales\Locales.lua
+Locales\enUS.lua
+Locales\esES.lua
+Core\Init.lua
+Guides\Guides.xml

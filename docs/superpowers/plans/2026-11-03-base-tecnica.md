@@ -20,7 +20,7 @@
 - `addon/LaRutaDel60/Guides/` es generado: nunca se edita a mano.
 - No copiar código ni guías de RestedXP u otros addons.
 - Python solo stdlib.
-- Commits con trailer `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
+- Commits con trailer `Co-Authored-By: Claude <modelo que hizo el commit> <noreply@anthropic.com>` (p. ej. Opus 5.5, Sonnet 5.5 o Haiku 5.5).
 
 ## Estructura de archivos
 
@@ -993,7 +993,8 @@ class CompileCliTest(unittest.TestCase):
         self.assertEqual(1, self.compile("--check").returncode)
 
     def test_check_does_not_write(self):
-        self.compile("--check")
+        result = self.compile("--check")
+        self.assertEqual(1, result.returncode, result.stderr)
         self.assertFalse(self.out.exists() and any(self.out.iterdir()))
 
     def test_removes_guides_of_deleted_routes(self):
@@ -2539,7 +2540,7 @@ Esperado: `OK: all green` y working tree limpio.
 
 - [ ] **Paso 2: tests congelados intactos**
 
-Run: `git diff --stat $(git log --format=%H --grep='acceptance tests for the technical base' -n 1) HEAD -- tests/acceptance tests/support tools/tests/acceptance`
+Run: `git diff --stat acceptance-frozen HEAD -- tests/acceptance tests/support tools/tests/acceptance`
 Esperado: sin salida (ningún cambio desde el commit en rojo).
 
 - [ ] **Paso 3: publicar en GitHub (requiere confirmación del usuario)**

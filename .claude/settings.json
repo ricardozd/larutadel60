@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(tools/check.sh)",
+      "Bash(tools/luals_check.sh)",
+      "Bash(tools/fetch_annotations.sh)",
+      "Bash(busted *)",
+      "Bash(~/.luarocks/bin/busted *)",
+      "Bash(luacheck *)",
+      "Bash(stylua *)",
+      "Bash(lua-language-server *)",
+      "Bash(luajit *)",
+      "Bash(python3 tools/validate_routes.py *)",
+      "Bash(python3 tools/compile_guides.py *)",
+      "Bash(python3 -m unittest *)",
+      "WebFetch(domain:warcraft.wiki.gg)",
+      "WebFetch(domain:www.wowhead.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/post-edit.sh"
+          }
+        ]
+      }
+    ]
+  },
+  "enabledPlugins": {
+    "wow-lua-lsp@larutadel60": true
+  },
+  "extraKnownMarketplaces": {
+    "larutadel60": {
+      "source": {
+        "source": "directory",
+        "path": "./"
+      }
+    }
+  }
+}

@@ -1,0 +1,7 @@
+return {
+	_all = {
+		lpath = "tests/?.lua",
+		ROOT = { "tests" },
+		pattern = "_spec",
+	},
+}

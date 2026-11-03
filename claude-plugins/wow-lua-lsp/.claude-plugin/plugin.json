@@ -1,0 +1,14 @@
+{
+  "name": "wow-lua-lsp",
+  "version": "0.1.0",
+  "description": "lua-language-server for the La Ruta del 60 addon (reads the project's .luarc.json)",
+  "author": { "name": "Ricardo Olivera" },
+  "lspServers": {
+    "lua": {
+      "command": "lua-language-server",
+      "extensionToLanguage": { ".lua": "lua" },
+      "workspaceFolder": "${CLAUDE_PROJECT_DIR}",
+      "startupTimeout": 30000
+    }
+  }
+}

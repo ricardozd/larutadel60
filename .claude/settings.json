@@ -25,9 +25,23 @@
       {
         "matcher": "Edit|Write|MultiEdit",
         "hooks": [
-          { "type": "command", "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/post-edit.sh" }
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/post-edit.sh"
+          }
         ]
       }
     ]
+  },
+  "enabledPlugins": {
+    "wow-lua-lsp@larutadel60": true
+  },
+  "extraKnownMarketplaces": {
+    "larutadel60": {
+      "source": {
+        "source": "directory",
+        "path": "./"
+      }
+    }
   }
 }

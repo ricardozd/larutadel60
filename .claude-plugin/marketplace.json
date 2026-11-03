@@ -1,0 +1,12 @@
+{
+  "name": "larutadel60",
+  "owner": { "name": "Ricardo Olivera" },
+  "description": "Local plugins for the La Ruta del 60 project",
+  "plugins": [
+    {
+      "name": "wow-lua-lsp",
+      "source": "./claude-plugins/wow-lua-lsp",
+      "description": "lua-language-server with WoW API annotations"
+    }
+  ]
+}

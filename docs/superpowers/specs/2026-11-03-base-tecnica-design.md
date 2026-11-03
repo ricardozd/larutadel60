@@ -19,7 +19,9 @@ Estado: aprobado (pendiente revisión final del documento)
 - Enfoque A: Claude Code nativo + toolchain Lua estándar (sin MCP propio).
 - Datos de rutas: bases de datos web (Wowhead y similares con datos de Forever), con fuente citada por registro.
 - Despliegue: GitHub + script PowerShell en el PC.
-- Idiomas: enUS y esES desde el inicio.
+- Idiomas del addon (textos al jugador): enUS y esES desde el inicio.
+- **Idioma del proyecto:** el código va siempre en inglés: identificadores, comentarios, strings, mensajes de herramientas/CLI, nombres de tests y commits. Las explicaciones van siempre en castellano: specs, planes, CLAUDE.md, agentes, skills y chat.
+- **Tests de aceptación primero:** antes de cualquier código se escriben tests de caja negra derivados solo de esta spec (§11). Se commitean en rojo y quedan congelados: la implementación los pone en verde sin modificarlos.
 
 ## 2. Estructura del repositorio
 
@@ -128,3 +130,41 @@ En esta fase solo se crean el esquema, el validador, el compilador y una ruta de
 ## 10. Fuera de alcance
 
 Motor de guía (flecha, lista de pasos, auto-quest), UI final, rutas reales, publicación en CurseForge.
+
+## 11. Contratos verificables y tests de aceptación
+
+Los tests de aceptación solo usan estas interfaces externas. Cualquier otra cosa (funciones internas, formato exacto del Lua generado, texto de los mensajes de error) es detalle de implementación y no se testea a este nivel.
+
+### 11.1 CLI del pipeline de rutas
+- `python3 tools/validate_routes.py [ROUTES_DIR]` (por defecto `data/routes`): exit 0 si todas las rutas son válidas; exit 1 si no, con un error por línea en stderr, y cada línea contiene la ruta relativa del archivo culpable.
+- `python3 tools/compile_guides.py [--routes DIR] [--out DIR] [--check]`:
+  - Sin `--check`: valida; si hay errores, exit 1 y **no escribe nada**. Si todo es válido, escribe `<id>.lua` por ruta y `Guides.xml` (que lista todas con `<Script file="<id>.lua"/>`), borra los `.lua` de rutas que ya no existen y termina con exit 0.
+  - Con `--check`: no escribe; exit 1 si la salida difiere de lo que hay en `--out`, exit 0 si está al día.
+- Ida y vuelta: cargar `<id>.lua` en Lua 5.1 con `(addonName, ns)` deja en `ns.Guides[id]` una tabla con **exactamente los mismos datos** que el JSON de origen.
+- Reglas de validación: las de la tabla de formato (§6 y la skill `guide-format`). Cada regla tiene al menos un caso de aceptación.
+
+### 11.2 Addon (lo que ve el jugador)
+Mensajes en el chat (sin códigos de color), con el prefijo `La Ruta del 60: `:
+
+| Situación | enUS | esES / esMX |
+|---|---|---|
+| Login | `Loaded. Type /ruta for info.` | `Cargado. Escribe /ruta para más info.` |
+| Login en un cliente que no es Forever (antes del anterior) | `Warning: this client is not WoW Forever; guides may be wrong.` | `Aviso: este cliente no es WoW Forever; las guías pueden fallar.` |
+| `/ruta` | `Version <TOC Version> - <N> guide(s) loaded.` | `Versión <TOC Version> - <N> guía(s) cargada(s).` |
+
+- `<N>` = número de rutas en `data/routes`.
+- `LaRutaDel60DB` existe tras el login y conserva los datos previos.
+- Globals nuevas tras cargar el addon y hacer login: solo `LaRutaDel60DB`, `SLASH_LARUTADEL601` y la clave `LARUTADEL60` en `SlashCmdList`.
+- TOC: `LaRutaDel60.toc` y `LaRutaDel60_Forever.toc` idénticos, `## Interface: 16001`, `## SavedVariables: LaRutaDel60DB`, y cada archivo listado (y cada script incluido en un `.xml`) existe.
+
+### 11.3 Herramientas
+- `tools/check.sh`: exit 0 en el repo limpio; exit distinto de 0 si hay un `.lua` del addon con error de lint, una ruta inválida o guías desactualizadas.
+- Hook `.claude/hooks/post-edit.sh` (recibe por stdin el JSON de PostToolUse): exit 2 con mensaje en stderr si el `.lua` editado tiene errores de lint o si la edición deja rutas inválidas; exit 0 en el resto de casos.
+- Los tests de herramientas que ejecutan `tools/check.sh` lo hacen sobre una copia temporal del repo y con `LR60_SKIP_TOOLING_TESTS=1`, para no ejecutarse a sí mismos en bucle.
+
+### 11.4 Emulación del cliente en tests
+- `tests/support/` emula el cliente: carga los archivos en el orden del TOC (expandiendo los `.xml`), pasa `(addonName, ns)`, resuelve los slash commands como el cliente (`SLASH_<KEY><n>` → `SlashCmdList[KEY]`) y captura el chat (`DEFAULT_CHAT_FRAME:AddMessage` y `print`).
+- Los mocks solo imitan APIs que están en `docs/api/forever-api.md`, con la fuente citada.
+
+### 11.5 Verificación manual (no automatizable en macOS)
+`deploy.ps1` en Windows, el LSP dentro de Claude Code y el addon en el cliente real: checklist para el usuario en la última tarea del plan.

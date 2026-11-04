@@ -52,9 +52,15 @@ class UndeadRoutesTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             routes = Path(tmp) / "horde"
             routes.mkdir()
-            for route_id in (TIRISFAL, SILVERPINE):
+            # Validate the whole chain reachable from Tirisfal through `next`, so later
+            # segments may be chained without breaking this test.
+            route_id, seen = TIRISFAL, set()
+            while route_id and route_id not in seen:
+                seen.add(route_id)
                 self.assertTrue(route_path(route_id).is_file(), f"missing {route_path(route_id)}")
                 shutil.copy(route_path(route_id), routes / f"{route_id}.json")
+                route_id = load(route_id).get("next")
+            self.assertIn(SILVERPINE, seen)
             result = run([sys.executable, VALIDATE, Path(tmp)])
             self.assertEqual(0, result.returncode, result.stderr)
         result = run([sys.executable, VALIDATE])

@@ -14,6 +14,7 @@ ns.Guides["horde-silverpine-12-20"] = {
 		enUS = "Undead 10-12: Silverpine Forest",
 		esES = "No-muerto 10-12: Bosque de Argénteos",
 	},
+	next = "horde-barrens-17-20",
 	races = {
 		"Scourge",
 	},
@@ -943,8 +944,8 @@ ns.Guides["horde-silverpine-12-20"] = {
 		},
 		{
 			text = {
-				enUS = "End of Silverpine Forest: you should be close to level 13. Next: the zeppelin to Durotar and The Barrens; type /ruta horde-barrens-17-20 to switch to that route.",
-				esES = "Fin del Bosque de Argénteos: deberías estar cerca del nivel 13. Siguiente: el zepelín a Durotar y Los Baldíos; escribe /ruta horde-barrens-17-20 para cambiar a esa ruta.",
+				enUS = "End of Silverpine Forest: you should be close to level 13. Next: the zeppelin to Durotar and The Barrens (the guide continues there automatically).",
+				esES = "Fin del Bosque de Argénteos: deberías estar cerca del nivel 13. Siguiente: el zepelín a Durotar y Los Baldíos (la guía continúa allí automáticamente).",
 			},
 			type = "note",
 		},

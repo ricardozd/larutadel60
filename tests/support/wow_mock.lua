@@ -6,11 +6,16 @@
 --   * "classic_era": WoW Classic Era 1.15.x (docs/superpowers/specs/2026-11-04-classic-era-compat-design.md):
 --     WOW_PROJECT_ID = WOW_PROJECT_CLASSIC = 2 and no WOW_PROJECT_CAMELOT; no C_QuestLog.ReadyForTurnIn,
 --     GetTitleForQuestID nor RequestLoadQuestByID (and no client.loadQuestData); GetQuestLogIndexByID,
---     GetQuestLogTitle and C_QuestLog.GetQuestInfo instead; QUEST_ACCEPTED fires (logIndex, questID).
+--     GetQuestLogTitle and C_QuestLog.GetQuestInfo instead; QUEST_ACCEPTED fires (logIndex, questID);
+--     RegisterEvent("QUEST_DATA_LOAD_RESULT") is a Lua error (unknown event).
 local WowMock = {}
 
 WowMock.FOREVER = "forever"
 WowMock.CLASSIC_ERA = "classic_era"
+
+-- Events that do not exist on Classic Era 1.15 (observed in game, 2026-11-04):
+-- Frame:RegisterEvent() errors with 'Attempt to register unknown event "<EVENT>"'.
+local CLASSIC_ERA_UNKNOWN_EVENTS = { QUEST_DATA_LOAD_RESULT = true }
 
 local function readTocFields(tocPath)
 	local fields = {}
@@ -441,6 +446,10 @@ function WowMock.install(opts)
 		}
 		addRegionMethods(frame)
 		function frame:RegisterEvent(event)
+			-- Like the real client, registering an event the flavor does not have is a Lua error.
+			if classicEra and CLASSIC_ERA_UNKNOWN_EVENTS[event] then
+				error('Frame:RegisterEvent(): Attempt to register unknown event "' .. event .. '"', 2)
+			end
 			self.events[event] = true
 		end
 		function frame:UnregisterEvent(event)

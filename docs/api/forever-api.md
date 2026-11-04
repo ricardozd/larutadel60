@@ -68,6 +68,7 @@ Source: warcraft.wiki.gg (verified by `wow-api-expert`, 2026-11-04). Feature det
 - `C_QuestLog.ReadyForTurnIn` is missing: use `GetQuestLogIndexByID(questID)` (0 when not in the log) and the 6th return of `GetQuestLogTitle(index)` (`1` complete, `-1` failed).
 - `C_QuestLog.GetTitleForQuestID` is missing: use `C_QuestLog.GetQuestInfo(questID)` (nil or `""` when unknown).
 - `C_QuestLog.RequestLoadQuestByID` / `QUEST_DATA_LOAD_RESULT`: uncertain, guarded.
+- **Verified in game (Classic Era 1.15, 2026-11-04):** `QUEST_DATA_LOAD_RESULT` does not exist. `Frame:RegisterEvent("QUEST_DATA_LOAD_RESULT")` is a Lua error: `Attempt to register unknown event "QUEST_DATA_LOAD_RESULT"`. Registering an unknown event must never abort startup, so `Game.On` registers defensively. Emulated on `classic_era` (`tests/acceptance/emulation_classic_events_spec.lua`).
 - `QUEST_ACCEPTED` sends `(questLogIndex, questID)`.
 - `WOW_PROJECT_CAMELOT` may be nil.
 

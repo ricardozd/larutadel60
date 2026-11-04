@@ -61,6 +61,9 @@ To update, run the same command again. If the game was open, type `/reload` in c
 
 **Found a wrong step, a wrong location or a Lua error?** Please [open an issue](../../issues) with the route, the step text and, for errors, the full message (BugSack helps).
 
+## Testing on Classic Era
+The addon also loads on WoW Classic Era 1.15 (`LaRutaDel60_Vanilla.toc`) so you can test it before WoW Forever is out. The routes are made for Forever: quest steps that only exist in Forever show as "Quest #<id>" and should be skipped. You will see a "not WoW Forever" warning at login; that is expected.
+
 ## Development
 
 The addon is developed entirely with AI (Claude Code) on macOS. Project rules, commands and structure are in [`CLAUDE.md`](CLAUDE.md). Run `tools/setup.sh` to set up the environment and `tools/check.sh` to run every check.

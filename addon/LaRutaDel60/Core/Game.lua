@@ -64,15 +64,33 @@ function Game.IsQuestCompleted(questId)
 end
 
 function Game.IsReadyForTurnIn(questId)
-	return C_QuestLog.ReadyForTurnIn(questId) == true
+	if C_QuestLog.ReadyForTurnIn then
+		return C_QuestLog.ReadyForTurnIn(questId) == true
+	end
+	-- Classic Era 1.15: no ReadyForTurnIn. The 6th return of GetQuestLogTitle is 1 when the quest is
+	-- complete and -1 when it failed.
+	local logIndex = GetQuestLogIndexByID(questId)
+	if type(logIndex) ~= "number" or logIndex == 0 then
+		return false
+	end
+	local title, _, _, _, _, isComplete, _, logQuestId = GetQuestLogTitle(logIndex)
+	if title == nil or (logQuestId ~= nil and logQuestId ~= questId) then
+		return false
+	end
+	return isComplete == 1
 end
 
 -- The quest title, or nil while it is not cached. A nil title asks the client to load it once;
 -- QUEST_DATA_LOAD_RESULT fires when it is ready.
 function Game.QuestTitle(questId)
-	local title = C_QuestLog.GetTitleForQuestID(questId)
+	local title
+	if C_QuestLog.GetTitleForQuestID then
+		title = C_QuestLog.GetTitleForQuestID(questId)
+	else
+		title = C_QuestLog.GetQuestInfo(questId) -- Classic Era 1.15
+	end
 	if title == nil or title == "" then
-		if not requestedQuests[questId] then
+		if not requestedQuests[questId] and C_QuestLog.RequestLoadQuestByID then
 			requestedQuests[questId] = true
 			C_QuestLog.RequestLoadQuestByID(questId)
 		end

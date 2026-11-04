@@ -63,6 +63,14 @@ The project's source of truth about the API. Every entry carries a date and a so
 | Widget methods used by the step window and arrow, beyond the row above: `Region:SetAllPoints`, `Region:SetShown`, `Texture:SetColorTexture(r, g, b, a)` (window background, no backdrop), `FontString:SetJustifyH`, `FontString:SetWordWrap(false)` (one row per step line) | step window, arrow | Ketho annotations (`Annotations/Core/Widget`). Not verified on Forever |
 | FrameXML templates and art: `GameFontNormal` / `GameFontHighlight` (font string templates), `UIPanelButtonTemplate` (button with label), texture `Interface\\Minimap\\MinimapArrow` (arrow pointing up) | step window, arrow | FrameXML (retail). Not verified on Forever |
 
+## Classic Era 1.15 (fallbacks in `Core/Game.lua`)
+Source: warcraft.wiki.gg (verified by `wow-api-expert`, 2026-11-04). Feature detection only.
+- `C_QuestLog.ReadyForTurnIn` is missing: use `GetQuestLogIndexByID(questID)` (0 when not in the log) and the 6th return of `GetQuestLogTitle(index)` (`1` complete, `-1` failed).
+- `C_QuestLog.GetTitleForQuestID` is missing: use `C_QuestLog.GetQuestInfo(questID)` (nil or `""` when unknown).
+- `C_QuestLog.RequestLoadQuestByID` / `QUEST_DATA_LOAD_RESULT`: uncertain, guarded.
+- `QUEST_ACCEPTED` sends `(questLogIndex, questID)`.
+- `WOW_PROJECT_CAMELOT` may be nil.
+
 ## To be verified in game
 - Forever install folder on Windows (`_forever_`, `_camelot_`...). `scripts/deploy.ps1` tries several.
 

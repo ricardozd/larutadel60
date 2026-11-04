@@ -18,7 +18,9 @@
     "SLASH_LARUTADEL601",
     "SlashCmdList",
     "DEFAULT_CHAT_FRAME",
-    "WOW_PROJECT_CAMELOT"
+    "WOW_PROJECT_CAMELOT",
+    "GetQuestLogIndexByID",
+    "GetQuestLogTitle"
   ],
   "telemetry.enable": false
 }

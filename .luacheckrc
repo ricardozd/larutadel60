@@ -20,6 +20,8 @@ read_globals = {
 	"DEFAULT_CHAT_FRAME",
 	"GetLocale",
 	"GetPlayerFacing",
+	"GetQuestLogIndexByID",
+	"GetQuestLogTitle",
 	"GetRealmName",
 	"UIParent",
 	"UnitClass",

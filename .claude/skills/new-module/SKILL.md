@@ -19,7 +19,7 @@ function Module.Example()
 end
 ```
 
-3. Register it in `LaRutaDel60.toc` in its load order (after `Core\Init.lua` if it uses `ns.Print`) and copy the TOC: `cp addon/LaRutaDel60/LaRutaDel60.toc addon/LaRutaDel60/LaRutaDel60_Forever.toc`.
+3. Register it in `LaRutaDel60.toc` in its load order (after `Core\Init.lua` if it uses `ns.Print`) and copy the TOC: `cp addon/LaRutaDel60/LaRutaDel60.toc addon/LaRutaDel60/LaRutaDel60_Forever.toc`, then regenerate the Classic Era one: `sed 's/^## Interface: .*/## Interface: 11509/' addon/LaRutaDel60/LaRutaDel60.toc > addon/LaRutaDel60/LaRutaDel60_Vanilla.toc`.
    The guides (`Guides\Guides.xml`) are loaded AFTER Core in the TOC: a module must read `ns.Guides` in `PLAYER_LOGIN` (or later), never when the file loads.
 4. Texts: keys in `Locales/enUS.lua` and `Locales/esES.lua`.
 5. New WoW APIs: skill `wow-forever-api`.

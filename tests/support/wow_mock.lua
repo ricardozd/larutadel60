@@ -1,6 +1,16 @@
 -- Minimal WoW Forever API emulation for out-of-game tests.
 -- Only APIs documented in docs/api/forever-api.md may be emulated here.
+--
+-- Flavors (opts.flavor in WowMock.install):
+--   * "forever" (default): WoW Forever 1.60.1, the retail-style API.
+--   * "classic_era": WoW Classic Era 1.15.x (docs/superpowers/specs/2026-11-04-classic-era-compat-design.md):
+--     WOW_PROJECT_ID = WOW_PROJECT_CLASSIC = 2 and no WOW_PROJECT_CAMELOT; no C_QuestLog.ReadyForTurnIn,
+--     GetTitleForQuestID nor RequestLoadQuestByID (and no client.loadQuestData); GetQuestLogIndexByID,
+--     GetQuestLogTitle and C_QuestLog.GetQuestInfo instead; QUEST_ACCEPTED fires (logIndex, questID).
 local WowMock = {}
+
+WowMock.FOREVER = "forever"
+WowMock.CLASSIC_ERA = "classic_era"
 
 local function readTocFields(tocPath)
 	local fields = {}
@@ -113,10 +123,21 @@ function WowMock.newWorld(opts)
 		log = toSet(questOpts.log),
 		ready = toSet(questOpts.ready),
 		titles = {},
+		-- Quest log order (ids), used by the classic_era quest log API: opts.quests.log in order,
+		-- then the ready quests that were not listed in it, then accepted quests at the end.
+		order = {},
 	}
+	for _, id in ipairs(questOpts.log or {}) do
+		if not toSet(quests.order)[id] then
+			quests.order[#quests.order + 1] = id
+		end
+	end
 	-- A quest ready for turn-in is necessarily in the quest log.
-	for id in pairs(quests.ready) do
-		quests.log[id] = true
+	for _, id in ipairs(questOpts.ready or {}) do
+		if not quests.log[id] then
+			quests.log[id] = true
+			quests.order[#quests.order + 1] = id
+		end
 	end
 	for id, title in pairs(questOpts.titles or {}) do
 		quests.titles[id] = title
@@ -170,11 +191,18 @@ local function normalizeAngle(radians)
 end
 WowMock.normalizeAngle = normalizeAngle
 
--- opts: { locale = "enUS", projectId = 18, addonName = "...", tocPath = "...", world = <newWorld()> }
+-- opts: { locale = "enUS", projectId = 18, addonName = "...", tocPath = "...", world = <newWorld()>,
+--         flavor = "forever"|"classic_era" (default "forever") }
 function WowMock.install(opts)
 	local client = { chat = {}, frames = {}, objects = {} }
 	local world = opts.world or WowMock.newWorld()
+	local classicEra = opts.flavor == WowMock.CLASSIC_ERA
+	assert(
+		opts.flavor == nil or opts.flavor == WowMock.FOREVER or classicEra,
+		"unknown flavor " .. tostring(opts.flavor)
+	)
 	client.world = world
+	client.flavor = opts.flavor or WowMock.FOREVER
 
 	local function capture(message)
 		client.chat[#client.chat + 1] = message
@@ -198,8 +226,14 @@ function WowMock.install(opts)
 	end
 
 	_G.WOW_PROJECT_MAINLINE = 1
-	_G.WOW_PROJECT_CAMELOT = 18
-	_G.WOW_PROJECT_ID = opts.projectId or 18
+	if classicEra then
+		-- Classic Era: WOW_PROJECT_CLASSIC = 2, and WOW_PROJECT_CAMELOT does not exist.
+		_G.WOW_PROJECT_CLASSIC = 2
+		_G.WOW_PROJECT_ID = opts.projectId or 2
+	else
+		_G.WOW_PROJECT_CAMELOT = 18
+		_G.WOW_PROJECT_ID = opts.projectId or 18
+	end
 
 	local tocFields = readTocFields(opts.tocPath)
 	_G.C_AddOns = {
@@ -633,11 +667,50 @@ function WowMock.install(opts)
 	}
 	client.questLoadRequests = {}
 
+	-- 1-based position of the quest in the log, or 0 when it is not in the log.
+	local function logIndexOf(questID)
+		for index, id in ipairs(quests.order) do
+			if id == questID then
+				return index
+			end
+		end
+		return 0
+	end
+
+	if classicEra then
+		-- 1.15 has neither ReadyForTurnIn, GetTitleForQuestID nor RequestLoadQuestByID.
+		_G.C_QuestLog.ReadyForTurnIn = nil
+		_G.C_QuestLog.GetTitleForQuestID = nil
+		_G.C_QuestLog.RequestLoadQuestByID = nil
+		-- The cached title, or nil when it is unknown.
+		_G.C_QuestLog.GetQuestInfo = function(questID)
+			return quests.titles[questID]
+		end
+		_G.GetQuestLogIndexByID = function(questID)
+			return logIndexOf(questID)
+		end
+		-- title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID.
+		-- isComplete is 1 when the quest is ready for turn-in and nil otherwise. The log has no headers.
+		_G.GetQuestLogTitle = function(questLogIndex)
+			local id = quests.order[questLogIndex]
+			if not id then
+				return nil
+			end
+			local isComplete = quests.ready[id] and 1 or nil
+			return quests.titles[id], player.level, 0, false, false, isComplete, 0, id
+		end
+	end
+
 	function client.acceptQuest(id)
 		assert(not quests.log[id], "quest " .. tostring(id) .. " is already in the log")
 		assert(not quests.completed[id], "quest " .. tostring(id) .. " is already completed")
 		quests.log[id] = true
-		client.fire("QUEST_ACCEPTED", id)
+		quests.order[#quests.order + 1] = id
+		if classicEra then
+			client.fire("QUEST_ACCEPTED", logIndexOf(id), id)
+		else
+			client.fire("QUEST_ACCEPTED", id)
+		end
 		client.fire("QUEST_LOG_UPDATE")
 	end
 
@@ -652,14 +725,21 @@ function WowMock.install(opts)
 		quests.log[id] = nil
 		quests.ready[id] = nil
 		quests.completed[id] = true
+		local index = logIndexOf(id)
+		if index > 0 then
+			table.remove(quests.order, index)
+		end
 		client.fire("QUEST_TURNED_IN", id, 0, 0)
 		client.fire("QUEST_REMOVED", id, false)
 		client.fire("QUEST_LOG_UPDATE")
 	end
 
-	function client.loadQuestData(id)
-		quests.titles[id] = quests.titles[id] or ("Quest Title " .. tostring(id))
-		client.fire("QUEST_DATA_LOAD_RESULT", id, true)
+	-- Classic Era has no async quest data load, so QUEST_DATA_LOAD_RESULT never fires there.
+	if not classicEra then
+		function client.loadQuestData(id)
+			quests.titles[id] = quests.titles[id] or ("Quest Title " .. tostring(id))
+			client.fire("QUEST_DATA_LOAD_RESULT", id, true)
+		end
 	end
 
 	function client.levelUp(level)

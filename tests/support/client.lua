@@ -6,6 +6,8 @@ Client.ADDON_NAME = "LaRutaDel60"
 Client.ADDON_DIR = "addon/LaRutaDel60/"
 Client.TOC = Client.ADDON_DIR .. "LaRutaDel60.toc"
 Client.FOREVER_TOC = Client.ADDON_DIR .. "LaRutaDel60_Forever.toc"
+-- Classic Era loads <Addon>_Vanilla.toc with priority over the base TOC.
+Client.VANILLA_TOC = Client.ADDON_DIR .. "LaRutaDel60_Vanilla.toc"
 -- uiMapID that C_Map.GetBestMapForUnit("player") reports inside an instance by default.
 Client.INSTANCE_MAP = WowMock.DEFAULT_INSTANCE_MAP
 
@@ -53,10 +55,19 @@ local function tocEntries(tocPath)
 	return entries
 end
 
+-- The TOC the client of that flavor loads ("forever" by default, or "classic_era").
+function Client.tocFor(flavor)
+	if flavor == WowMock.CLASSIC_ERA then
+		return Client.VANILLA_TOC
+	end
+	return Client.TOC
+end
+
 -- Lua files in client load order, with .xml files expanded into their <Script file="..."/> entries.
-function Client.addonFiles()
+-- tocPath defaults to the base TOC.
+function Client.addonFiles(tocPath)
 	local files = {}
-	for _, entry in ipairs(tocEntries(Client.TOC)) do
+	for _, entry in ipairs(tocEntries(tocPath or Client.TOC)) do
 		local path = Client.ADDON_DIR .. entry
 		if entry:match("%.xml$") then
 			local dir = path:match("^(.*/)")
@@ -86,18 +97,20 @@ local GUIDES_DIR = Client.ADDON_DIR .. "Guides/"
 -- Boots one client session. `world` (player, quests, position, maps) outlives a /reload.
 local function bootSession(opts, world, savedVariables)
 	resetGlobals()
+	local tocPath = Client.tocFor(opts.flavor)
 	local client = WowMock.install({
 		locale = opts.locale,
 		projectId = opts.projectId,
+		flavor = opts.flavor,
 		addonName = Client.ADDON_NAME,
-		tocPath = Client.TOC,
+		tocPath = tocPath,
 		world = world,
 	})
 	local globalsBefore = keysOf(_G)
 	local slashBefore = keysOf(SlashCmdList)
 
 	local ns = {}
-	for _, path in ipairs(Client.addonFiles()) do
+	for _, path in ipairs(Client.addonFiles(tocPath)) do
 		-- replaceGuides skips the addon's own compiled guides (Guides/Guides.xml and its scripts).
 		if not (opts.replaceGuides and path:sub(1, #GUIDES_DIR) == GUIDES_DIR) then
 			local chunk = assert(loadfile(path))
@@ -159,7 +172,9 @@ local function bootSession(opts, world, savedVariables)
 end
 
 -- opts: {
---   locale = "enUS", projectId = 18, savedVariables = <table|nil>,
+--   locale = "enUS", projectId = 18 (2 on classic_era), savedVariables = <table|nil>,
+--   flavor = "forever" (default) | "classic_era" (WoW Classic Era 1.15: loads LaRutaDel60_Vanilla.toc
+--     and emulates the 1.15 quest API, see wow_mock.lua),
 --   player = { name, realm, faction, race, class, level },
 --   quests = { completed = {ids}, log = {ids}, ready = {ids}, titles = { [id] = "Title" } },
 --   position = { mapId, x, y, facing } (x, y in percent; nil = inside an instance),

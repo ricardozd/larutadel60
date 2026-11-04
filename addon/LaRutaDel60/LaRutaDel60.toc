@@ -3,7 +3,7 @@
 ## Notes: Fastest 1-60 leveling guide for WoW Forever.
 ## Notes-esES: La guía de leveo 1-60 más rápida para WoW Forever.
 ## Author: Ricardo Olivera
-## Version: 0.2.1
+## Version: 0.2.2
 ## SavedVariables: LaRutaDel60DB
 ## Category: Quests
 

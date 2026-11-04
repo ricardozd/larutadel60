@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.2.2 - 2026-11-04
+
+- Fix: on Classic Era the arrow froze after login (fixed distance, no rotation) and goto steps never completed. Startup no longer aborts when the client does not know an event (`QUEST_DATA_LOAD_RESULT`).
+- `deploy.ps1`: fixed the TLS setting and the `RepoPath` default on Windows PowerShell 5.1; CI now smoke-tests it on Windows.
+
 ## v0.2.1 - 2026-11-04
 
 - Classic Era 1.15 support, so the addon can be tested before WoW Forever launches:

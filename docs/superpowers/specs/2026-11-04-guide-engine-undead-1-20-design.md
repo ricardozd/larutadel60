@@ -135,8 +135,8 @@ Line contract:
 | `/ruta <id>` | switches to that route, step 1 | `Route: <name>` | `Ruta: <name>` |
 | `/ruta <unknown id>` | nothing changes | `Unknown route: <id>` | `Ruta desconocida: <id>` |
 | `/ruta reset` / `/ruta reiniciar` | back to step 1 of the current route, then catch-up; with no route it only prints the message | `Route restarted.` | `Ruta reiniciada.` |
-| `/ruta show` / `/ruta mostrar` | shows the window | none | none |
-| `/ruta hide` / `/ruta ocultar` | hides the window | none | none |
+| `/ruta show` / `/ruta mostrar` | shows the window and the arrow | none | none |
+| `/ruta hide` / `/ruta ocultar` | hides the window and the arrow | none | none |
 
 - Every chat line starts with `La Ruta del 60: `. `/ruta list` prints one such line per route, in any order.
 - `/ruta list` shows routes matching faction, race and class; level is ignored.

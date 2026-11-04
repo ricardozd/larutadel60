@@ -6,11 +6,7 @@ local Progress = {}
 ns.Progress = Progress
 
 local function chars()
-	local db = ns.Game.DB()
-	if type(db.chars) ~= "table" then
-		db.chars = {}
-	end
-	return db.chars
+	return ns.Game.DB().chars
 end
 
 -- Saved route id and step for this character, or nil.

@@ -18,11 +18,7 @@ local lines = {}
 local backButton, doneButton, skipButton
 
 local function uiDB()
-	local db = ns.Game.DB()
-	if type(db.ui) ~= "table" then
-		db.ui = {}
-	end
-	return db.ui
+	return ns.Game.DB().ui
 end
 
 local function savePosition()
@@ -76,6 +72,7 @@ local function build()
 	title:SetPoint("TOPLEFT", frame, "TOPLEFT", PADDING, -PADDING)
 	title:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -PADDING, -PADDING)
 	title:SetJustifyH("LEFT")
+	title:SetWordWrap(false)
 
 	for i = 1, LINE_COUNT do
 		local line = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
@@ -83,6 +80,8 @@ local function build()
 		line:SetPoint("TOPLEFT", frame, "TOPLEFT", PADDING, y)
 		line:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -PADDING, y)
 		line:SetJustifyH("LEFT")
+		-- One row per line, so long step texts are truncated instead of overlapping the next line.
+		line:SetWordWrap(false)
 		lines[i] = line
 	end
 

@@ -39,6 +39,16 @@ function Selector.Matches(route, player)
 	return (route.minLevel or 1) <= level and level <= (route.maxLevel or 60)
 end
 
+-- The route with that id when it can be used by the character (level ignored), or nil.
+-- Shared by saved progress, /ruta <id> and chaining to `next`.
+function Selector.Find(guides, id, player)
+	local route = type(id) == "string" and guides and guides[id] or nil
+	if type(route) == "table" and route.id == id and Selector.MatchesCharacter(route, player) then
+		return route
+	end
+	return nil
+end
+
 -- Ranking: a route that lists races first, then the lowest minLevel, then the id.
 local function ranksBefore(a, b)
 	local aRaces, bRaces = a.races ~= nil, b.races ~= nil

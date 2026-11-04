@@ -2,7 +2,8 @@ local _, ns = ...
 
 -- Waypoint arrow (spec §3.4): a rotated texture pointing at the current step's coords and a
 -- distance label, both in their own unnamed frame. Updated on every engine tick (0.1 s), also
--- while hidden, so its visibility does not depend on zone events.
+-- while hidden, so its visibility does not depend on zone events. /ruta hide (LaRutaDel60DB.ui.hidden)
+-- hides it together with the step window.
 local Arrow = {}
 ns.Arrow = Arrow
 
@@ -34,6 +35,10 @@ end
 function Arrow.Update()
 	if not frame then
 		build()
+	end
+	if ns.Game.DB().ui.hidden then
+		frame:Hide()
+		return
 	end
 	local distance, bearing = ns.Engine.Navigation()
 	local facing = ns.Game.Facing()

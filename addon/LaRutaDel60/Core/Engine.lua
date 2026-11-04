@@ -11,6 +11,10 @@ local GOTO_RADIUS = 10
 local TICK_SECONDS = 0.1
 
 local MANUAL_TYPES = { hearth = true, fly = true, train = true, note = true }
+-- Steps shown in the window: the current one plus 2 upcoming (spec §3.3).
+local VISIBLE_STEPS = 3
+-- Upper bound on `next` hops in one catch-up, so a cycle of satisfied routes terminates.
+local MAX_CHAIN_HOPS = 100
 
 local started = false
 local routeId -- current route id, or nil when no route matches
@@ -19,6 +23,9 @@ local index = 1 -- current step; #steps + 1 means "route complete"
 -- quest state (or by standing in a goto radius) until the step changes or stops being satisfied.
 local held = false
 local ticker
+local player -- faction, race and class do not change during a session
+-- Last progress written to the saved variables, so unchanged state is not written again.
+local savedRouteId, savedIndex
 
 local changeListeners = {}
 local tickListeners = {}
@@ -60,22 +67,41 @@ local function updateNavigation()
 	navBearing = math.atan2(dWest, dNorth)
 end
 
-local function inGotoRadius(step)
-	return step ~= nil and step.type == "goto" and navDistance ~= nil and navDistance <= GOTO_RADIUS
+local function currentPlayer()
+	player = player or ns.Game.Player()
+	return player
+end
+
+-- Whether a step is already done by the game state: the catch-up rule for quest steps, and
+-- being inside the radius for goto. Back holds a step while this stays true.
+local function isDone(step)
+	if step == nil then
+		return false
+	end
+	if step.type == "goto" then
+		return navDistance ~= nil and navDistance <= GOTO_RADIUS
+	end
+	return ns.Progress.IsSatisfied(step)
 end
 
 local function save()
-	if routeId then
+	if routeId and (routeId ~= savedRouteId or index ~= savedIndex) then
+		savedRouteId, savedIndex = routeId, index
 		ns.Progress.Save(routeId, index)
 	end
 end
 
-local function notify()
-	save()
-	updateNavigation()
+local function refreshViews()
 	for i = 1, #changeListeners do
 		changeListeners[i]()
 	end
+end
+
+-- After a step or route change: persist, recompute navigation and refresh the views.
+local function notify()
+	save()
+	updateNavigation()
+	refreshViews()
 end
 
 -- Catch-up: keep advancing while the current step is satisfied, chaining to `next` at the end.
@@ -90,8 +116,8 @@ local function settle()
 		local steps = route.steps
 		if index > #steps then
 			local nextId = route.next
-			local nextRoute = nextId and ns.Guides[nextId]
-			if type(nextRoute) == "table" and type(nextRoute.steps) == "table" and hops < 100 then
+			local nextRoute = nextId ~= routeId and ns.Selector.Find(ns.Guides, nextId, currentPlayer())
+			if nextRoute and hops < MAX_CHAIN_HOPS then
 				hops = hops + 1
 				routeId, index = nextId, 1
 			else
@@ -142,7 +168,7 @@ local function onQuestLogUpdate()
 		return
 	end
 	if held then
-		held = ns.Progress.IsSatisfied(step)
+		held = isDone(step)
 		return
 	end
 	if ns.Progress.IsSatisfied(step) then
@@ -151,22 +177,37 @@ local function onQuestLogUpdate()
 	end
 end
 
-local function onQuestDataLoaded()
-	if routeId then
-		notify()
+local function isVisibleQuest(questId)
+	local route = currentRoute()
+	if route == nil then
+		return false
+	end
+	for i = index, index + VISIBLE_STEPS - 1 do
+		local step = route.steps[i]
+		if step and step.questId == questId then
+			return true
+		end
+	end
+	return false
+end
+
+local function onQuestDataLoaded(questId, success)
+	if not success then
+		ns.Game.ForgetQuestRequest(questId)
+		return
+	end
+	if isVisibleQuest(questId) then
+		refreshViews()
 	end
 end
 
 local function onTick()
 	updateNavigation()
 	local step = currentStep()
-	if step and step.type == "goto" then
-		local reached = inGotoRadius(step)
-		if held then
-			held = reached
-		elseif reached then
-			advance()
-		end
+	if held then
+		held = isDone(step)
+	elseif step and step.type == "goto" and isDone(step) then
+		advance()
 	end
 	for i = 1, #tickListeners do
 		tickListeners[i]()
@@ -183,14 +224,14 @@ function Engine.Start()
 		return
 	end
 	started = true
-	local player = ns.Game.Player()
 	local savedRoute, savedStep = ns.Progress.Load()
-	local saved = savedRoute and ns.Guides[savedRoute]
-	if saved and ns.Selector.MatchesCharacter(saved, player) then
+	savedRouteId, savedIndex = savedRoute, savedStep
+	local saved = savedRoute and ns.Selector.Find(ns.Guides, savedRoute, currentPlayer())
+	if saved then
 		routeId = savedRoute
 		index = math.max(1, math.min(savedStep, #saved.steps + 1))
 	else
-		routeId = ns.Selector.Choose(ns.Guides, player)
+		routeId = ns.Selector.Choose(ns.Guides, currentPlayer())
 		index = 1
 	end
 	if routeId then
@@ -221,15 +262,14 @@ function Engine.Back()
 	end
 	index = index - 1
 	notify()
-	local step = currentStep()
-	held = ns.Progress.IsSatisfied(step) or inGotoRadius(step)
+	held = isDone(currentStep())
 end
 
 -- Switches to a route that matches the character (level ignored), at step 1 with catch-up.
 -- Returns the route, or nil when the id is unknown or does not match.
 function Engine.SetRoute(id)
-	local route = type(id) == "string" and ns.Guides[id] or nil
-	if not route or route.id ~= id or not ns.Selector.MatchesCharacter(route, ns.Game.Player()) then
+	local route = ns.Selector.Find(ns.Guides, id, currentPlayer())
+	if not route then
 		return nil
 	end
 	routeId, index = id, 1
@@ -238,15 +278,14 @@ function Engine.SetRoute(id)
 	return route
 end
 
--- Back to step 1 of the current route, with catch-up. Returns false when there is no route.
+-- Back to step 1 of the current route, with catch-up. Does nothing when there is no route.
 function Engine.Reset()
 	if routeId == nil then
-		return false
+		return
 	end
 	index = 1
 	settle()
 	notify()
-	return true
 end
 
 -- route, index, step. step is nil on "route complete"; route is nil when no route matches.
@@ -264,7 +303,7 @@ function Engine.Navigation()
 	return navDistance, navBearing
 end
 
--- callback() runs after every step or route change, and when quest titles load.
+-- callback() runs after every step or route change, and when a visible quest title loads.
 function Engine.OnChange(callback)
 	changeListeners[#changeListeners + 1] = callback
 end

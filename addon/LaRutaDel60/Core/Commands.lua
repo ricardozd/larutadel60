@@ -18,12 +18,15 @@ local function resetRoute()
 	ns.Print(L.ROUTE_RESTARTED)
 end
 
+-- show and hide apply to the step window and the arrow (spec §3.5).
 local function showWindow()
 	ns.StepFrame.Show()
+	ns.Arrow.Update()
 end
 
 local function hideWindow()
 	ns.StepFrame.Hide()
+	ns.Arrow.Update()
 end
 
 -- Every alias works in every locale.

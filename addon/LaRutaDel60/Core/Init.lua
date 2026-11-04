@@ -24,7 +24,7 @@ local frame = CreateFrame("Frame")
 frame:RegisterEvent("PLAYER_LOGIN")
 frame:SetScript("OnEvent", function(_, event)
 	if event == "PLAYER_LOGIN" then
-		LaRutaDel60DB = LaRutaDel60DB or {}
+		ns.Game.DB()
 		if not isForever() then
 			ns.Print(L.NOT_FOREVER)
 		end

@@ -7,10 +7,20 @@ ns.Game = Game
 
 local requestedQuests = {}
 
--- Saved variables, created on first use.
+-- Saved variables, created on first use. The single place that initializes them:
+-- chars = per-character progress, ui = window state.
 function Game.DB()
-	LaRutaDel60DB = LaRutaDel60DB or {}
-	return LaRutaDel60DB
+	if type(LaRutaDel60DB) ~= "table" then
+		LaRutaDel60DB = {}
+	end
+	local db = LaRutaDel60DB
+	if type(db.chars) ~= "table" then
+		db.chars = {}
+	end
+	if type(db.ui) ~= "table" then
+		db.ui = {}
+	end
+	return db
 end
 
 -- "esES" on Spanish clients (esES and esMX), "enUS" otherwise. Guide data only carries these two.
@@ -69,6 +79,13 @@ function Game.QuestTitle(questId)
 		return nil
 	end
 	return title
+end
+
+-- After a failed QUEST_DATA_LOAD_RESULT, lets the next QuestTitle call request the quest again.
+function Game.ForgetQuestRequest(questId)
+	if questId ~= nil then
+		requestedQuests[questId] = nil
+	end
 end
 
 ------------------------------------------------------------------------------------------------

@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.2.1 - 2026-11-04
+
+- Classic Era 1.15 support, so the addon can be tested before WoW Forever launches:
+  - a new `LaRutaDel60_Vanilla.toc` (Interface 11509);
+  - API fallbacks for `ReadyForTurnIn` and `GetTitleForQuestID`.
+
+  The routes are still made for Forever: Forever-only quests show as `Quest #<id>` and need Skip.
+- `deploy.ps1` also finds the `_classic_era_` folder.
+
 ## v0.2.0 - 2026-11-04
 
 First test release.

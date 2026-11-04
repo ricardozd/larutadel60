@@ -20,3 +20,6 @@ L.ROUTE_COMPLETE = "Route complete!"
 L.BUTTON_BACK = "Back"
 L.BUTTON_DONE = "Done"
 L.BUTTON_SKIP = "Skip"
+
+-- Waypoint arrow (spec §3.4).
+L.ARROW_DISTANCE = "%d yd"

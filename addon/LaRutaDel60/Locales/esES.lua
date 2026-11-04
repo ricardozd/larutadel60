@@ -24,3 +24,6 @@ L.ROUTE_COMPLETE = "¡Ruta completada!"
 L.BUTTON_BACK = "Atrás"
 L.BUTTON_DONE = "Hecho"
 L.BUTTON_SKIP = "Saltar"
+
+-- Waypoint arrow (spec §3.4).
+L.ARROW_DISTANCE = "%d yd"

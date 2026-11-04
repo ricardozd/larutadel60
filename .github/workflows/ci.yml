@@ -53,6 +53,20 @@ jobs:
       - name: Full verification
         run: tools/check.sh
 
+  deploy-smoke:
+    # Runs deploy.ps1 for real on Windows PowerShell 5.1 against a fake WoW folder.
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install the latest release into a fake Classic Era folder
+        shell: powershell
+        run: |
+          $wow = Join-Path $env:RUNNER_TEMP "wow\_classic_era_"
+          New-Item -ItemType Directory -Force -Path $wow | Out-Null
+          .\scripts\deploy.ps1 -Source release -Repo $env:GITHUB_REPOSITORY -WowPath $wow
+          if (-not (Test-Path (Join-Path $wow "Interface\AddOns\LaRutaDel60\LaRutaDel60.toc"))) { throw "addon not installed" }
+
   release:
     if: startsWith(github.ref, 'refs/tags/v')
     needs: check

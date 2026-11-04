@@ -12,13 +12,19 @@ param(
     [ValidateSet("git", "release")]
     [string]$Source = "git",
     [string]$Repo = "",
-    [string]$RepoPath = (Split-Path -Parent $PSScriptRoot)
+    [string]$RepoPath = ""
 )
 
 $ErrorActionPreference = "Stop"
-[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocol]::Tls12
+[Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
 $ProgressPreference = "SilentlyContinue"
 $AddonName = "LaRutaDel60"
+
+# $PSScriptRoot can be empty in param() defaults on Windows PowerShell 5.1, so resolve it here.
+if (-not $RepoPath) {
+    $scriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Path }
+    $RepoPath = Split-Path -Parent $scriptDir
+}
 
 if (-not $WowPath) {
     $roots = @("C:\Program Files (x86)\World of Warcraft", "C:\Program Files\World of Warcraft", "D:\World of Warcraft")

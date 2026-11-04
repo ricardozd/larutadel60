@@ -160,10 +160,14 @@ eventFrame:SetScript("OnEvent", function(_, event, ...)
 	end
 end)
 
--- One handler per event; handler(...) receives the event arguments.
+-- One handler per event; handler(...) receives the event arguments. Returns false, without
+-- erroring, when the client does not know the event (e.g. QUEST_DATA_LOAD_RESULT on Classic Era).
 function Game.On(event, handler)
+	if not pcall(eventFrame.RegisterEvent, eventFrame, event) then
+		return false
+	end
 	handlers[event] = handler
-	eventFrame:RegisterEvent(event)
+	return true
 end
 
 function Game.NewTicker(seconds, callback)

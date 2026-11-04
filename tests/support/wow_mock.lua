@@ -122,6 +122,8 @@ function WowMock.newWorld(opts)
 		completed = toSet(questOpts.completed),
 		log = toSet(questOpts.log),
 		ready = toSet(questOpts.ready),
+		-- Failed quests stay in the log, never ready (classic_era: GetQuestLogTitle isComplete = -1).
+		failed = toSet(questOpts.failed),
 		titles = {},
 		-- Quest log order (ids), used by the classic_era quest log API: opts.quests.log in order,
 		-- then the ready quests that were not listed in it, then accepted quests at the end.
@@ -132,12 +134,17 @@ function WowMock.newWorld(opts)
 			quests.order[#quests.order + 1] = id
 		end
 	end
-	-- A quest ready for turn-in is necessarily in the quest log.
-	for _, id in ipairs(questOpts.ready or {}) do
-		if not quests.log[id] then
-			quests.log[id] = true
-			quests.order[#quests.order + 1] = id
+	-- A quest ready for turn-in, or failed, is necessarily in the quest log.
+	for _, list in ipairs({ questOpts.ready or {}, questOpts.failed or {} }) do
+		for _, id in ipairs(list) do
+			if not quests.log[id] then
+				quests.log[id] = true
+				quests.order[#quests.order + 1] = id
+			end
 		end
+	end
+	for id in pairs(quests.failed) do
+		quests.ready[id] = nil
 	end
 	for id, title in pairs(questOpts.titles or {}) do
 		quests.titles[id] = title
@@ -690,14 +697,24 @@ function WowMock.install(opts)
 			return logIndexOf(questID)
 		end
 		-- title, level, suggestedGroup, isHeader, isCollapsed, isComplete, frequency, questID.
-		-- isComplete is 1 when the quest is ready for turn-in and nil otherwise. The log has no headers.
+		-- isComplete is 1 when the quest is ready for turn-in, -1 when it failed and nil otherwise.
+		-- frequency is 1 (a normal, non-repeatable quest). A quest in the log always has a title, as in
+		-- the real client: the cached one, else "Quest Title <id>"; only an out-of-range index returns nil.
+		-- The emulated log has no header rows, and GetNumQuestLogEntries is not emulated: the spec
+		-- mandates looking a quest up with GetQuestLogIndexByID.
 		_G.GetQuestLogTitle = function(questLogIndex)
 			local id = quests.order[questLogIndex]
 			if not id then
 				return nil
 			end
-			local isComplete = quests.ready[id] and 1 or nil
-			return quests.titles[id], player.level, 0, false, false, isComplete, 0, id
+			local isComplete
+			if quests.failed[id] then
+				isComplete = -1
+			elseif quests.ready[id] then
+				isComplete = 1
+			end
+			local title = quests.titles[id] or ("Quest Title " .. tostring(id))
+			return title, player.level, 0, false, false, isComplete, 1, id
 		end
 	end
 
@@ -717,6 +734,16 @@ function WowMock.install(opts)
 	function client.completeObjectives(id)
 		assert(quests.log[id], "quest " .. tostring(id) .. " is not in the log")
 		quests.ready[id] = true
+		quests.failed[id] = nil
+		client.fire("QUEST_LOG_UPDATE")
+	end
+
+	-- The quest fails (e.g. a timer ran out): it stays in the log and is not ready for turn-in.
+	-- classic_era: GetQuestLogTitle reports isComplete = -1. forever: ReadyForTurnIn returns false.
+	function client.failQuest(id)
+		assert(quests.log[id], "quest " .. tostring(id) .. " is not in the log")
+		quests.ready[id] = nil
+		quests.failed[id] = true
 		client.fire("QUEST_LOG_UPDATE")
 	end
 
@@ -724,6 +751,7 @@ function WowMock.install(opts)
 		assert(quests.log[id], "quest " .. tostring(id) .. " is not in the log")
 		quests.log[id] = nil
 		quests.ready[id] = nil
+		quests.failed[id] = nil
 		quests.completed[id] = true
 		local index = logIndexOf(id)
 		if index > 0 then

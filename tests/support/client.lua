@@ -176,7 +176,7 @@ end
 --   flavor = "forever" (default) | "classic_era" (WoW Classic Era 1.15: loads LaRutaDel60_Vanilla.toc
 --     and emulates the 1.15 quest API, see wow_mock.lua),
 --   player = { name, realm, faction, race, class, level },
---   quests = { completed = {ids}, log = {ids}, ready = {ids}, titles = { [id] = "Title" } },
+--   quests = { completed = {ids}, log = {ids}, ready = {ids}, failed = {ids}, titles = { [id] = "Title" } },
 --   position = { mapId, x, y, facing } (x, y in percent; nil = inside an instance),
 --   maps = { [uiMapID] = { continent, left, top, width, height } } (yards, see wow_mock.lua),
 --   guides = { <route table>, ... }, replaceGuides = true|false,

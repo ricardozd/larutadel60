@@ -176,13 +176,24 @@ describe("Classic Era compatibility (acceptance)", function()
 			assert.are.equal("Closing note", current(client))
 		end)
 
-		it("reads the quest ID from QUEST_ACCEPTED(logIndex, questID)", function()
-			-- 102 and 103 are already in the log, so 101 is accepted at log index 3.
+		it("reads the quest ID from the last argument of QUEST_ACCEPTED(logIndex, questID)", function()
+			-- 102 and 103 are already in the log, so 101 lands at log index 3. QUEST_ACCEPTED is fired
+			-- alone (no QUEST_LOG_UPDATE after it), so only the questID argument can advance the step.
 			local client = bootQuestRoute({ quests = { log = { 102, 103 } } })
 			assert.are.equal("Accept: First Quest", current(client))
-			client.acceptQuest(101)
+			local quests = client.world.quests
+			quests.log[101] = true
+			quests.order[#quests.order + 1] = 101
 			assert.are.equal(3, GetQuestLogIndexByID(101))
+			client.fire("QUEST_ACCEPTED", 3, 101)
 			assert.are.equal("Complete: First Quest", current(client))
+		end)
+
+		it("ignores QUEST_ACCEPTED whose questID (last argument) is another quest", function()
+			-- logIndex 1 matches nothing; the questID 102 is not on the route.
+			local client = bootQuestRoute({ quests = { log = { 102 } } })
+			client.fire("QUEST_ACCEPTED", 1, 102)
+			assert.are.equal("Accept: First Quest", current(client))
 		end)
 
 		it("completes through GetQuestLogIndexByID and GetQuestLogTitle, not another log entry", function()
@@ -200,6 +211,21 @@ describe("Classic Era compatibility (acceptance)", function()
 		it("stays on complete while the quest is in the log but not ready", function()
 			local client = bootQuestRoute({ quests = { log = { 101 } } })
 			assert.are.equal("Complete: First Quest", current(client))
+			client.advance(1)
+			assert.are.equal("Complete: First Quest", current(client))
+		end)
+
+		it("does not advance a complete step when the quest fails", function()
+			local client = bootQuestRoute()
+			client.acceptQuest(101)
+			assert.are.equal("Complete: First Quest", current(client))
+			client.failQuest(101)
+			client.advance(1)
+			assert.are.equal("Complete: First Quest", current(client))
+		end)
+
+		it("does not catch up past a quest that is failed at login", function()
+			local client = bootQuestRoute({ quests = { failed = { 101 } } })
 			client.advance(1)
 			assert.are.equal("Complete: First Quest", current(client))
 		end)
@@ -276,13 +302,16 @@ describe("Classic Era compatibility (acceptance)", function()
 			assert.are.equal("Acepta: Misión #555", Fx.current(client, { "Acepta: Misión #555", "Nota final" }))
 		end)
 
-		it("keeps Quest #<id> while the quest without a title is in the log", function()
+		it("takes the displayed title from GetQuestInfo, not the quest log, while the quest is in the log", function()
+			-- GetQuestInfo has no title for 555; the quest log entry does ("Quest Title 555").
 			local client = bootUnknown()
 			client.acceptQuest(555)
 			client.advance(1)
-			assert.are.equal("Complete: Quest #555", Fx.current(client, { "Complete: Quest #555", "Closing note" }))
+			local texts = { "Complete: Quest #555", "Complete: Quest Title 555", "Closing note" }
+			assert.are.equal("Complete: Quest #555", Fx.current(client, texts))
+			assert.is_false(Fx.shows(client, "Complete: Quest Title 555"))
 			client.completeObjectives(555)
-			assert.are.equal("Closing note", Fx.current(client, { "Complete: Quest #555", "Closing note" }))
+			assert.are.equal("Closing note", Fx.current(client, texts))
 		end)
 	end)
 

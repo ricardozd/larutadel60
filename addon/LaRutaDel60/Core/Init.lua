@@ -29,6 +29,7 @@ frame:SetScript("OnEvent", function(_, event)
 			ns.Print(L.NOT_FOREVER)
 		end
 		ns.Print(L.LOADED)
+		ns.Engine.Start()
 	end
 end)
 

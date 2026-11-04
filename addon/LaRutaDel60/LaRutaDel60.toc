@@ -11,4 +11,10 @@ Locales\Locales.lua
 Locales\enUS.lua
 Locales\esES.lua
 Core\Init.lua
+Core\Game.lua
+Core\Selector.lua
+Core\Progress.lua
+Core\StepText.lua
+Core\Engine.lua
+UI\StepFrame.lua
 Guides\Guides.xml

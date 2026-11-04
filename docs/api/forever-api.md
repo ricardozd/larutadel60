@@ -60,6 +60,8 @@ The project's source of truth about the API. Every entry carries a date and a so
 | `C_Timer.After(seconds, cb)`, `C_Timer.NewTicker(seconds, cb, iterations?)` → ticker with `:Cancel()` | polling | Ketho annotations |
 | `UIParent` | parent of the addon's frames | Ketho annotations (FrameXML) |
 | Frames: `CreateFrame(type, name, parent, template)`; layout methods (`SetPoint`, `GetPoint`, `ClearAllPoints`, `SetSize`, `SetMovable`, `EnableMouse`, `RegisterForDrag`, `StartMoving`, `StopMovingOrSizing`, `SetClampedToScreen`, `SetFrameStrata`; `SetBackdrop*` only with a template containing `BackdropTemplate`); `GetName`; `Button:GetFontString` (nil until `SetText`, unless a `*ButtonTemplate` template provides the label); `Show`/`Hide`/`IsShown`/`IsVisible`; `CreateTexture` (`SetTexture`, `SetRotation`/`GetRotation`), `CreateFontString` (`SetText`/`GetText`); `Button` (`SetText`/`GetText`, `OnClick`, `Enable`/`Disable`) | step window, arrow | Ketho annotations. `BackdropTemplate` availability not verified on Forever |
+| Widget methods used by the step window and arrow, beyond the row above: `Region:SetAllPoints`, `Region:SetShown`, `Texture:SetColorTexture(r, g, b, a)` (window background, no backdrop), `FontString:SetJustifyH` | step window, arrow | Ketho annotations (`Annotations/Core/Widget`). Not verified on Forever |
+| FrameXML templates and art: `GameFontNormal` / `GameFontHighlight` (font string templates), `UIPanelButtonTemplate` (button with label), texture `Interface\\Minimap\\MinimapArrow` (arrow pointing up) | step window, arrow | FrameXML (retail). Not verified on Forever |
 
 ## To be verified in game
 - Forever install folder on Windows (`_forever_`, `_camelot_`...). `scripts/deploy.ps1` tries several.

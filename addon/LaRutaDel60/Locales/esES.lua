@@ -27,3 +27,9 @@ L.BUTTON_SKIP = "Saltar"
 
 -- Waypoint arrow (spec §3.4).
 L.ARROW_DISTANCE = "%d yd"
+
+-- Commands (spec §3.5).
+L.ROUTE_LIST_LINE = "%s - %s"
+L.ROUTE_SWITCHED = "Ruta: %s"
+L.ROUTE_UNKNOWN = "Ruta desconocida: %s"
+L.ROUTE_RESTARTED = "Ruta reiniciada."

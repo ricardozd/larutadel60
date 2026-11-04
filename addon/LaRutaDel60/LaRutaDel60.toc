@@ -16,6 +16,7 @@ Core\Selector.lua
 Core\Progress.lua
 Core\StepText.lua
 Core\Engine.lua
+Core\Commands.lua
 UI\StepFrame.lua
 UI\Arrow.lua
 Guides\Guides.xml

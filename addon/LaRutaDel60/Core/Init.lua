@@ -34,6 +34,11 @@ frame:SetScript("OnEvent", function(_, event)
 end)
 
 SLASH_LARUTADEL601 = "/ruta"
-SlashCmdList.LARUTADEL60 = function()
-	ns.Print(string.format(L.VERSION_INFO, ns.VERSION, guideCount()))
+SlashCmdList.LARUTADEL60 = function(input)
+	input = (input or ""):match("^%s*(.-)%s*$")
+	if input == "" then
+		ns.Print(string.format(L.VERSION_INFO, ns.VERSION, guideCount()))
+	else
+		ns.Commands.Run(input)
+	end
 end

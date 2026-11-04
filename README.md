@@ -2,9 +2,9 @@
 
 A **free** addon for **World of Warcraft: Forever** (client 1.60.1) that guides any character from level 1 to 60 along the fastest route, step by step.
 
-> **Status: in development (v0.1.0).** The addon currently loads, detects WoW Forever and answers `/ruta`. The first playable route, Undead 1-20 (Tirisfal Glades and Silverpine Forest), is in progress.
+> **Status: early test release (v0.2.0).** Playable for **Undead** characters: a route chain through Tirisfal Glades, Silverpine Forest and The Barrens that currently reaches about level 15. Quest data comes from public Forever databases and is still being verified in game. Other races and higher levels are coming.
 
-## Planned features
+## Features
 
 - A step window showing the current and upcoming steps. It advances on its own when you accept, complete or turn in quests.
 - An on-screen arrow pointing to the next objective, with the distance.
@@ -48,8 +48,18 @@ To update, run the same command again. If the game was open, type `/reload` in c
 
 ## Usage
 
-- When you log in, the chat shows `La Ruta del 60: Loaded. Type /ruta for info.` (in Spanish on Spanish clients).
-- `/ruta` shows the version and the number of loaded guides.
+- When you log in, a window shows your route and the current step. An arrow points to the next objective, with the distance in yards.
+- Steps advance on their own when you accept, complete or turn in quests, or reach a location. Steps like "use your Hearthstone" have a **Done** button. **Back** and **Skip** are always available.
+- Chat commands:
+  - `/ruta`: version and number of loaded guides.
+  - `/ruta list`: routes available for your character.
+  - `/ruta <id>`: switch route.
+  - `/ruta reset`: restart the current route.
+  - `/ruta hide` / `/ruta show`: hide or show the window and the arrow.
+
+  Spanish aliases also work: `lista`, `reiniciar`, `ocultar`, `mostrar`.
+
+**Found a wrong step, a wrong location or a Lua error?** Please [open an issue](../../issues) with the route, the step text and, for errors, the full message (BugSack helps).
 
 ## Development
 

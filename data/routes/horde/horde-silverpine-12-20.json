@@ -1,0 +1,949 @@
+{
+  "id": "horde-silverpine-12-20",
+  "name": {
+    "enUS": "Undead 10-12: Silverpine Forest",
+    "esES": "No-muerto 10-12: Bosque de Argénteos"
+  },
+  "faction": "Horde",
+  "races": [
+    "Scourge"
+  ],
+  "minLevel": 10,
+  "maxLevel": 20,
+  "carriedQuests": [
+    411,
+    445
+  ],
+  "steps": [
+    {
+      "type": "note",
+      "text": {
+        "enUS": "Travel south-west from Brill to The Sepulcher in Silverpine Forest.",
+        "esES": "Viaja al suroeste desde Rémol hasta El Sepulcro, en el Bosque de Argénteos."
+      },
+      "coords": {
+        "mapId": 1421,
+        "x": 42.8,
+        "y": 40.9
+      }
+    },
+    {
+      "type": "goto",
+      "coords": {
+        "mapId": 1421,
+        "x": 42.8,
+        "y": 40.9
+      }
+    },
+    {
+      "type": "turnin",
+      "questId": 445,
+      "coords": {
+        "mapId": 1421,
+        "x": 42.8,
+        "y": 40.9
+      },
+      "source": "https://www.wowhead.com/forever/quest=445"
+    },
+    {
+      "type": "accept",
+      "questId": 447,
+      "coords": {
+        "mapId": 1421,
+        "x": 42.8,
+        "y": 40.9
+      },
+      "source": "https://www.wowhead.com/forever/quest=447"
+    },
+    {
+      "type": "note",
+      "text": {
+        "enUS": "Set your hearthstone at Innkeeper Bates in The Sepulcher.",
+        "esES": "Vincula tu piedra de hogar con el tabernero Bates en El Sepulcro."
+      },
+      "coords": {
+        "mapId": 1421,
+        "x": 43.2,
+        "y": 41.3
+      }
+    },
+    {
+      "type": "accept",
+      "questId": 428,
+      "coords": {
+        "mapId": 1421,
+        "x": 43.4,
+        "y": 40.9
+      },
+      "source": "https://www.wowhead.com/forever/quest=428"
+    },
+    {
+      "type": "accept",
+      "questId": 437,
+      "coords": {
+        "mapId": 1421,
+        "x": 43.4,
+        "y": 40.9
+      },
+      "source": "https://www.wowhead.com/forever/quest=437"
+    },
+    {
+      "type": "accept",
+      "questId": 6321,
+      "coords": {
+        "mapId": 1421,
+        "x": 43.4,
+        "y": 41.7
+      },
+      "source": "https://www.wowhead.com/forever/quest=6321"
+    },
+    {
+      "type": "turnin",
+      "questId": 6321,
+      "coords": {
+        "mapId": 1421,
+        "x": 45.6,
+        "y": 42.6
+      },
+      "source": "https://www.wowhead.com/forever/quest=6321"
+    },
+    {
+      "type": "accept",
+      "questId": 6323,
+      "coords": {
+        "mapId": 1421,
+        "x": 45.6,
+        "y": 42.6
+      },
+      "source": "https://www.wowhead.com/forever/quest=6323"
+    },
+    {
+      "type": "fly",
+      "coords": {
+        "mapId": 1458,
+        "x": 63.2,
+        "y": 48.6
+      },
+      "text": {
+        "enUS": "Buy a bat ride from Karos Razok to the Undercity.",
+        "esES": "Compra un vuelo en murciélago a Karos Razok hasta Entrañas."
+      }
+    },
+    {
+      "type": "turnin",
+      "questId": 6323,
+      "coords": {
+        "mapId": 1458,
+        "x": 61.5,
+        "y": 41.8
+      },
+      "source": "https://www.wowhead.com/forever/quest=6323"
+    },
+    {
+      "type": "accept",
+      "questId": 6322,
+      "coords": {
+        "mapId": 1458,
+        "x": 61.5,
+        "y": 41.8
+      },
+      "source": "https://www.wowhead.com/forever/quest=6322"
+    },
+    {
+      "type": "turnin",
+      "questId": 6322,
+      "coords": {
+        "mapId": 1458,
+        "x": 63.2,
+        "y": 48.6
+      },
+      "source": "https://www.wowhead.com/forever/quest=6322"
+    },
+    {
+      "type": "accept",
+      "questId": 6324,
+      "coords": {
+        "mapId": 1458,
+        "x": 63.2,
+        "y": 48.6
+      },
+      "source": "https://www.wowhead.com/forever/quest=6324"
+    },
+    {
+      "type": "goto",
+      "coords": {
+        "mapId": 1458,
+        "x": 84.1,
+        "y": 17.4
+      }
+    },
+    {
+      "type": "turnin",
+      "questId": 411,
+      "coords": {
+        "mapId": 1458,
+        "x": 84.1,
+        "y": 17.4
+      },
+      "source": "https://www.wowhead.com/forever/quest=411"
+    },
+    {
+      "type": "goto",
+      "coords": {
+        "mapId": 1458,
+        "x": 63.2,
+        "y": 48.6
+      }
+    },
+    {
+      "type": "fly",
+      "coords": {
+        "mapId": 1421,
+        "x": 45.6,
+        "y": 42.6
+      },
+      "text": {
+        "enUS": "Buy a bat ride from Michael Garrett to The Sepulcher.",
+        "esES": "Compra un vuelo en murciélago a Michael Garrett hasta El Sepulcro."
+      }
+    },
+    {
+      "type": "turnin",
+      "questId": 6324,
+      "coords": {
+        "mapId": 1421,
+        "x": 43.4,
+        "y": 41.7
+      },
+      "source": "https://www.wowhead.com/forever/quest=6324"
+    },
+    {
+      "type": "complete",
+      "questId": 447,
+      "coords": {
+        "mapId": 1421,
+        "x": 45,
+        "y": 38
+      },
+      "source": "https://www.wowhead.com/forever/quest=447"
+    },
+    {
+      "type": "goto",
+      "coords": {
+        "mapId": 1421,
+        "x": 53.5,
+        "y": 13.4
+      }
+    },
+    {
+      "type": "turnin",
+      "questId": 428,
+      "coords": {
+        "mapId": 1421,
+        "x": 53.5,
+        "y": 13.4
+      },
+      "source": "https://www.wowhead.com/forever/quest=428"
+    },
+    {
+      "type": "accept",
+      "questId": 429,
+      "coords": {
+        "mapId": 1421,
+        "x": 53.5,
+        "y": 13.4
+      },
+      "source": "https://www.wowhead.com/forever/quest=429"
+    },
+    {
+      "type": "accept",
+      "questId": 91920,
+      "coords": {
+        "mapId": 1421,
+        "x": 53.4,
+        "y": 12.6
+      },
+      "source": "https://www.wowhead.com/forever/quest=91920"
+    },
+    {
+      "type": "accept",
+      "questId": 435,
+      "coords": {
+        "mapId": 1421,
+        "x": 56.2,
+        "y": 9.2
+      },
+      "source": "https://www.wowhead.com/forever/quest=435"
+    },
+    {
+      "type": "complete",
+      "questId": 435,
+      "coords": {
+        "mapId": 1421,
+        "x": 56.2,
+        "y": 9.2
+      },
+      "source": "https://www.wowhead.com/forever/quest=435"
+    },
+    {
+      "type": "turnin",
+      "questId": 435,
+      "coords": {
+        "mapId": 1421,
+        "x": 53.5,
+        "y": 13.4
+      },
+      "source": "https://www.wowhead.com/forever/quest=435"
+    },
+    {
+      "type": "accept",
+      "questId": 449,
+      "coords": {
+        "mapId": 1421,
+        "x": 53.5,
+        "y": 13.4
+      },
+      "source": "https://www.wowhead.com/forever/quest=449"
+    },
+    {
+      "type": "complete",
+      "questId": 429,
+      "coords": {
+        "mapId": 1421,
+        "x": 57,
+        "y": 29
+      },
+      "source": "https://www.wowhead.com/forever/quest=429"
+    },
+    {
+      "type": "note",
+      "text": {
+        "enUS": "Murloc Eyes drop from the murlocs of the Silverpine coast; the exact area is not confirmed.",
+        "esES": "Los ojos de múrloc los sueltan los múrlocs de la costa del Bosque de Argénteos; la zona exacta no está confirmada."
+      }
+    },
+    {
+      "type": "complete",
+      "questId": 91920,
+      "source": "https://www.wowhead.com/forever/quest=91920"
+    },
+    {
+      "type": "note",
+      "text": {
+        "enUS": "The Dead Fields: Nightlash appears after you kill gnolls at the Dead Fields farm, in the north of the forest.",
+        "esES": "Los Campos Muertos: Nightlash aparece tras matar gnolls en la granja de los Campos Muertos, en el norte del bosque."
+      }
+    },
+    {
+      "type": "complete",
+      "questId": 437,
+      "source": "https://www.wowhead.com/forever/quest=437"
+    },
+    {
+      "type": "goto",
+      "coords": {
+        "mapId": 1421,
+        "x": 42.8,
+        "y": 40.9
+      }
+    },
+    {
+      "type": "turnin",
+      "questId": 429,
+      "coords": {
+        "mapId": 1421,
+        "x": 42.8,
+        "y": 40.9
+      },
+      "source": "https://www.wowhead.com/forever/quest=429"
+    },
+    {
+      "type": "accept",
+      "questId": 430,
+      "coords": {
+        "mapId": 1421,
+        "x": 42.8,
+        "y": 40.9
+      },
+      "source": "https://www.wowhead.com/forever/quest=430"
+    },
+    {
+      "type": "turnin",
+      "questId": 91920,
+      "coords": {
+        "mapId": 1421,
+        "x": 42.8,
+        "y": 40.9
+      },
+      "source": "https://www.wowhead.com/forever/quest=91920"
+    },
+    {
+      "type": "note",
+      "text": {
+        "enUS": "Return to Quinn (Again) may need other steps first: skip it if Renferrel does not offer it.",
+        "esES": "Regresa con Quinn (otra vez) puede requerir otros pasos antes: sáltala si Renferrel no la ofrece."
+      },
+      "coords": {
+        "mapId": 1421,
+        "x": 42.8,
+        "y": 40.9
+      }
+    },
+    {
+      "type": "accept",
+      "questId": 91921,
+      "coords": {
+        "mapId": 1421,
+        "x": 42.8,
+        "y": 40.9
+      },
+      "source": "https://www.wowhead.com/forever/quest=91921"
+    },
+    {
+      "type": "turnin",
+      "questId": 449,
+      "coords": {
+        "mapId": 1421,
+        "x": 43.4,
+        "y": 40.9
+      },
+      "source": "https://www.wowhead.com/forever/quest=449"
+    },
+    {
+      "type": "accept",
+      "questId": 3221,
+      "coords": {
+        "mapId": 1421,
+        "x": 43.4,
+        "y": 40.9
+      },
+      "source": "https://www.wowhead.com/forever/quest=3221"
+    },
+    {
+      "type": "turnin",
+      "questId": 3221,
+      "coords": {
+        "mapId": 1421,
+        "x": 42.8,
+        "y": 40.9
+      },
+      "source": "https://www.wowhead.com/forever/quest=3221"
+    },
+    {
+      "type": "accept",
+      "questId": 1359,
+      "coords": {
+        "mapId": 1421,
+        "x": 42.8,
+        "y": 40.9
+      },
+      "source": "https://www.wowhead.com/forever/quest=1359"
+    },
+    {
+      "type": "turnin",
+      "questId": 437,
+      "coords": {
+        "mapId": 1421,
+        "x": 43.4,
+        "y": 40.9
+      },
+      "source": "https://www.wowhead.com/forever/quest=437"
+    },
+    {
+      "type": "accept",
+      "questId": 438,
+      "coords": {
+        "mapId": 1421,
+        "x": 43.4,
+        "y": 40.9
+      },
+      "source": "https://www.wowhead.com/forever/quest=438"
+    },
+    {
+      "type": "accept",
+      "questId": 477,
+      "npcId": 2121,
+      "coords": {
+        "mapId": 1421,
+        "x": 44.0,
+        "y": 40.9
+      },
+      "source": "https://www.wowhead.com/forever/quest=477"
+    },
+    {
+      "type": "goto",
+      "coords": {
+        "mapId": 1421,
+        "x": 53.4,
+        "y": 12.6
+      }
+    },
+    {
+      "type": "turnin",
+      "questId": 430,
+      "coords": {
+        "mapId": 1421,
+        "x": 53.4,
+        "y": 12.6
+      },
+      "source": "https://www.wowhead.com/forever/quest=430"
+    },
+    {
+      "type": "turnin",
+      "questId": 91921,
+      "coords": {
+        "mapId": 1421,
+        "x": 53.4,
+        "y": 12.6
+      },
+      "source": "https://www.wowhead.com/forever/quest=91921"
+    },
+    {
+      "type": "accept",
+      "questId": 425,
+      "coords": {
+        "mapId": 1421,
+        "x": 53.5,
+        "y": 13.4
+      },
+      "source": "https://www.wowhead.com/forever/quest=425"
+    },
+    {
+      "type": "complete",
+      "questId": 425,
+      "coords": {
+        "mapId": 1421,
+        "x": 53.5,
+        "y": 13.4
+      },
+      "source": "https://www.wowhead.com/forever/quest=425"
+    },
+    {
+      "type": "turnin",
+      "questId": 425,
+      "coords": {
+        "mapId": 1421,
+        "x": 53.5,
+        "y": 13.4
+      },
+      "source": "https://www.wowhead.com/forever/quest=425"
+    },
+    {
+      "type": "goto",
+      "coords": {
+        "mapId": 1421,
+        "x": 58.4,
+        "y": 34.9
+      }
+    },
+    {
+      "type": "turnin",
+      "questId": 438,
+      "coords": {
+        "mapId": 1421,
+        "x": 58.4,
+        "y": 34.9
+      },
+      "source": "https://www.wowhead.com/forever/quest=438"
+    },
+    {
+      "type": "accept",
+      "questId": 439,
+      "coords": {
+        "mapId": 1421,
+        "x": 58.4,
+        "y": 34.9
+      },
+      "source": "https://www.wowhead.com/forever/quest=439"
+    },
+    {
+      "type": "goto",
+      "coords": {
+        "mapId": 1421,
+        "x": 43.4,
+        "y": 40.9
+      }
+    },
+    {
+      "type": "turnin",
+      "questId": 439,
+      "coords": {
+        "mapId": 1421,
+        "x": 43.4,
+        "y": 40.9
+      },
+      "source": "https://www.wowhead.com/forever/quest=439"
+    },
+    {
+      "type": "accept",
+      "questId": 440,
+      "coords": {
+        "mapId": 1421,
+        "x": 43.4,
+        "y": 40.9
+      },
+      "source": "https://www.wowhead.com/forever/quest=440"
+    },
+    {
+      "type": "goto",
+      "coords": {
+        "mapId": 1421,
+        "x": 49.9,
+        "y": 60.3
+      }
+    },
+    {
+      "type": "turnin",
+      "questId": 477,
+      "coords": {
+        "mapId": 1421,
+        "x": 49.9,
+        "y": 60.3
+      },
+      "source": "https://www.wowhead.com/forever/quest=477"
+    },
+    {
+      "type": "accept",
+      "questId": 478,
+      "coords": {
+        "mapId": 1421,
+        "x": 49.9,
+        "y": 60.3
+      },
+      "source": "https://www.wowhead.com/forever/quest=478"
+    },
+    {
+      "type": "goto",
+      "coords": {
+        "mapId": 1421,
+        "x": 44.0,
+        "y": 40.9
+      }
+    },
+    {
+      "type": "turnin",
+      "questId": 478,
+      "npcId": 2121,
+      "coords": {
+        "mapId": 1421,
+        "x": 44.0,
+        "y": 40.9
+      },
+      "source": "https://www.wowhead.com/forever/quest=478"
+    },
+    {
+      "type": "accept",
+      "questId": 481,
+      "npcId": 2121,
+      "coords": {
+        "mapId": 1421,
+        "x": 44.0,
+        "y": 40.9
+      },
+      "source": "https://www.wowhead.com/forever/quest=481"
+    },
+    {
+      "type": "turnin",
+      "questId": 481,
+      "npcId": 1938,
+      "coords": {
+        "mapId": 1421,
+        "x": 44.2,
+        "y": 39.8
+      },
+      "source": "https://www.wowhead.com/forever/quest=481"
+    },
+    {
+      "type": "accept",
+      "questId": 482,
+      "npcId": 1938,
+      "coords": {
+        "mapId": 1421,
+        "x": 44.2,
+        "y": 39.8
+      },
+      "source": "https://www.wowhead.com/forever/quest=482"
+    },
+    {
+      "type": "turnin",
+      "questId": 482,
+      "npcId": 2121,
+      "coords": {
+        "mapId": 1421,
+        "x": 44.0,
+        "y": 40.9
+      },
+      "source": "https://www.wowhead.com/forever/quest=482"
+    },
+    {
+      "type": "train",
+      "text": {
+        "enUS": "Level 12: train your class skills next time you are in the Undercity.",
+        "esES": "Nivel 12: aprende tus habilidades de clase la próxima vez que pases por Entrañas."
+      }
+    },
+    {
+      "type": "note",
+      "text": {
+        "enUS": "Prove Your Worth needs level 12: kill a few mobs first if you are not level 12 yet.",
+        "esES": "Demuestra tu valía requiere nivel 12: mata algunos enemigos antes si aún no eres nivel 12."
+      },
+      "coords": {
+        "mapId": 1421,
+        "x": 44.2,
+        "y": 39.8
+      }
+    },
+    {
+      "type": "accept",
+      "questId": 421,
+      "npcId": 1938,
+      "coords": {
+        "mapId": 1421,
+        "x": 44.2,
+        "y": 39.8
+      },
+      "source": "https://www.wowhead.com/forever/quest=421"
+    },
+    {
+      "type": "complete",
+      "questId": 421,
+      "coords": {
+        "mapId": 1421,
+        "x": 52,
+        "y": 33
+      },
+      "source": "https://www.wowhead.com/forever/quest=421"
+    },
+    {
+      "type": "goto",
+      "coords": {
+        "mapId": 1421,
+        "x": 44.2,
+        "y": 39.8
+      }
+    },
+    {
+      "type": "turnin",
+      "questId": 421,
+      "npcId": 1938,
+      "coords": {
+        "mapId": 1421,
+        "x": 44.2,
+        "y": 39.8
+      },
+      "source": "https://www.wowhead.com/forever/quest=421"
+    },
+    {
+      "type": "accept",
+      "questId": 422,
+      "npcId": 1938,
+      "coords": {
+        "mapId": 1421,
+        "x": 44.2,
+        "y": 39.8
+      },
+      "source": "https://www.wowhead.com/forever/quest=422"
+    },
+    {
+      "type": "complete",
+      "questId": 422,
+      "coords": {
+        "mapId": 1421,
+        "x": 52.8,
+        "y": 28.6
+      },
+      "source": "https://www.wowhead.com/forever/quest=422"
+    },
+    {
+      "type": "goto",
+      "coords": {
+        "mapId": 1421,
+        "x": 44.2,
+        "y": 39.8
+      }
+    },
+    {
+      "type": "turnin",
+      "questId": 422,
+      "npcId": 1938,
+      "coords": {
+        "mapId": 1421,
+        "x": 44.2,
+        "y": 39.8
+      },
+      "source": "https://www.wowhead.com/forever/quest=422"
+    },
+    {
+      "type": "accept",
+      "questId": 423,
+      "npcId": 1938,
+      "coords": {
+        "mapId": 1421,
+        "x": 44.2,
+        "y": 39.8
+      },
+      "source": "https://www.wowhead.com/forever/quest=423"
+    },
+    {
+      "type": "complete",
+      "questId": 423,
+      "coords": {
+        "mapId": 1421,
+        "x": 49,
+        "y": 32
+      },
+      "source": "https://www.wowhead.com/forever/quest=423"
+    },
+    {
+      "type": "goto",
+      "coords": {
+        "mapId": 1421,
+        "x": 44.2,
+        "y": 39.8
+      }
+    },
+    {
+      "type": "turnin",
+      "questId": 423,
+      "npcId": 1938,
+      "coords": {
+        "mapId": 1421,
+        "x": 44.2,
+        "y": 39.8
+      },
+      "source": "https://www.wowhead.com/forever/quest=423"
+    },
+    {
+      "type": "accept",
+      "questId": 424,
+      "npcId": 1938,
+      "coords": {
+        "mapId": 1421,
+        "x": 44.2,
+        "y": 39.8
+      },
+      "source": "https://www.wowhead.com/forever/quest=424"
+    },
+    {
+      "type": "goto",
+      "coords": {
+        "mapId": 1421,
+        "x": 58.6,
+        "y": 44.9
+      }
+    },
+    {
+      "type": "complete",
+      "questId": 424,
+      "coords": {
+        "mapId": 1421,
+        "x": 58.6,
+        "y": 44.9
+      },
+      "source": "https://www.wowhead.com/forever/quest=424"
+    },
+    {
+      "type": "hearth",
+      "text": {
+        "enUS": "Hearth to The Sepulcher.",
+        "esES": "Usa la piedra de hogar para volver a El Sepulcro."
+      }
+    },
+    {
+      "type": "turnin",
+      "questId": 424,
+      "npcId": 1938,
+      "coords": {
+        "mapId": 1421,
+        "x": 44.2,
+        "y": 39.8
+      },
+      "source": "https://www.wowhead.com/forever/quest=424"
+    },
+    {
+      "type": "goto",
+      "coords": {
+        "mapId": 1421,
+        "x": 45.6,
+        "y": 42.6
+      }
+    },
+    {
+      "type": "fly",
+      "coords": {
+        "mapId": 1458,
+        "x": 63.2,
+        "y": 48.6
+      },
+      "text": {
+        "enUS": "Fly to the Undercity.",
+        "esES": "Vuela a Entrañas."
+      }
+    },
+    {
+      "type": "goto",
+      "coords": {
+        "mapId": 1458,
+        "x": 50.1,
+        "y": 68.0
+      }
+    },
+    {
+      "type": "turnin",
+      "questId": 1359,
+      "coords": {
+        "mapId": 1458,
+        "x": 50.1,
+        "y": 68.0
+      },
+      "source": "https://www.wowhead.com/forever/quest=1359"
+    },
+    {
+      "type": "turnin",
+      "questId": 447,
+      "coords": {
+        "mapId": 1458,
+        "x": 48.8,
+        "y": 69.3
+      },
+      "source": "https://www.wowhead.com/forever/quest=447"
+    },
+    {
+      "type": "train",
+      "text": {
+        "enUS": "Level 12: train your class skills in the Undercity.",
+        "esES": "Nivel 12: aprende tus habilidades de clase en Entrañas."
+      }
+    },
+    {
+      "type": "note",
+      "text": {
+        "enUS": "Leave the Undercity and walk north to Brill (Magistrate Sevren).",
+        "esES": "Sal de Entrañas y camina al norte hasta Rémol (Magistrado Sevren)."
+      },
+      "coords": {
+        "mapId": 1420,
+        "x": 61.3,
+        "y": 50.8
+      }
+    },
+    {
+      "type": "turnin",
+      "questId": 440,
+      "coords": {
+        "mapId": 1420,
+        "x": 61.3,
+        "y": 50.8
+      },
+      "source": "https://www.wowhead.com/forever/quest=440"
+    },
+    {
+      "type": "note",
+      "text": {
+        "enUS": "End of Silverpine Forest: you should be close to level 13. Next: the zeppelin to Durotar and The Barrens; type /ruta horde-barrens-17-20 to switch to that route.",
+        "esES": "Fin del Bosque de Argénteos: deberías estar cerca del nivel 13. Siguiente: el zepelín a Durotar y Los Baldíos; escribe /ruta horde-barrens-17-20 para cambiar a esa ruta."
+      }
+    }
+  ]
+}

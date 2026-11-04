@@ -1,0 +1,1021 @@
+{
+  "id": "horde-barrens-17-20",
+  "name": {
+    "enUS": "Undead 12-15: The Barrens",
+    "esES": "No-muerto 12-15: Los Baldíos"
+  },
+  "faction": "Horde",
+  "races": [
+    "Scourge"
+  ],
+  "minLevel": 12,
+  "maxLevel": 20,
+  "steps": [
+    {
+      "type": "note",
+      "text": {
+        "enUS": "Take the zeppelin from the tower between Brill and the Undercity to Durotar.",
+        "esES": "Toma el zepelín en la torre entre Rémol y Entrañas hasta Durotar."
+      }
+    },
+    {
+      "type": "goto",
+      "coords": {
+        "mapId": 1411,
+        "x": 50.8,
+        "y": 13.4
+      }
+    },
+    {
+      "type": "train",
+      "text": {
+        "enUS": "Orgrimmar is right next to the zeppelin tower: train your class skills there if you reached level 12 or 14.",
+        "esES": "Orgrimmar está junto a la torre del zepelín: aprende allí tus habilidades de clase si llegaste a nivel 12 o 14."
+      }
+    },
+    {
+      "type": "note",
+      "text": {
+        "enUS": "Walk south along the road to Razor Hill.",
+        "esES": "Camina hacia el sur por el camino hasta Cerrotajo."
+      },
+      "coords": {
+        "mapId": 1411,
+        "x": 50.8,
+        "y": 43.6
+      }
+    },
+    {
+      "type": "accept",
+      "questId": 840,
+      "coords": {
+        "mapId": 1411,
+        "x": 50.8,
+        "y": 43.6
+      },
+      "source": "https://www.wowhead.com/forever/quest=840"
+    },
+    {
+      "type": "note",
+      "text": {
+        "enUS": "Take the west road from Razor Hill and cross the bridge into The Barrens to Far Watch Post.",
+        "esES": "Toma el camino del oeste desde Cerrotajo y cruza el puente hacia Los Baldíos hasta el Puesto de Avanzada."
+      },
+      "coords": {
+        "mapId": 1413,
+        "x": 62.3,
+        "y": 19.4
+      }
+    },
+    {
+      "type": "turnin",
+      "questId": 840,
+      "npcId": 3337,
+      "coords": {
+        "mapId": 1413,
+        "x": 62.3,
+        "y": 19.4
+      },
+      "source": "https://www.wowhead.com/forever/quest=840"
+    },
+    {
+      "type": "accept",
+      "questId": 842,
+      "npcId": 3337,
+      "coords": {
+        "mapId": 1413,
+        "x": 62.3,
+        "y": 19.4
+      },
+      "source": "https://www.wowhead.com/forever/quest=842"
+    },
+    {
+      "type": "note",
+      "text": {
+        "enUS": "Keep west along the road and take the south branch at the fork to the Crossroads.",
+        "esES": "Sigue el camino hacia el oeste y toma el desvío sur en el cruce hasta El Cruce."
+      },
+      "coords": {
+        "mapId": 1413,
+        "x": 52.2,
+        "y": 31.0
+      }
+    },
+    {
+      "type": "turnin",
+      "questId": 842,
+      "npcId": 3338,
+      "coords": {
+        "mapId": 1413,
+        "x": 52.2,
+        "y": 31.0
+      },
+      "source": "https://www.wowhead.com/forever/quest=842"
+    },
+    {
+      "type": "note",
+      "text": {
+        "enUS": "Talk to Devrak to learn the Crossroads flight path, and set your hearthstone at Innkeeper Boorand Plainswind.",
+        "esES": "Habla con Devrak para aprender la ruta de vuelo de El Cruce y vincula tu piedra de hogar con el tabernero Boorand Plainswind."
+      },
+      "coords": {
+        "mapId": 1413,
+        "x": 52.0,
+        "y": 29.9
+      }
+    },
+    {
+      "type": "accept",
+      "questId": 844,
+      "npcId": 3338,
+      "coords": {
+        "mapId": 1413,
+        "x": 52.2,
+        "y": 31.0
+      },
+      "source": "https://www.wowhead.com/forever/quest=844"
+    },
+    {
+      "type": "accept",
+      "questId": 869,
+      "coords": {
+        "mapId": 1413,
+        "x": 51.9,
+        "y": 30.3
+      },
+      "source": "https://www.wowhead.com/forever/quest=869"
+    },
+    {
+      "type": "accept",
+      "questId": 871,
+      "coords": {
+        "mapId": 1413,
+        "x": 51.5,
+        "y": 30.9
+      },
+      "source": "https://www.wowhead.com/forever/quest=871"
+    },
+    {
+      "type": "accept",
+      "questId": 870,
+      "npcId": 3448,
+      "coords": {
+        "mapId": 1413,
+        "x": 52.3,
+        "y": 31.9
+      },
+      "source": "https://www.wowhead.com/forever/quest=870"
+    },
+    {
+      "type": "accept",
+      "questId": 848,
+      "npcId": 3390,
+      "coords": {
+        "mapId": 1413,
+        "x": 51.4,
+        "y": 30.1
+      },
+      "source": "https://www.wowhead.com/forever/quest=848"
+    },
+    {
+      "type": "accept",
+      "questId": 1492,
+      "npcId": 3390,
+      "coords": {
+        "mapId": 1413,
+        "x": 51.4,
+        "y": 30.1
+      },
+      "source": "https://www.wowhead.com/forever/quest=1492"
+    },
+    {
+      "type": "accept",
+      "questId": 867,
+      "coords": {
+        "mapId": 1413,
+        "x": 51.6,
+        "y": 30.9
+      },
+      "source": "https://www.wowhead.com/forever/quest=867"
+    },
+    {
+      "type": "note",
+      "text": {
+        "enUS": "Kill Plainstriders and Sunscale raptors whenever you meet them around the Crossroads.",
+        "esES": "Mata zancudos y raptores Escamasol cuando los encuentres alrededor de El Cruce."
+      }
+    },
+    {
+      "type": "complete",
+      "questId": 871,
+      "coords": {
+        "mapId": 1413,
+        "x": 56,
+        "y": 25
+      },
+      "source": "https://www.wowhead.com/forever/quest=871"
+    },
+    {
+      "type": "complete",
+      "questId": 844,
+      "source": "https://www.wowhead.com/forever/quest=844"
+    },
+    {
+      "type": "goto",
+      "coords": {
+        "mapId": 1413,
+        "x": 51.5,
+        "y": 30.9
+      }
+    },
+    {
+      "type": "turnin",
+      "questId": 871,
+      "coords": {
+        "mapId": 1413,
+        "x": 51.5,
+        "y": 30.9
+      },
+      "source": "https://www.wowhead.com/forever/quest=871"
+    },
+    {
+      "type": "accept",
+      "questId": 872,
+      "coords": {
+        "mapId": 1413,
+        "x": 51.5,
+        "y": 30.9
+      },
+      "source": "https://www.wowhead.com/forever/quest=872"
+    },
+    {
+      "type": "accept",
+      "questId": 5041,
+      "coords": {
+        "mapId": 1413,
+        "x": 51.5,
+        "y": 30.9
+      },
+      "source": "https://www.wowhead.com/forever/quest=5041"
+    },
+    {
+      "type": "turnin",
+      "questId": 844,
+      "npcId": 3338,
+      "coords": {
+        "mapId": 1413,
+        "x": 52.2,
+        "y": 31.0
+      },
+      "source": "https://www.wowhead.com/forever/quest=844"
+    },
+    {
+      "type": "accept",
+      "questId": 845,
+      "npcId": 3338,
+      "coords": {
+        "mapId": 1413,
+        "x": 52.2,
+        "y": 31.0
+      },
+      "source": "https://www.wowhead.com/forever/quest=845"
+    },
+    {
+      "type": "complete",
+      "questId": 5041,
+      "coords": {
+        "mapId": 1413,
+        "x": 59,
+        "y": 26
+      },
+      "source": "https://www.wowhead.com/forever/quest=5041"
+    },
+    {
+      "type": "complete",
+      "questId": 872,
+      "coords": {
+        "mapId": 1413,
+        "x": 58.5,
+        "y": 27
+      },
+      "source": "https://www.wowhead.com/forever/quest=872"
+    },
+    {
+      "type": "complete",
+      "questId": 845,
+      "source": "https://www.wowhead.com/forever/quest=845"
+    },
+    {
+      "type": "complete",
+      "questId": 869,
+      "source": "https://www.wowhead.com/forever/quest=869"
+    },
+    {
+      "type": "goto",
+      "coords": {
+        "mapId": 1413,
+        "x": 51.5,
+        "y": 30.9
+      }
+    },
+    {
+      "type": "turnin",
+      "questId": 872,
+      "coords": {
+        "mapId": 1413,
+        "x": 51.5,
+        "y": 30.9
+      },
+      "source": "https://www.wowhead.com/forever/quest=872"
+    },
+    {
+      "type": "turnin",
+      "questId": 5041,
+      "coords": {
+        "mapId": 1413,
+        "x": 51.5,
+        "y": 30.9
+      },
+      "source": "https://www.wowhead.com/forever/quest=5041"
+    },
+    {
+      "type": "turnin",
+      "questId": 845,
+      "npcId": 3338,
+      "coords": {
+        "mapId": 1413,
+        "x": 52.2,
+        "y": 31.0
+      },
+      "source": "https://www.wowhead.com/forever/quest=845"
+    },
+    {
+      "type": "turnin",
+      "questId": 869,
+      "coords": {
+        "mapId": 1413,
+        "x": 51.9,
+        "y": 30.3
+      },
+      "source": "https://www.wowhead.com/forever/quest=869"
+    },
+    {
+      "type": "goto",
+      "coords": {
+        "mapId": 1413,
+        "x": 63.4,
+        "y": 38.5
+      }
+    },
+    {
+      "type": "turnin",
+      "questId": 1492,
+      "coords": {
+        "mapId": 1413,
+        "x": 63.4,
+        "y": 38.5
+      },
+      "source": "https://www.wowhead.com/forever/quest=1492"
+    },
+    {
+      "type": "note",
+      "text": {
+        "enUS": "Talk to Bragok to learn the Ratchet flight path.",
+        "esES": "Habla con Bragok para aprender la ruta de vuelo de Trinquete."
+      },
+      "coords": {
+        "mapId": 1413,
+        "x": 63.1,
+        "y": 37.2
+      }
+    },
+    {
+      "type": "accept",
+      "questId": 887,
+      "npcId": 3391,
+      "coords": {
+        "mapId": 1413,
+        "x": 62.7,
+        "y": 36.2
+      },
+      "source": "https://www.wowhead.com/forever/quest=887"
+    },
+    {
+      "type": "accept",
+      "questId": 895,
+      "coords": {
+        "mapId": 1413,
+        "x": 62.6,
+        "y": 37.5
+      },
+      "source": "https://www.wowhead.com/forever/quest=895"
+    },
+    {
+      "type": "accept",
+      "questId": 97253,
+      "coords": {
+        "mapId": 1413,
+        "x": 63.1,
+        "y": 36.3
+      },
+      "source": "https://www.wowhead.com/forever/quest=97253"
+    },
+    {
+      "type": "accept",
+      "questId": 894,
+      "npcId": 3442,
+      "coords": {
+        "mapId": 1413,
+        "x": 63.0,
+        "y": 37.2
+      },
+      "source": "https://www.wowhead.com/forever/quest=894"
+    },
+    {
+      "type": "complete",
+      "questId": 887,
+      "coords": {
+        "mapId": 1413,
+        "x": 64,
+        "y": 47
+      },
+      "source": "https://www.wowhead.com/forever/quest=887"
+    },
+    {
+      "type": "complete",
+      "questId": 97253,
+      "coords": {
+        "mapId": 1413,
+        "x": 62,
+        "y": 47
+      },
+      "source": "https://www.wowhead.com/forever/quest=97253"
+    },
+    {
+      "type": "note",
+      "text": {
+        "enUS": "Baron Longshore is a level 16 quest: pull him away from the other pirates.",
+        "esES": "El Barón Longshore es una misión de nivel 16: sepáralo de los demás piratas."
+      },
+      "coords": {
+        "mapId": 1413,
+        "x": 63,
+        "y": 48
+      }
+    },
+    {
+      "type": "complete",
+      "questId": 895,
+      "coords": {
+        "mapId": 1413,
+        "x": 63,
+        "y": 48
+      },
+      "source": "https://www.wowhead.com/forever/quest=895"
+    },
+    {
+      "type": "goto",
+      "coords": {
+        "mapId": 1413,
+        "x": 62.7,
+        "y": 36.2
+      }
+    },
+    {
+      "type": "turnin",
+      "questId": 887,
+      "npcId": 3391,
+      "coords": {
+        "mapId": 1413,
+        "x": 62.7,
+        "y": 36.2
+      },
+      "source": "https://www.wowhead.com/forever/quest=887"
+    },
+    {
+      "type": "accept",
+      "questId": 890,
+      "npcId": 3391,
+      "coords": {
+        "mapId": 1413,
+        "x": 62.7,
+        "y": 36.2
+      },
+      "source": "https://www.wowhead.com/forever/quest=890"
+    },
+    {
+      "type": "turnin",
+      "questId": 895,
+      "npcId": 3391,
+      "coords": {
+        "mapId": 1413,
+        "x": 62.7,
+        "y": 36.2
+      },
+      "source": "https://www.wowhead.com/forever/quest=895"
+    },
+    {
+      "type": "turnin",
+      "questId": 97253,
+      "coords": {
+        "mapId": 1413,
+        "x": 63.1,
+        "y": 36.3
+      },
+      "source": "https://www.wowhead.com/forever/quest=97253"
+    },
+    {
+      "type": "turnin",
+      "questId": 890,
+      "coords": {
+        "mapId": 1413,
+        "x": 63.4,
+        "y": 38.5
+      },
+      "source": "https://www.wowhead.com/forever/quest=890"
+    },
+    {
+      "type": "fly",
+      "coords": {
+        "mapId": 1413,
+        "x": 51.5,
+        "y": 30.3
+      },
+      "text": {
+        "enUS": "Fly to the Crossroads.",
+        "esES": "Vuela a El Cruce."
+      }
+    },
+    {
+      "type": "complete",
+      "questId": 848,
+      "coords": {
+        "mapId": 1413,
+        "x": 50,
+        "y": 33
+      },
+      "source": "https://www.wowhead.com/forever/quest=848"
+    },
+    {
+      "type": "accept",
+      "questId": 855,
+      "npcId": 3389,
+      "coords": {
+        "mapId": 1413,
+        "x": 45.3,
+        "y": 28.4
+      },
+      "source": "https://www.wowhead.com/forever/quest=855"
+    },
+    {
+      "type": "accept",
+      "questId": 850,
+      "npcId": 3389,
+      "coords": {
+        "mapId": 1413,
+        "x": 45.3,
+        "y": 28.4
+      },
+      "source": "https://www.wowhead.com/forever/quest=850"
+    },
+    {
+      "type": "complete",
+      "questId": 870,
+      "coords": {
+        "mapId": 1413,
+        "x": 45.3,
+        "y": 22.8
+      },
+      "source": "https://www.wowhead.com/forever/quest=870"
+    },
+    {
+      "type": "complete",
+      "questId": 850,
+      "coords": {
+        "mapId": 1413,
+        "x": 43,
+        "y": 24
+      },
+      "source": "https://www.wowhead.com/forever/quest=850"
+    },
+    {
+      "type": "note",
+      "text": {
+        "enUS": "Centaur Bracers drop from the Kolkar centaurs around Kodobane's camp.",
+        "esES": "Los brazales de centauro los sueltan los centauros Kolkar alrededor del campamento de Kodobane."
+      },
+      "coords": {
+        "mapId": 1413,
+        "x": 43,
+        "y": 24
+      }
+    },
+    {
+      "type": "complete",
+      "questId": 855,
+      "coords": {
+        "mapId": 1413,
+        "x": 43,
+        "y": 24
+      },
+      "source": "https://www.wowhead.com/forever/quest=855"
+    },
+    {
+      "type": "goto",
+      "coords": {
+        "mapId": 1413,
+        "x": 45.3,
+        "y": 28.4
+      }
+    },
+    {
+      "type": "turnin",
+      "questId": 855,
+      "npcId": 3389,
+      "coords": {
+        "mapId": 1413,
+        "x": 45.3,
+        "y": 28.4
+      },
+      "source": "https://www.wowhead.com/forever/quest=855"
+    },
+    {
+      "type": "turnin",
+      "questId": 850,
+      "npcId": 3389,
+      "coords": {
+        "mapId": 1413,
+        "x": 45.3,
+        "y": 28.4
+      },
+      "source": "https://www.wowhead.com/forever/quest=850"
+    },
+    {
+      "type": "goto",
+      "coords": {
+        "mapId": 1413,
+        "x": 52.3,
+        "y": 31.9
+      }
+    },
+    {
+      "type": "turnin",
+      "questId": 870,
+      "npcId": 3448,
+      "coords": {
+        "mapId": 1413,
+        "x": 52.3,
+        "y": 31.9
+      },
+      "source": "https://www.wowhead.com/forever/quest=870"
+    },
+    {
+      "type": "accept",
+      "questId": 877,
+      "npcId": 3448,
+      "coords": {
+        "mapId": 1413,
+        "x": 52.3,
+        "y": 31.9
+      },
+      "source": "https://www.wowhead.com/forever/quest=877"
+    },
+    {
+      "type": "turnin",
+      "questId": 848,
+      "npcId": 3390,
+      "coords": {
+        "mapId": 1413,
+        "x": 51.4,
+        "y": 30.1
+      },
+      "source": "https://www.wowhead.com/forever/quest=848"
+    },
+    {
+      "type": "note",
+      "text": {
+        "enUS": "Harpy Raiders: the Witchwing harpies are north-west of the Crossroads.",
+        "esES": "Asaltantes arpías: las arpías Alabruja están al noroeste de El Cruce."
+      },
+      "coords": {
+        "mapId": 1413,
+        "x": 40.2,
+        "y": 16.0
+      }
+    },
+    {
+      "type": "complete",
+      "questId": 867,
+      "coords": {
+        "mapId": 1413,
+        "x": 40.2,
+        "y": 16.0
+      },
+      "source": "https://www.wowhead.com/forever/quest=867"
+    },
+    {
+      "type": "goto",
+      "coords": {
+        "mapId": 1413,
+        "x": 51.6,
+        "y": 30.9
+      }
+    },
+    {
+      "type": "turnin",
+      "questId": 867,
+      "coords": {
+        "mapId": 1413,
+        "x": 51.6,
+        "y": 30.9
+      },
+      "source": "https://www.wowhead.com/forever/quest=867"
+    },
+    {
+      "type": "accept",
+      "questId": 875,
+      "coords": {
+        "mapId": 1413,
+        "x": 51.6,
+        "y": 30.9
+      },
+      "source": "https://www.wowhead.com/forever/quest=875"
+    },
+    {
+      "type": "train",
+      "text": {
+        "enUS": "Level 14: fly to Orgrimmar from the Crossroads to train your class skills.",
+        "esES": "Nivel 14: vuela a Orgrimmar desde El Cruce para aprender tus habilidades de clase."
+      }
+    },
+    {
+      "type": "complete",
+      "questId": 875,
+      "coords": {
+        "mapId": 1413,
+        "x": 40.2,
+        "y": 16.0
+      },
+      "source": "https://www.wowhead.com/forever/quest=875"
+    },
+    {
+      "type": "goto",
+      "coords": {
+        "mapId": 1413,
+        "x": 51.6,
+        "y": 30.9
+      }
+    },
+    {
+      "type": "turnin",
+      "questId": 875,
+      "coords": {
+        "mapId": 1413,
+        "x": 51.6,
+        "y": 30.9
+      },
+      "source": "https://www.wowhead.com/forever/quest=875"
+    },
+    {
+      "type": "complete",
+      "questId": 877,
+      "coords": {
+        "mapId": 1413,
+        "x": 56,
+        "y": 43
+      },
+      "source": "https://www.wowhead.com/forever/quest=877"
+    },
+    {
+      "type": "goto",
+      "coords": {
+        "mapId": 1413,
+        "x": 52.3,
+        "y": 31.9
+      }
+    },
+    {
+      "type": "turnin",
+      "questId": 877,
+      "npcId": 3448,
+      "coords": {
+        "mapId": 1413,
+        "x": 52.3,
+        "y": 31.9
+      },
+      "source": "https://www.wowhead.com/forever/quest=877"
+    },
+    {
+      "type": "accept",
+      "questId": 880,
+      "npcId": 3448,
+      "coords": {
+        "mapId": 1413,
+        "x": 52.3,
+        "y": 31.9
+      },
+      "source": "https://www.wowhead.com/forever/quest=880"
+    },
+    {
+      "type": "note",
+      "text": {
+        "enUS": "Altered Beings: Oasis Snapjaws live in the Barrens oases, such as the Stagnant Oasis.",
+        "esES": "Seres alterados: las tortugas mordedoras de oasis viven en los oasis de Los Baldíos, como el Oasis Estancado."
+      },
+      "coords": {
+        "mapId": 1413,
+        "x": 56,
+        "y": 43
+      }
+    },
+    {
+      "type": "complete",
+      "questId": 880,
+      "coords": {
+        "mapId": 1413,
+        "x": 56,
+        "y": 43
+      },
+      "source": "https://www.wowhead.com/forever/quest=880"
+    },
+    {
+      "type": "goto",
+      "coords": {
+        "mapId": 1413,
+        "x": 52.3,
+        "y": 31.9
+      }
+    },
+    {
+      "type": "turnin",
+      "questId": 880,
+      "npcId": 3448,
+      "coords": {
+        "mapId": 1413,
+        "x": 52.3,
+        "y": 31.9
+      },
+      "source": "https://www.wowhead.com/forever/quest=880"
+    },
+    {
+      "type": "goto",
+      "coords": {
+        "mapId": 1413,
+        "x": 52.4,
+        "y": 11.7
+      }
+    },
+    {
+      "type": "turnin",
+      "questId": 894,
+      "coords": {
+        "mapId": 1413,
+        "x": 52.4,
+        "y": 11.7
+      },
+      "source": "https://www.wowhead.com/forever/quest=894"
+    },
+    {
+      "type": "note",
+      "text": {
+        "enUS": "Ignition Key, Flee and Raptor Horns are level 18 quests: pull carefully, or group up.",
+        "esES": "Llave de contacto, Huida y Cuernos de raptor son misiones de nivel 18: atrae con cuidado o agrúpate."
+      },
+      "coords": {
+        "mapId": 1413,
+        "x": 56.5,
+        "y": 7.5
+      }
+    },
+    {
+      "type": "accept",
+      "questId": 858,
+      "coords": {
+        "mapId": 1413,
+        "x": 56.5,
+        "y": 7.5
+      },
+      "source": "https://www.wowhead.com/forever/quest=858"
+    },
+    {
+      "type": "complete",
+      "questId": 858,
+      "coords": {
+        "mapId": 1413,
+        "x": 56.3,
+        "y": 8.6
+      },
+      "source": "https://www.wowhead.com/forever/quest=858"
+    },
+    {
+      "type": "turnin",
+      "questId": 858,
+      "coords": {
+        "mapId": 1413,
+        "x": 56.5,
+        "y": 7.5
+      },
+      "source": "https://www.wowhead.com/forever/quest=858"
+    },
+    {
+      "type": "accept",
+      "questId": 863,
+      "coords": {
+        "mapId": 1413,
+        "x": 56.5,
+        "y": 7.5
+      },
+      "source": "https://www.wowhead.com/forever/quest=863"
+    },
+    {
+      "type": "complete",
+      "questId": 863,
+      "coords": {
+        "mapId": 1413,
+        "x": 56.5,
+        "y": 7.5
+      },
+      "source": "https://www.wowhead.com/forever/quest=863"
+    },
+    {
+      "type": "goto",
+      "coords": {
+        "mapId": 1413,
+        "x": 63.0,
+        "y": 37.2
+      }
+    },
+    {
+      "type": "turnin",
+      "questId": 863,
+      "npcId": 3442,
+      "coords": {
+        "mapId": 1413,
+        "x": 63.0,
+        "y": 37.2
+      },
+      "source": "https://www.wowhead.com/forever/quest=863"
+    },
+    {
+      "type": "accept",
+      "questId": 865,
+      "coords": {
+        "mapId": 1413,
+        "x": 62.4,
+        "y": 37.6
+      },
+      "source": "https://www.wowhead.com/forever/quest=865"
+    },
+    {
+      "type": "fly",
+      "coords": {
+        "mapId": 1413,
+        "x": 51.5,
+        "y": 30.3
+      },
+      "text": {
+        "enUS": "Fly to the Crossroads.",
+        "esES": "Vuela a El Cruce."
+      }
+    },
+    {
+      "type": "complete",
+      "questId": 865,
+      "coords": {
+        "mapId": 1413,
+        "x": 49,
+        "y": 29
+      },
+      "source": "https://www.wowhead.com/forever/quest=865"
+    },
+    {
+      "type": "fly",
+      "coords": {
+        "mapId": 1413,
+        "x": 63.1,
+        "y": 37.2
+      },
+      "text": {
+        "enUS": "Fly back to Ratchet.",
+        "esES": "Vuelve volando a Trinquete."
+      }
+    },
+    {
+      "type": "turnin",
+      "questId": 865,
+      "coords": {
+        "mapId": 1413,
+        "x": 62.4,
+        "y": 37.6
+      },
+      "source": "https://www.wowhead.com/forever/quest=865"
+    },
+    {
+      "type": "note",
+      "text": {
+        "enUS": "End of the quests in this guide: you should be about level 15. Quests alone do not reach level 20 yet; until the next route, grind or run Wailing Caverns with a group.",
+        "esES": "Fin de las misiones de esta guía: deberías rondar el nivel 15. Las misiones solas aún no llegan a nivel 20; hasta la siguiente ruta, mata enemigos o haz las Cuevas de los Lamentos en grupo."
+      }
+    }
+  ]
+}
